@@ -1,167 +1,156 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import Link from "next/link";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+export default function Footer() {
+  return (
+    <footer className="border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#0b1020]">
+      <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
+        <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr_1fr]">
+          <div>
+            <h3 className="text-lg font-semibold tracking-tight">
+              CleanNestPro
+            </h3>
 
-type PartnerApplicationPayload = {
-  applicationType: "Individual Cleaner" | "Cleaning Company";
-  fullName: string;
-  companyName: string;
-  phone: string;
-  email: string;
-  location: string;
-  experience: string;
-  languages: string[];
-  availability: string;
-  hasSupplies: string;
-  transport: string;
-  teamSize: string;
-  notes: string;
-};
+            <p className="mt-4 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-300">
+              Private home cleaning in Antalya for expats, holiday homeowners,
+              and guest-ready properties. Designed around trust, calm
+              communication, and international expectations.
+            </p>
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
+            <div className="mt-5 flex flex-wrap gap-2">
+              {[
+                "English support",
+                "Türkçe support",
+                "Russian support",
+                "Secure Stripe payments",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
 
-function row(label: string, value: string) {
-  return `
-    <tr>
-      <td style="padding:10px 12px;border:1px solid #e2e8f0;background:#f8fafc;font-weight:600;width:220px;">
-        ${escapeHtml(label)}
-      </td>
-      <td style="padding:10px 12px;border:1px solid #e2e8f0;">
-        ${escapeHtml(value || "Not provided")}
-      </td>
-    </tr>
-  `;
-}
+          <div>
+            <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Navigation
+            </h4>
 
-function buildAdminHtml(data: PartnerApplicationPayload) {
-  return `
-    <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0f172a;max-width:760px;margin:0 auto;">
-      <h2 style="margin:0 0 16px 0;">New Partner Application — CleanNestPro</h2>
+            <ul className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+              <li>
+                <a
+                  href="/#services"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Services
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#why-us"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Why us
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#how-it-works"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  How it works
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#quote-form"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Quote
+                </a>
+              </li>
+              <li>
+                <Link
+                  href="/about"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/apply"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Work with us
+                </Link>
+              </li>
+            </ul>
+          </div>
 
-      <table style="border-collapse:collapse;width:100%;font-size:14px;">
-        <tbody>
-          ${row("Application type", data.applicationType)}
-          ${row("Full name / Contact", data.fullName)}
-          ${row("Company name", data.companyName || "Not provided")}
-          ${row("Phone", data.phone)}
-          ${row("Email", data.email)}
-          ${row("Area in Antalya", data.location)}
-          ${row("Experience", data.experience || "Not provided")}
-          ${row(
-            "Languages",
-            data.languages?.length ? data.languages.join(", ") : "Not provided"
-          )}
-          ${row("Availability", data.availability || "Not provided")}
-          ${row("Can bring supplies", data.hasSupplies)}
-          ${row("Has transport", data.transport)}
-          ${row("Team size", data.teamSize || "Not provided")}
-          ${row("Notes", data.notes || "None")}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
+          <div>
+            <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Company & trust
+            </h4>
 
-function buildApplicantHtml(data: PartnerApplicationPayload) {
-  return `
-    <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.7;color:#0f172a;max-width:640px;margin:0 auto;">
-      <div style="padding:32px 24px;border:1px solid #e2e8f0;border-radius:20px;background:#ffffff;">
-        <p style="margin:0 0 12px 0;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:#64748b;">
-          CleanNestPro
-        </p>
-
-        <h1 style="margin:0 0 18px 0;font-size:28px;line-height:1.2;">
-          Your application has been received
-        </h1>
-
-        <p style="margin:0 0 16px 0;color:#475569;">
-          Hi ${escapeHtml(data.fullName)},
-        </p>
-
-        <p style="margin:0 0 16px 0;color:#475569;">
-          Thank you for your application to work with CleanNestPro.
-        </p>
-
-        <p style="margin:0 0 16px 0;color:#475569;">
-          We review applications carefully and selectively. If there is a fit,
-          we will get back to you by email with the next step.
-        </p>
-
-        <div style="margin:24px 0;padding:16px 18px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;">
-          <p style="margin:0;font-size:14px;color:#475569;">
-            We value reliability, clear communication, and a more considered
-            service standard — especially for international clients.
-          </p>
+            <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <p>
+                <strong>Generation Beta Digital Ltd</strong>
+              </p>
+              <p>
+                3rd Floor, 86–90 Paul Street
+                <br />
+                London EC2A 4NE, UK
+              </p>
+              <p>Company No: 16274319</p>
+              <p>ICO No: ZB883806</p>
+              <p>Quote requests handled by email</p>
+              <p>
+                Internationally trusted payment infrastructure via Stripe
+              </p>
+            </div>
+          </div>
         </div>
 
-        <p style="margin:0;color:#475569;">
-          Warm regards,<br />
-          <strong style="color:#0f172a;">CleanNestPro</strong>
-        </p>
+        <div className="mt-12 flex flex-col gap-4 border-t pt-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-1">
+            <p>© {new Date().getFullYear()} CleanNestPro. All rights reserved.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              UK-based, Antalya-connected, and designed for clients who value
+              clarity, trust, and international standards.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-6">
+            <Link
+              href="/privacy-policy"
+              className="transition hover:text-black dark:hover:text-white"
+            >
+              Privacy Policy
+            </Link>
+            <Link
+              href="/terms"
+              className="transition hover:text-black dark:hover:text-white"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/about"
+              className="transition hover:text-black dark:hover:text-white"
+            >
+              About
+            </Link>
+            <Link
+              href="/apply"
+              className="transition hover:text-black dark:hover:text-white"
+            >
+              Work with us
+            </Link>
+          </div>
+        </div>
       </div>
-    </div>
-  `;
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const data = (await req.json()) as PartnerApplicationPayload;
-
-    if (!data.fullName || !data.email || !data.location) {
-      return NextResponse.json(
-        { error: "Missing required fields." },
-        { status: 400 }
-      );
-    }
-
-    const adminEmail = process.env.QUOTE_TO_EMAIL;
-    const fromEmail =
-      process.env.QUOTE_FROM_EMAIL || "CleanNestPro <onboarding@resend.dev>";
-
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { error: "RESEND_API_KEY is not configured." },
-        { status: 500 }
-      );
-    }
-
-    if (!adminEmail) {
-      return NextResponse.json(
-        { error: "QUOTE_TO_EMAIL is not configured." },
-        { status: 500 }
-      );
-    }
-
-    await resend.emails.send({
-      from: fromEmail,
-      to: adminEmail,
-      replyTo: data.email,
-      subject: `New partner application from ${data.fullName}`,
-      html: buildAdminHtml(data),
-    });
-
-    await resend.emails.send({
-      from: fromEmail,
-      to: data.email,
-      subject: "We’ve received your CleanNestPro application",
-      html: buildApplicantHtml(data),
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("partner application route error", error);
-
-    return NextResponse.json(
-      { error: "Failed to send application." },
-      { status: 500 }
-    );
-  }
+    </footer>
+  );
 }
