@@ -296,7 +296,7 @@ export default function Home() {
       >
         <div className="absolute inset-0">
           <img
-            src="/premium-villa-cleaning-service-antalya-turkey.jpg.png"
+            src="/premium-villa-cleaning-service-antalya-turkey.jpg.avif"
             alt="Premium home cleaning in Antalya for international residents"
             className="h-full w-full object-cover"
           />
