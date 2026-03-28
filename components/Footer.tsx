@@ -1,99 +1,85 @@
 import Link from "next/link";
 
-type FooterProps = {
-  whatsappNumber: string;
-};
-
-export default function Footer({ whatsappNumber }: FooterProps) {
+export default function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-white">
+    <footer className="border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#0b1020]">
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
         <div className="grid gap-10 md:grid-cols-3">
-          {/* BRAND */}
           <div>
             <h3 className="text-lg font-semibold tracking-tight">
               CleanNestPro
             </h3>
 
-            <p className="mt-4 text-sm leading-6 text-slate-600">
+            <p className="mt-4 text-sm leading-6 text-slate-600 dark:text-slate-300">
               Premium home cleaning in Antalya for expats, Airbnb hosts, and
               holiday homeowners.
             </p>
 
-            <p className="mt-4 text-sm text-slate-500">
-              English • Russian • Ukrainian support
+            <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">
+              English • Russian support
             </p>
           </div>
 
-          {/* NAVIGATION */}
           <div>
-            <h4 className="text-sm font-medium text-slate-900">Navigation</h4>
+            <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Navigation
+            </h4>
 
-            <ul className="mt-4 space-y-3 text-sm text-slate-600">
+            <ul className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
               <li>
-                <a href="#services" className="hover:text-black transition">
+                <a href="#services" className="transition hover:text-black dark:hover:text-white">
                   Services
                 </a>
               </li>
               <li>
-                <a href="#how-it-works" className="hover:text-black transition">
+                <a href="#why-us" className="transition hover:text-black dark:hover:text-white">
+                  Why us
+                </a>
+              </li>
+              <li>
+                <a href="#how-it-works" className="transition hover:text-black dark:hover:text-white">
                   How it works
                 </a>
               </li>
               <li>
-                <a href="#quote-form" className="hover:text-black transition">
-                  Get a quote
+                <a href="#quote-form" className="transition hover:text-black dark:hover:text-white">
+                  Quote
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* CONTACT */}
           <div>
-            <h4 className="text-sm font-medium text-slate-900">Contact</h4>
+            <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Contact
+            </h4>
 
-            <div className="mt-4 space-y-3 text-sm text-slate-600">
+            <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
               <p>Antalya, Turkey</p>
-
-              <a
-                href={`https://wa.me/${whatsappNumber}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 hover:text-black transition"
-              >
-                WhatsApp
-              </a>
-
+              <p>Quote requests handled by email</p>
               <p>Secure international payment options available</p>
             </div>
           </div>
         </div>
 
-        {/* BOTTOM */}
-        <div className="mt-12 flex flex-col gap-4 border-t pt-6 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t pt-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <p>
-              © {new Date().getFullYear()} CleanNestPro. All rights reserved.
-            </p>
-
-            <p className="text-xs text-slate-400">
+            <p>© {new Date().getFullYear()} CleanNestPro. All rights reserved.</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">
               Designed for international clients. Discreet, reliable, and premium service.
             </p>
           </div>
 
-          {/* LINKS */}
           <div className="flex flex-wrap gap-6">
-            <Link href="/privacy-policy" className="hover:text-black transition">
+            <Link href="/privacy-policy" className="transition hover:text-black dark:hover:text-white">
               Privacy Policy
             </Link>
-
-            <Link href="/terms" className="hover:text-black transition">
+            <Link href="/terms" className="transition hover:text-black dark:hover:text-white">
               Terms
             </Link>
-
-            <Link href="/apply" className="hover:text-black transition opacity-80 hover:opacity-100">
-  Work with us
-</Link>
+            <Link href="/apply" className="transition hover:text-black dark:hover:text-white">
+              Work with us
+            </Link>
           </div>
         </div>
       </div>

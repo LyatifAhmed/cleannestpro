@@ -1,9 +1,10 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Footer from "@/components/Footer";
 import HeroLens from "@/components/HeroLens";
+import ChatAssistant from "@/components/ChatAssistant";
 
 type ServiceType =
   | "Regular Home Cleaning"
@@ -27,11 +28,10 @@ type FrequencyType =
   | "Monthly"
   | "Not sure yet";
 
-type LanguageType = "English" | "Russian" | "Ukrainian";
+type LanguageType = "English" | "Russian";
 
 type FormState = {
   fullName: string;
-  phone: string;
   email: string;
   preferredLanguage: LanguageType;
   location: string;
@@ -49,8 +49,6 @@ type FormState = {
   accessDetails: string;
   specialNotes: string;
 };
-
-const WHATSAPP_NUMBER = "905000000000"; // change this
 
 const serviceCards = [
   {
@@ -85,14 +83,46 @@ const extraTaskOptions = [
 
 const trustBadges = [
   "Designed for expats & international residents",
-  "English, Russian & Ukrainian support",
-  "Fast WhatsApp response",
+  "English & Russian support",
+  "Clear quote by email",
   "Secure international payment options",
+];
+
+const quoteReasons = [
+  {
+    title: "Selective by design",
+    text: "We are intentionally built for clients who value calm communication, trust, and consistency.",
+  },
+  {
+    title: "Thoughtful quoting",
+    text: "We ask the right questions first, so the quote feels considered rather than rushed.",
+  },
+  {
+    title: "Premium fit",
+    text: "A more suitable experience for holiday homes, well-kept apartments, and guest-ready properties.",
+  },
+];
+
+const processSteps = [
+  {
+    step: "01",
+    title: "Tell us about the property",
+    text: "Share the essentials so we can understand the size, timing, and type of cleaning required.",
+  },
+  {
+    step: "02",
+    title: "Receive a thoughtful quote",
+    text: "We review the request properly and respond by email with a clear next step.",
+  },
+  {
+    step: "03",
+    title: "Confirm only if it feels right",
+    text: "No pressure, no noise — just a cleaner, more considered booking experience.",
+  },
 ];
 
 const initialState: FormState = {
   fullName: "",
-  phone: "",
   email: "",
   preferredLanguage: "English",
   location: "",
@@ -111,16 +141,19 @@ const initialState: FormState = {
   specialNotes: "",
 };
 
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 28 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
   },
 };
 
-const staggerWrap = {
+const staggerWrap: Variants = {
   hidden: {},
   show: {
     transition: {
@@ -198,41 +231,10 @@ function estimateQuote(data: FormState) {
   return `€${min}–€${max}`;
 }
 
-function buildWhatsAppMessage(data: FormState, estimate: string) {
-  const extras =
-    data.extraTasks.length > 0 ? data.extraTasks.join(", ") : "None";
-
-  return `Hello, I would like to request a cleaning quote.
-
-Name: ${data.fullName}
-Phone / WhatsApp: ${data.phone}
-Email: ${data.email || "Not provided"}
-Preferred language: ${data.preferredLanguage}
-
-Location: ${data.location}
-Service type: ${data.serviceType}
-Property type: ${data.propertyType}
-Bathrooms: ${data.bathrooms}
-Approx size: ${data.propertySize || "Not provided"}
-Frequency: ${data.frequency}
-
-Preferred date: ${data.preferredDate || "Not provided"}
-Preferred time: ${data.preferredTime || "Not provided"}
-
-Furnished: ${data.furnished}
-Pets: ${data.pets}
-Need cleaning supplies brought: ${data.suppliesNeeded}
-Extra tasks: ${extras}
-
-Access details: ${data.accessDetails || "Not provided"}
-Special notes: ${data.specialNotes || "None"}
-
-Estimated range shown on site: ${estimate}`;
-}
-
 export default function Home() {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
   const heroRef = useRef<HTMLElement | null>(null);
 
   const estimate = useMemo(() => estimateQuote(form), [form]);
@@ -253,38 +255,59 @@ export default function Home() {
     });
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSending(true);
+    setSubmitted(false);
 
-    const message = buildWhatsAppMessage(form, estimate);
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      message
-    )}`;
+    try {
+      const payload = {
+        ...form,
+        estimatedRange: estimate,
+      };
 
-    setSubmitted(true);
-    window.open(url, "_blank");
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to send quote request.");
+      }
+
+      setSubmitted(true);
+      setForm(initialState);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while sending your quote request.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <main className="min-h-screen bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
       <section
         ref={heroRef}
-        className="relative min-h-[92vh] overflow-hidden text-white"
+        className="relative min-h-[96vh] overflow-hidden text-white"
       >
         <div className="absolute inset-0">
           <img
             src="/premium-villa-cleaning-service-antalya-turkey.jpg.png"
-            alt="Premium villa cleaning service in Antalya for international residents"
+            alt="Premium home cleaning in Antalya for international residents"
             className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/45" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_30%),linear-gradient(to_bottom,rgba(15,23,42,0.25),rgba(15,23,42,0.62))]" />
+          <div className="absolute inset-0 bg-black/50" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.10),transparent_30%),linear-gradient(to_bottom,rgba(15,23,42,0.20),rgba(15,23,42,0.72))]" />
         </div>
 
         <HeroLens containerRef={heroRef} />
 
-        <div className="relative z-30 mx-auto flex min-h-[92vh] max-w-7xl flex-col px-6 pb-16 pt-8 md:px-8">
-          <header className="flex items-center justify-between rounded-full border border-white/15 bg-black/30 px-4 py-3 shadow-sm backdrop-blur-md md:px-6">
+        <div className="relative z-30 mx-auto flex min-h-[96vh] max-w-7xl flex-col px-6 pb-16 pt-8 md:px-8">
+          <header className="mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/30 px-4 py-3 shadow-sm backdrop-blur-md md:px-6">
             <div className="text-lg font-semibold tracking-tight text-white">
               CleanNestPro
             </div>
@@ -304,33 +327,35 @@ export default function Home() {
               </a>
             </div>
 
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={() =>
+                document
+                  .getElementById("quote-form")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
               className="rounded-full bg-white/90 px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-white"
             >
-              WhatsApp us
-            </a>
+              Request quote
+            </button>
           </header>
 
-          <div className="flex flex-1 items-center">
+          <div className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center">
             <motion.div
               initial="hidden"
               animate="show"
               variants={staggerWrap}
-              className="max-w-4xl pt-16 md:pt-24"
+              className="max-w-4xl pt-16 text-center md:pt-24"
             >
               <motion.div
                 variants={fadeUp}
-                className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-white/85 shadow-sm backdrop-blur"
+                className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-white/85 shadow-sm backdrop-blur"
               >
                 Premium cleaning for expats, holiday homes & Airbnb hosts
               </motion.div>
 
               <motion.h1
                 variants={fadeUp}
-                className="mt-6 text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl"
+                className="mx-auto mt-6 max-w-5xl text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl"
               >
                 Premium home cleaning
                 <br />
@@ -339,16 +364,16 @@ export default function Home() {
 
               <motion.p
                 variants={fadeUp}
-                className="mt-6 max-w-2xl text-lg leading-8 text-white/85 md:text-xl"
+                className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/85 md:text-xl"
               >
-                A calm, reliable cleaning experience designed for international
-                residents, short-term rental hosts, and holiday homeowners in
-                central Antalya.
+                A calmer, more considered cleaning experience designed for
+                international residents, holiday homeowners, and guest-ready
+                properties in Antalya.
               </motion.p>
 
               <motion.div
                 variants={fadeUp}
-                className="mt-8 flex flex-wrap gap-3"
+                className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-3"
               >
                 {trustBadges.map((badge) => (
                   <span
@@ -362,30 +387,30 @@ export default function Home() {
 
               <motion.div
                 variants={fadeUp}
-                className="mt-10 flex flex-col gap-3 sm:flex-row"
+                className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
               >
                 <a
                   href="#quote-form"
-                  className="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90"
+                  className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90"
                 >
                   Get a detailed quote
                 </a>
 
-                <a
-                  href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-black/20 px-6 py-4 text-base font-medium text-white transition hover:bg-black/30"
+                <button
+                  onClick={() =>
+                    window.dispatchEvent(new CustomEvent("open-clean-chat"))
+                  }
+                  className="inline-flex min-w-[220px] items-center justify-center rounded-2xl border border-white/20 bg-black/20 px-6 py-4 text-base font-medium text-white transition hover:bg-black/30"
                 >
-                  Chat on WhatsApp
-                </a>
+                  Ask the assistant
+                </button>
               </motion.div>
 
               <motion.div
                 variants={fadeUp}
                 className="mt-6 text-sm text-white/70"
               >
-                English • Russian • Ukrainian support
+                English • Russian support
               </motion.div>
             </motion.div>
           </div>
@@ -398,28 +423,28 @@ export default function Home() {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={staggerWrap}
-        className="mx-auto max-w-7xl px-6 py-20 md:px-8"
+        className="mx-auto max-w-7xl px-6 py-24 md:px-8"
       >
-        <motion.div variants={fadeUp} className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+        <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
             Services tailored to your property
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-            Built for apartments, holiday homes, and guest-ready properties that
-            need a cleaner, more reliable experience.
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+            Built for apartments, holiday homes, and well-kept spaces that
+            deserve a more thoughtful standard of care.
           </p>
         </motion.div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
           {serviceCards.map((card) => (
             <motion.div
               key={card.title}
               variants={fadeUp}
-              className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:shadow-none"
+              className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.06)] transition hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(15,23,42,0.10)] dark:border-white/10 dark:bg-white/5 dark:shadow-none"
             >
-              <div className="text-3xl">{card.icon}</div>
-              <h3 className="mt-4 text-xl font-semibold">{card.title}</h3>
-              <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">
+              <div className="text-4xl">{card.icon}</div>
+              <h3 className="mt-5 text-xl font-semibold">{card.title}</h3>
+              <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
                 {card.description}
               </p>
             </motion.div>
@@ -433,44 +458,30 @@ export default function Home() {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={staggerWrap}
-        className="relative overflow-hidden bg-[#f6f3ee] py-20 dark:bg-[#0f172a]"
+        className="relative overflow-hidden bg-[#f6f3ee] py-24 dark:bg-[#0f172a]"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.5),transparent_35%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_35%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.45),transparent_35%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_35%)]" />
         <div className="relative mx-auto max-w-7xl px-6 md:px-8">
-          <motion.div variants={fadeUp} className="max-w-3xl">
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+          <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
               Designed around trust, clarity, and discretion
             </h2>
-            <p className="mt-4 text-lg leading-8 text-slate-600 dark:text-slate-300">
-              We are not trying to feel like a mass-market platform. The entire
-              experience is built to feel calm, responsive, and considered —
-              especially for international clients who value communication and
-              reliability.
+            <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
+              This is not designed to feel loud, rushed, or transactional. The
+              experience is intentionally quieter, more selective, and better
+              suited to clients who value calm communication and thoughtful care.
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                title: "Clear communication",
-                text: "No confusing back-and-forth. We collect the right details early and respond properly.",
-              },
-              {
-                title: "Premium positioning",
-                text: "A more thoughtful service experience for expats, holiday homeowners, and Airbnb hosts.",
-              },
-              {
-                title: "Detail-conscious approach",
-                text: "The kind of service that feels suitable for a home you genuinely care about.",
-              },
-            ].map((item) => (
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
+            {quoteReasons.map((item) => (
               <motion.div
                 key={item.title}
                 variants={fadeUp}
-                className="rounded-[28px] border border-slate-200 bg-white/80 p-6 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
+                className="rounded-[32px] border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
               >
                 <h3 className="text-xl font-semibold">{item.title}</h3>
-                <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">
+                <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
                   {item.text}
                 </p>
               </motion.div>
@@ -485,46 +496,30 @@ export default function Home() {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={staggerWrap}
-        className="mx-auto max-w-7xl px-6 py-20 md:px-8"
+        className="mx-auto max-w-7xl px-6 py-24 md:px-8"
       >
-        <motion.div variants={fadeUp} className="text-center">
-          <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+        <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
             How it works
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-300">
-            A smooth process designed to feel clear, responsive, and easy from
-            the first message onward.
+          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+            A smooth process that feels more considered from the first enquiry
+            onward.
           </p>
         </motion.div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
-          {[
-            {
-              step: "01",
-              title: "Tell us what you need",
-              text: "Share your property details, your preferred date, and the kind of cleaning you’re looking for.",
-            },
-            {
-              step: "02",
-              title: "Receive a confirmed quote",
-              text: "We review the request and confirm the expected price range, timing, and any important notes.",
-            },
-            {
-              step: "03",
-              title: "Enjoy a cleaner, calmer space",
-              text: "Once agreed, we move forward with a simple, clear process and reliable communication.",
-            },
-          ].map((item) => (
+        <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
+          {processSteps.map((item) => (
             <motion.div
               key={item.step}
               variants={fadeUp}
-              className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5"
+              className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-white/5"
             >
-              <div className="text-sm font-semibold text-slate-400">
+              <div className="text-sm font-semibold tracking-[0.18em] text-slate-400">
                 {item.step}
               </div>
-              <h3 className="mt-3 text-xl font-semibold">{item.title}</h3>
-              <p className="mt-3 leading-7 text-slate-600 dark:text-slate-300">
+              <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
+              <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
                 {item.text}
               </p>
             </motion.div>
@@ -538,26 +533,26 @@ export default function Home() {
         whileInView="show"
         viewport={{ once: true, amount: 0.15 }}
         variants={staggerWrap}
-        className="mx-auto max-w-7xl px-6 py-20 md:px-8"
+        className="mx-auto max-w-7xl px-6 py-24 md:px-8"
       >
-        <div className="grid gap-10 md:grid-cols-[0.88fr_1.12fr]">
-          <motion.div variants={fadeUp}>
-            <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+        <div className="grid items-start gap-10 md:grid-cols-[0.9fr_1.1fr]">
+          <motion.div variants={fadeUp} className="mx-auto max-w-xl">
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
               Request your personalised quote
             </h2>
-            <p className="mt-4 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              This form is designed to give us enough detail to respond
-              properly. It helps us understand the property, the type of
-              cleaning, and any extras that may affect the quote.
+            <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
+              Share the essentials and we’ll respond by email with a clear,
+              considered next step. No pressure. No noise. Just a better quote
+              experience.
             </p>
 
-            <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-6 dark:border-white/10 dark:bg-white/5">
-              <h3 className="text-lg font-semibold">Why clients like this</h3>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                <li>• Clear communication before anything is confirmed</li>
+            <div className="mt-8 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-7 dark:border-white/10 dark:bg-white/5">
+              <h3 className="text-lg font-semibold">Why clients prefer this</h3>
+              <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                <li>• More thoughtful communication from the start</li>
                 <li>• A quote shaped around the actual property details</li>
-                <li>• Support in English, Russian, and Ukrainian</li>
-                <li>• Designed for expats, hosts, and holiday homeowners</li>
+                <li>• English and Russian support</li>
+                <li>• Better suited to premium homes and guest-ready spaces</li>
               </ul>
             </div>
           </motion.div>
@@ -565,7 +560,7 @@ export default function Home() {
           <motion.form
             variants={fadeUp}
             onSubmit={handleSubmit}
-            className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5 md:p-8"
+            className="rounded-[36px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9"
           >
             <div className="grid gap-5 md:grid-cols-2">
               <Field>
@@ -579,22 +574,13 @@ export default function Home() {
               </Field>
 
               <Field>
-                <Label>Phone / WhatsApp</Label>
-                <Input
-                  value={form.phone}
-                  onChange={(e) => updateField("phone", e.target.value)}
-                  placeholder="+90 ..."
-                  required
-                />
-              </Field>
-
-              <Field>
                 <Label>Email</Label>
                 <Input
                   type="email"
                   value={form.email}
                   onChange={(e) => updateField("email", e.target.value)}
                   placeholder="you@example.com"
+                  required
                 />
               </Field>
 
@@ -611,7 +597,6 @@ export default function Home() {
                 >
                   <option>English</option>
                   <option>Russian</option>
-                  <option>Ukrainian</option>
                 </Select>
               </Field>
 
@@ -792,46 +777,57 @@ export default function Home() {
               </Field>
             </div>
 
-            <div className="mt-8 rounded-3xl border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
+            <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
               <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Estimated range
               </div>
-              <div className="mt-1 text-3xl font-semibold tracking-tight">
+              <div className="mt-2 text-3xl font-semibold tracking-tight">
                 {estimate}
               </div>
-              <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">
+              <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
                 This is an indicative range only. Final pricing is confirmed
-                after we review the request.
+                after review.
               </p>
             </div>
 
             <div className="mt-6 flex flex-col gap-4 sm:flex-row">
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 dark:bg-white dark:text-slate-900"
+                disabled={sending}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
               >
-                Send request on WhatsApp
+                {sending ? "Sending..." : "Request quote by email"}
               </button>
 
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noreferrer"
+              <button
+                type="button"
+                onClick={() =>
+                  window.dispatchEvent(new CustomEvent("open-clean-chat"))
+                }
                 className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-slate-50 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
               >
-                Open WhatsApp directly
-              </a>
+                Ask the assistant
+              </button>
             </div>
 
             {submitted ? (
-              <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">
-                Your request has been prepared and opened in WhatsApp.
-              </p>
+              <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  Your quote request has been sent.
+                </p>
+                <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
+                  Thank you. We’ll review the details properly and get back to you by email
+                  with a clear next step.
+                </p>
+              </div>
             ) : null}
 
             <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
               Are you a cleaner in Antalya?{" "}
-              <a href="/apply" className="underline hover:text-black dark:hover:text-white">
+              <a
+                href="/apply"
+                className="underline hover:text-black dark:hover:text-white"
+              >
                 Apply to work with us
               </a>
             </p>
@@ -844,32 +840,24 @@ export default function Home() {
         whileInView="show"
         viewport={{ once: true, amount: 0.2 }}
         variants={fadeUp}
-        className="mx-auto max-w-5xl px-6 pb-20 text-center md:px-8"
+        className="mx-auto max-w-5xl px-6 pb-24 text-center md:px-8"
       >
-        <div className="rounded-[32px] border border-slate-200 bg-white px-8 py-10 shadow-sm dark:border-white/10 dark:bg-white/5">
-          <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+        <div className="rounded-[36px] border border-slate-200 bg-white px-8 py-12 shadow-[0_18px_60px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+          <h2 className="text-2xl font-semibold tracking-tight md:text-4xl">
             Cleaning in Antalya, designed around international expectations
           </h2>
-          <p className="mx-auto mt-4 max-w-3xl leading-8 text-slate-600 dark:text-slate-300">
+          <p className="mx-auto mt-5 max-w-3xl leading-8 text-slate-600 dark:text-slate-300">
             If you are looking for a more reliable, more responsive, and more
             comfortable home cleaning experience in Antalya, this service is
-            built for you. We focus on clear communication, thoughtful quoting,
-            and a calmer process for expats, holiday homeowners, and short-term
-            rental hosts.
+            built for you. We focus on clarity, thoughtful quoting, and a calmer
+            process for clients who value quality over noise.
           </p>
         </div>
       </motion.section>
 
-      <a
-        href={`https://wa.me/${WHATSAPP_NUMBER}`}
-        target="_blank"
-        rel="noreferrer"
-        className="fixed bottom-6 right-6 rounded-full bg-slate-950 px-5 py-4 text-sm font-medium text-white shadow-xl transition hover:opacity-90 dark:bg-white dark:text-slate-900"
-      >
-        Chat with us
-      </a>
+      <ChatAssistant />
 
-      <Footer whatsappNumber={WHATSAPP_NUMBER} />
+      <Footer />
     </main>
   );
 }
