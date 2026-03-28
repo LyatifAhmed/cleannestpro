@@ -1,12 +1,15 @@
-// app/apply/page.tsx
 "use client";
 
 import { FormEvent, useState } from "react";
 
-type LanguageOption = "English" | "Russian" | "Turkish" | "Ukrainian" | "Other";
+type ApplicationType = "Individual Cleaner" | "Cleaning Company";
+
+type LanguageOption = "English" | "Russian" | "Turkish" | "Other";
 
 type CleanerApplyForm = {
+  applicationType: ApplicationType;
   fullName: string;
+  companyName: string;
   phone: string;
   email: string;
   location: string;
@@ -15,21 +18,21 @@ type CleanerApplyForm = {
   availability: string;
   hasSupplies: string;
   transport: string;
+  teamSize: string;
   notes: string;
 };
-
-const WHATSAPP_NUMBER = "905000000000"; // change this
 
 const languageOptions: LanguageOption[] = [
   "English",
   "Russian",
   "Turkish",
-  "Ukrainian",
   "Other",
 ];
 
 const initialState: CleanerApplyForm = {
+  applicationType: "Individual Cleaner",
   fullName: "",
+  companyName: "",
   phone: "",
   email: "",
   location: "",
@@ -38,32 +41,14 @@ const initialState: CleanerApplyForm = {
   availability: "",
   hasSupplies: "No",
   transport: "No",
+  teamSize: "",
   notes: "",
 };
-
-function buildCleanerWhatsAppMessage(data: CleanerApplyForm) {
-  const languages =
-    data.languages.length > 0 ? data.languages.join(", ") : "Not specified";
-
-  return `Hello, I would like to apply to work with CleanNestPro.
-
-Full name: ${data.fullName}
-Phone / WhatsApp: ${data.phone}
-Email: ${data.email || "Not provided"}
-Location: ${data.location}
-Cleaning experience: ${data.experience || "Not provided"}
-Languages: ${languages}
-Availability: ${data.availability || "Not provided"}
-Can bring supplies: ${data.hasSupplies}
-Has transport: ${data.transport}
-
-Notes:
-${data.notes || "None"}`;
-}
 
 export default function ApplyPage() {
   const [form, setForm] = useState<CleanerApplyForm>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   function updateField<K extends keyof CleanerApplyForm>(
     key: K,
@@ -84,98 +69,194 @@ export default function ApplyPage() {
     });
   }
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSending(true);
+    setSubmitted(false);
 
-    const message = buildCleanerWhatsAppMessage(form);
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-      message
-    )}`;
+    try {
+      const res = await fetch("/api/partner-application", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-    setSubmitted(true);
-    window.open(url, "_blank");
+      if (!res.ok) {
+        throw new Error("Failed to send application.");
+      }
+
+      setSubmitted(true);
+      setForm(initialState);
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while sending the application.");
+    } finally {
+      setSending(false);
+    }
   }
+
+  const isCompany = form.applicationType === "Cleaning Company";
 
   return (
     <main className="min-h-screen bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,23,42,0.06),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(120,119,198,0.08),transparent_25%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(120,119,198,0.12),transparent_25%)]" />
+      <section className="relative overflow-hidden border-b border-slate-200 bg-white/80 dark:border-white/10 dark:bg-white/5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,23,42,0.05),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(120,119,198,0.08),transparent_25%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(120,119,198,0.12),transparent_25%)]" />
         <div className="relative mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-24">
-          <div className="max-w-3xl">
+          <div className="max-w-4xl">
             <div className="inline-flex rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-sm text-slate-600 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
               Work with CleanNestPro
             </div>
 
             <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
-              Join our trusted cleaning network in Antalya
+              Join our selected service network in Antalya
             </h1>
 
-            <p className="mt-6 text-lg leading-8 text-slate-600 dark:text-slate-300">
-              We are building a small, reliable network of detail-oriented
-              cleaners for premium homes, holiday properties, and short-term
-              rentals. If you take pride in your work and want to be part of a
-              more thoughtful service experience, we would love to hear from you.
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+              We work with a limited number of carefully selected local cleaners
+              and cleaning firms in Antalya. If you value presentation,
+              punctuality, and professional communication, we would be happy to
+              hear from you.
             </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {[
+                "English, Turkish & Russian support",
+                "Individual and company applications welcome",
+                "Better organised communication",
+                "Premium client-facing standard",
+              ].map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20 md:px-8">
-        <div className="grid gap-10 md:grid-cols-[0.9fr_1.1fr]">
+      <section className="mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-20">
+        <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <div className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
-              <h2 className="text-2xl font-semibold">Who we are looking for</h2>
+            <div className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm dark:border-white/10 dark:bg-white/5">
+              <h2 className="text-2xl font-semibold">Who we work with</h2>
 
               <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                <li>• Reliable and detail-oriented cleaners</li>
-                <li>• People who care about presentation and consistency</li>
-                <li>• Experience with homes, villas, or short-term rentals is a plus</li>
-                <li>• Professional communication and punctuality matter</li>
-                <li>• English, Russian, Turkish, or Ukrainian language skills are valuable</li>
+                <li>• Reliable individual cleaners with strong attention to detail</li>
+                <li>• Local cleaning firms with a professional standard</li>
+                <li>• Teams experienced with apartments, villas, and guest-ready homes</li>
+                <li>• Service partners who communicate clearly and show up on time</li>
+                <li>• People comfortable serving international clients</li>
               </ul>
             </div>
 
-            <div className="mt-6 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-6 dark:border-white/10 dark:bg-white/5">
-              <h3 className="text-lg font-semibold">Why apply</h3>
+            <div className="mt-6 rounded-[30px] border border-slate-200 bg-[#f6f3ee] p-7 dark:border-white/10 dark:bg-white/5">
+              <h3 className="text-lg font-semibold">Why partners apply</h3>
+
               <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                <li>• Premium client base</li>
-                <li>• Better organised communication</li>
-                <li>• Clearer job details before confirmation</li>
-                <li>• Opportunity to work with international clients</li>
+                <li>• Access to a more premium client profile</li>
+                <li>• Better structured communication before confirmation</li>
+                <li>• Clearer briefing and service expectations</li>
+                <li>• Opportunity to work with English, Turkish, and Russian-speaking clients</li>
               </ul>
+            </div>
+
+            <div className="mt-6 rounded-[30px] border border-slate-200 bg-white p-7 dark:border-white/10 dark:bg-white/5">
+              <h3 className="text-lg font-semibold">How applications are reviewed</h3>
+              <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                We review applications carefully and may decide not to move
+                forward with every enquiry. CleanNestPro is intentionally
+                selective about who joins the network, because client trust and
+                delivery quality matter more than scale.
+              </p>
             </div>
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5 md:p-8"
+            className="rounded-[34px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9"
           >
-            <h2 className="text-2xl font-semibold">Apply to work with us</h2>
+            <div className="flex flex-wrap gap-3">
+              {(["Individual Cleaner", "Cleaning Company"] as ApplicationType[]).map(
+                (type) => {
+                  const active = form.applicationType === type;
+
+                  return (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => updateField("applicationType", type)}
+                      className={`rounded-full border px-4 py-2 text-sm transition ${
+                        active
+                          ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                          : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  );
+                }
+              )}
+            </div>
+
+            <h2 className="mt-6 text-2xl font-semibold">
+              {isCompany ? "Apply as a company" : "Apply as an individual"}
+            </h2>
+
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-              Fill in a few details below and your application will open in
-              WhatsApp for review.
+              Submit your details below and we’ll review your application by
+              email. Clear communication in English, Turkish, and Russian is a
+              strong advantage.
             </p>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               <Field>
-                <Label>Full name</Label>
+                <Label>{isCompany ? "Main contact name" : "Full name"}</Label>
                 <Input
                   value={form.fullName}
                   onChange={(e) => updateField("fullName", e.target.value)}
-                  placeholder="Your full name"
+                  placeholder={isCompany ? "Main contact person" : "Your full name"}
                   required
                 />
               </Field>
 
-              <Field>
-                <Label>Phone / WhatsApp</Label>
-                <Input
-                  value={form.phone}
-                  onChange={(e) => updateField("phone", e.target.value)}
-                  placeholder="+90 ..."
-                  required
-                />
-              </Field>
+              {isCompany ? (
+                <Field>
+                  <Label>Company name</Label>
+                  <Input
+                    value={form.companyName}
+                    onChange={(e) => updateField("companyName", e.target.value)}
+                    placeholder="Your company name"
+                    required
+                  />
+                </Field>
+              ) : (
+                <Field>
+                  <Label>Phone</Label>
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => updateField("phone", e.target.value)}
+                    placeholder="+90 ..."
+                    required
+                  />
+                </Field>
+              )}
+
+              {!isCompany ? null : (
+                <Field>
+                  <Label>Phone</Label>
+                  <Input
+                    value={form.phone}
+                    onChange={(e) => updateField("phone", e.target.value)}
+                    placeholder="+90 ..."
+                    required
+                  />
+                </Field>
+              )}
 
               <Field>
                 <Label>Email</Label>
@@ -184,6 +265,7 @@ export default function ApplyPage() {
                   value={form.email}
                   onChange={(e) => updateField("email", e.target.value)}
                   placeholder="you@example.com"
+                  required
                 />
               </Field>
 
@@ -197,12 +279,49 @@ export default function ApplyPage() {
                 />
               </Field>
 
+              {isCompany ? (
+                <Field>
+                  <Label>Approx team size</Label>
+                  <Input
+                    value={form.teamSize}
+                    onChange={(e) => updateField("teamSize", e.target.value)}
+                    placeholder="e.g. 3 cleaners"
+                  />
+                </Field>
+              ) : (
+                <Field>
+                  <Label>Availability</Label>
+                  <Input
+                    value={form.availability}
+                    onChange={(e) => updateField("availability", e.target.value)}
+                    placeholder="Weekdays, weekends, mornings..."
+                  />
+                </Field>
+              )}
+
+              {isCompany ? (
+                <Field>
+                  <Label>Availability</Label>
+                  <Input
+                    value={form.availability}
+                    onChange={(e) => updateField("availability", e.target.value)}
+                    placeholder="Typical availability"
+                  />
+                </Field>
+              ) : null}
+
               <Field className="md:col-span-2">
-                <Label>Cleaning experience</Label>
+                <Label>
+                  {isCompany ? "Company / team experience" : "Cleaning experience"}
+                </Label>
                 <Textarea
                   value={form.experience}
                   onChange={(e) => updateField("experience", e.target.value)}
-                  placeholder="Tell us about your experience with apartments, villas, Airbnb cleaning, deep cleaning, etc."
+                  placeholder={
+                    isCompany
+                      ? "Tell us about your team, the kinds of homes you handle, service areas, and client experience."
+                      : "Tell us about your experience with apartments, villas, Airbnb cleaning, deep cleaning, etc."
+                  }
                 />
               </Field>
 
@@ -227,15 +346,6 @@ export default function ApplyPage() {
                     );
                   })}
                 </div>
-              </Field>
-
-              <Field>
-                <Label>Availability</Label>
-                <Input
-                  value={form.availability}
-                  onChange={(e) => updateField("availability", e.target.value)}
-                  placeholder="Weekdays, weekends, mornings..."
-                />
               </Field>
 
               <Field>
@@ -265,33 +375,30 @@ export default function ApplyPage() {
                 <Textarea
                   value={form.notes}
                   onChange={(e) => updateField("notes", e.target.value)}
-                  placeholder="You can mention experience, availability, areas you prefer, or anything useful for your application."
+                  placeholder="You can mention availability, preferred areas, experience, company profile, or anything useful for your application."
                 />
               </Field>
             </div>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+            <div className="mt-8 flex flex-col gap-4">
               <button
                 type="submit"
-                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 dark:bg-white dark:text-slate-900"
+                disabled={sending}
+                className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
               >
-                Send application on WhatsApp
+                {sending ? "Sending..." : "Submit application by email"}
               </button>
-
-              <a
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-slate-50 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
-              >
-                Open WhatsApp directly
-              </a>
             </div>
 
             {submitted ? (
-              <p className="mt-4 text-sm text-emerald-600 dark:text-emerald-400">
-                Your application has been prepared and opened in WhatsApp.
-              </p>
+              <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                  Your application has been sent.
+                </p>
+                <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
+                  Thank you. We’ll review it carefully and get back to you by email if there is a fit.
+                </p>
+              </div>
             ) : null}
           </form>
         </div>

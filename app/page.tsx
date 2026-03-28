@@ -28,7 +28,7 @@ type FrequencyType =
   | "Monthly"
   | "Not sure yet";
 
-type LanguageType = "English" | "Russian";
+type LanguageType = "Turkish" |"English" | "Russian";
 
 type FormState = {
   fullName: string;
@@ -296,7 +296,7 @@ export default function Home() {
       >
         <div className="absolute inset-0">
           <img
-            src="/premium-villa-cleaning-service-antalya-turkey.jpg.avif"
+            src="/premium-villa-cleaning-service-antalya-turkey.avif"
             alt="Premium home cleaning in Antalya for international residents"
             className="h-full w-full object-cover"
           />
@@ -321,6 +321,9 @@ export default function Home() {
               </a>
               <a href="#how-it-works" className="hover:text-white">
                 How it works
+              </a>
+              <a href="/about" className="hover:text-white">
+                About
               </a>
               <a href="#quote-form" className="hover:text-white">
                 Quote
@@ -410,7 +413,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mt-6 text-sm text-white/70"
               >
-                English • Russian support
+                Turkish • English • Russian support
               </motion.div>
             </motion.div>
           </div>
@@ -597,6 +600,7 @@ export default function Home() {
                 >
                   <option>English</option>
                   <option>Russian</option>
+                  <option>Turkish</option>
                 </Select>
               </Field>
 

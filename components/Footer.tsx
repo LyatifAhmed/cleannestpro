@@ -77,6 +77,9 @@ export default function Footer() {
             <Link href="/terms" className="transition hover:text-black dark:hover:text-white">
               Terms
             </Link>
+            <Link href="/about" className="transition hover:text-black dark:hover:text-white">
+              About
+            </Link>
             <Link href="/apply" className="transition hover:text-black dark:hover:text-white">
               Work with us
             </Link>
