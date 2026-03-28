@@ -361,6 +361,7 @@ export default function Home() {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+
   const heroRef = useRef<HTMLElement | null>(null);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
@@ -427,14 +428,13 @@ export default function Home() {
       <Script
         id="cleannestpro-localbusiness-schema"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(getLocalBusinessJsonLd()) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getLocalBusinessJsonLd()),
+        }}
       />
 
       <main className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
-        <section
-          ref={heroRef}
-          className="relative min-h-[96vh] overflow-hidden text-white"
-        >
+        <section ref={heroRef} className="relative h-screen w-full overflow-hidden text-white">
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
             className="absolute inset-0"
@@ -445,23 +445,20 @@ export default function Home() {
               fill
               priority
               sizes="100vw"
-              className="object-cover"
+              className="object-cover scale-[1.02]"
             />
-            <div className="absolute inset-0 bg-black/28" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.16),transparent_32%),linear-gradient(to_bottom,rgba(15,23,42,0.06),rgba(15,23,42,0.42))]" />
+            <div className="absolute inset-0 bg-black/12" />
           </motion.div>
 
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-32 bg-gradient-to-b from-black/12 to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-28 bg-gradient-to-t from-[#fcfbf8] via-[#fcfbf8]/38 to-transparent dark:from-[#0b1020] dark:via-[#0b1020]/38" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-black/10 to-transparent" />
 
           <HeroLens containerRef={heroRef} />
 
-          <div className="relative z-30 mx-auto flex min-h-[96vh] max-w-7xl flex-col px-6 pb-16 pt-8 md:px-8">
+          <div className="relative z-30 flex h-full w-full flex-col pt-8">
             <header className="mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md md:px-6">
               <div className="flex items-center gap-2.5 text-lg font-semibold tracking-tight text-white">
- 
-              <span className="text-xl">CleanNestPro</span>
-            </div>
+                <span className="text-xl">CleanNestPro</span>
+              </div>
 
               <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
                 <a href="#services" className="hover:text-white">
@@ -496,23 +493,23 @@ export default function Home() {
               </button>
             </header>
 
-            <div className="mx-auto flex w-full max-w-6xl flex-1 items-center justify-center">
+            <div className="flex w-full flex-1 items-center justify-center px-6">
               <motion.div
                 initial="hidden"
                 animate="show"
                 variants={staggerWrap}
-                className="max-w-5xl pt-16 text-center md:pt-24"
+                className="w-full pt-20 text-center md:pt-28"
               >
                 <motion.div
                   variants={fadeUp}
-                  className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-white/85 shadow-sm backdrop-blur"
+                  className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
                 >
                   Premium cleaning for expats, holiday homes & Airbnb hosts
                 </motion.div>
 
                 <motion.h1
                   variants={fadeUp}
-                  className="mx-auto mt-6 max-w-5xl text-5xl font-semibold leading-[1.02] tracking-tight md:text-7xl"
+                  className="mx-auto mt-8 max-w-7xl text-[56px] font-light leading-[0.95] tracking-[-0.04em] text-white sm:text-[72px] md:text-[96px] lg:text-[128px]"
                 >
                   Premium home cleaning
                   <br />
@@ -521,7 +518,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/88 md:text-xl"
+                  className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/85 md:text-2xl md:leading-10"
                 >
                   A calmer, more considered cleaning experience designed for
                   international residents, holiday homeowners, and guest-ready
@@ -530,7 +527,7 @@ export default function Home() {
 
                 <motion.div
                   variants={fadeUp}
-                  className="mx-auto mt-8 flex max-w-4xl flex-wrap items-center justify-center gap-3"
+                  className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-3"
                 >
                   {trustBadges.map((badge) => (
                     <span
@@ -562,8 +559,6 @@ export default function Home() {
                     Ask the assistant
                   </button>
                 </motion.div>
-
-                
               </motion.div>
             </div>
           </div>
@@ -595,19 +590,39 @@ export default function Home() {
               <motion.div
                 key={card.title}
                 variants={softReveal}
-                whileHover={{ y: -8 }}
-                className="group relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_18px_50px_rgba(15,23,42,0.06)] transition dark:border-white/10 dark:bg-white/5 dark:shadow-none"
+                whileHover={{ y: -10 }}
+                className="group relative overflow-hidden rounded-[34px] border border-white/40 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,245,240,0.88))] p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition duration-500 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] dark:shadow-none"
               >
-                <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100 bg-[radial-gradient(circle_at_top_right,rgba(15,23,42,0.05),transparent_40%)] dark:bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_40%)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.9),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.05),transparent_30%)] opacity-80 dark:bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.06),transparent_30%)]" />
+
+                <div className="pointer-events-none absolute inset-0 rounded-[34px] ring-1 ring-inset ring-white/50 dark:ring-white/10" />
+
+                <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -skew-x-12 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.72),transparent)] opacity-0 blur-xl transition-all duration-700 group-hover:left-[120%] group-hover:opacity-100 dark:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)]" />
+
                 <div className="relative z-10">
-                  <div className="text-4xl">{card.icon}</div>
-                  <div className="mt-5 inline-flex rounded-full border border-slate-200 px-3 py-1 text-xs text-slate-500 dark:border-white/10 dark:text-slate-300">
-                    0{index + 1}
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(234,228,218,0.75))] text-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_30px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[linear-gradient(145deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                      <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),transparent_45%)] opacity-90 dark:opacity-40" />
+                      <span className="relative z-10">{card.icon}</span>
+                    </div>
+
+                    <div className="inline-flex rounded-full border border-slate-200/80 bg-white/80 px-3 py-1 text-xs font-medium tracking-[0.18em] text-slate-500 backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                      0{index + 1}
+                    </div>
                   </div>
-                  <h3 className="mt-5 text-xl font-semibold">{card.title}</h3>
+
+                  <h3 className="mt-6 text-[22px] font-semibold tracking-tight text-slate-900 dark:text-white">
+                    {card.title}
+                  </h3>
+
                   <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
                     {card.description}
                   </p>
+
+                  <div className="mt-6 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
+                    <span className="inline-block h-2 w-2 rounded-full bg-slate-400/70 dark:bg-white/60" />
+                    Premium care
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -643,8 +658,9 @@ export default function Home() {
                 variants={fadeUp}
                 className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300"
               >
-                From luxury villas to guest-ready holiday homes, every detail is shaped
-                around presentation, comfort, and a more refined standard of care.
+                From luxury villas to guest-ready holiday homes, every detail is
+                shaped around presentation, comfort, and a more refined standard
+                of care.
               </motion.p>
             </motion.div>
 
@@ -683,7 +699,9 @@ export default function Home() {
                   </div>
 
                   <div
-                    className={`px-2 py-4 md:px-6 ${index % 2 === 1 ? "md:order-1" : ""}`}
+                    className={`px-2 py-4 md:px-6 ${
+                      index % 2 === 1 ? "md:order-1" : ""
+                    }`}
                   >
                     <div className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
                       {panel.eyebrow}
@@ -766,7 +784,7 @@ export default function Home() {
           whileInView="show"
           viewport={{ once: true, amount: 0.15 }}
           variants={staggerWrap}
-          className="mx-auto max-w-7xl px-6 py-24 md:px-8"
+          className="mx-auto px-6 py-24 md:px-8"
         >
           <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
             <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
@@ -808,301 +826,309 @@ export default function Home() {
           whileInView="show"
           viewport={{ once: true, amount: 0.1 }}
           variants={staggerWrap}
-          className="mx-auto max-w-7xl px-6 py-24 md:px-8"
+          className="w-full px-6 py-24 md:px-10 lg:px-16"
         >
-          <div className="grid items-start gap-10 md:grid-cols-[0.92fr_1.08fr]">
-            <motion.div variants={fadeUp} className="mx-auto max-w-xl">
-              <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                Personalised quote
-              </div>
-              <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                Request your personalised quote
-              </h2>
-              <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
-                Share the essentials and we’ll respond by email with a clear,
-                considered next step. No pressure. No noise. Just a better quote experience.
-              </p>
-
-              <div className="mt-8 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-7 dark:border-white/10 dark:bg-white/5">
-                <h3 className="text-lg font-semibold">Why clients prefer this</h3>
-                <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                  <li>• More thoughtful communication from the start</li>
-                  <li>• A quote shaped around the actual property details</li>
-                  <li>• English, Turkish, and Russian support</li>
-                  <li>• Better suited to premium homes and guest-ready spaces</li>
-                </ul>
-              </div>
-            </motion.div>
-
-            <motion.form
-              variants={softReveal}
-              onSubmit={handleSubmit}
-              className="rounded-[36px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9"
-            >
-              <div className="grid gap-5 md:grid-cols-2">
-                <Field>
-                  <Label>Full name</Label>
-                  <Input
-                    value={form.fullName}
-                    onChange={(e) => updateField("fullName", e.target.value)}
-                    placeholder="Your full name"
-                    required
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Email</Label>
-                  <Input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => updateField("email", e.target.value)}
-                    placeholder="you@example.com"
-                    required
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Preferred language</Label>
-                  <Select
-                    value={form.preferredLanguage}
-                    onChange={(e) =>
-                      updateField("preferredLanguage", e.target.value as LanguageType)
-                    }
-                  >
-                    <option>English</option>
-                    <option>Russian</option>
-                    <option>Turkish</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Area in Antalya</Label>
-                  <Input
-                    value={form.location}
-                    onChange={(e) => updateField("location", e.target.value)}
-                    placeholder="Area / neighbourhood"
-                    required
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Service type</Label>
-                  <Select
-                    value={form.serviceType}
-                    onChange={(e) =>
-                      updateField("serviceType", e.target.value as ServiceType)
-                    }
-                  >
-                    <option>Regular Home Cleaning</option>
-                    <option>Deep Cleaning</option>
-                    <option>Airbnb Turnover Cleaning</option>
-                    <option>Move In / Move Out Cleaning</option>
-                    <option>After-party Cleanup</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Property type</Label>
-                  <Select
-                    value={form.propertyType}
-                    onChange={(e) =>
-                      updateField("propertyType", e.target.value as PropertyType)
-                    }
-                  >
-                    <option>Studio</option>
-                    <option>1 Bedroom Apartment</option>
-                    <option>2 Bedroom Apartment</option>
-                    <option>3 Bedroom Apartment</option>
-                    <option>Villa / Large Home</option>
-                    <option>Holiday Home</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Bathrooms</Label>
-                  <Select
-                    value={form.bathrooms}
-                    onChange={(e) => updateField("bathrooms", e.target.value)}
-                  >
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4+</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Approx property size</Label>
-                  <Input
-                    value={form.propertySize}
-                    onChange={(e) => updateField("propertySize", e.target.value)}
-                    placeholder="e.g. 90 m²"
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Cleaning frequency</Label>
-                  <Select
-                    value={form.frequency}
-                    onChange={(e) =>
-                      updateField("frequency", e.target.value as FrequencyType)
-                    }
-                  >
-                    <option>One-time</option>
-                    <option>Weekly</option>
-                    <option>Bi-weekly</option>
-                    <option>Monthly</option>
-                    <option>Not sure yet</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Preferred date</Label>
-                  <Input
-                    type="date"
-                    value={form.preferredDate}
-                    onChange={(e) => updateField("preferredDate", e.target.value)}
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Preferred time</Label>
-                  <Input
-                    type="time"
-                    value={form.preferredTime}
-                    onChange={(e) => updateField("preferredTime", e.target.value)}
-                  />
-                </Field>
-
-                <Field>
-                  <Label>Is the property furnished?</Label>
-                  <Select
-                    value={form.furnished}
-                    onChange={(e) => updateField("furnished", e.target.value)}
-                  >
-                    <option>Yes</option>
-                    <option>No</option>
-                    <option>Partly</option>
-                  </Select>
-                </Field>
-
-                <Field>
-                  <Label>Any pets?</Label>
-                  <Select
-                    value={form.pets}
-                    onChange={(e) => updateField("pets", e.target.value)}
-                  >
-                    <option>No</option>
-                    <option>Yes</option>
-                  </Select>
-                </Field>
-
-                <Field className="md:col-span-2">
-                  <Label>Do you need cleaning supplies brought by the cleaner?</Label>
-                  <Select
-                    value={form.suppliesNeeded}
-                    onChange={(e) => updateField("suppliesNeeded", e.target.value)}
-                  >
-                    <option>No</option>
-                    <option>Yes</option>
-                  </Select>
-                </Field>
-
-                <Field className="md:col-span-2">
-                  <Label>Extra tasks</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {extraTaskOptions.map((task) => {
-                      const active = form.extraTasks.includes(task);
-                      return (
-                        <button
-                          key={task}
-                          type="button"
-                          onClick={() => toggleExtraTask(task)}
-                          className={`rounded-full border px-4 py-2 text-sm transition ${
-                            active
-                              ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
-                              : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-                          }`}
-                        >
-                          {task}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </Field>
-
-                <Field className="md:col-span-2">
-                  <Label>Access details</Label>
-                  <Input
-                    value={form.accessDetails}
-                    onChange={(e) => updateField("accessDetails", e.target.value)}
-                    placeholder="Building access, key handover, guest timing, parking notes..."
-                  />
-                </Field>
-
-                <Field className="md:col-span-2">
-                  <Label>Anything else we should know?</Label>
-                  <Textarea
-                    value={form.specialNotes}
-                    onChange={(e) => updateField("specialNotes", e.target.value)}
-                    placeholder="You can mention the condition of the property, urgency, special requirements, guest check-out times, or anything useful for an accurate quote."
-                  />
-                </Field>
-              </div>
-
-              <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
-                <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                  Estimated range
+          <div className="mx-auto w-full max-w-[1440px]">
+            <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_1.15fr] xl:gap-16">
+              <motion.div variants={fadeUp} className="max-w-2xl">
+                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                  Personalised quote
                 </div>
-                <div className="mt-2 text-3xl font-semibold tracking-tight">
-                  {estimate}
-                </div>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                  This is an indicative range only. Final pricing is confirmed after review.
+
+                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
+                  Request your
+                  <br />
+                  personalised quote
+                </h2>
+
+                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
+                  Share the essentials and we’ll respond by email with a clear,
+                  considered next step. No pressure. No noise. Just a better
+                  quote experience.
                 </p>
-              </div>
 
-              <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
-                >
-                  {sending ? "Sending..." : "Request quote by email"}
-                </button>
+                <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
+                  <h3 className="text-lg font-semibold">Why clients prefer this</h3>
+                  <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                    <li>• More thoughtful communication from the start</li>
+                    <li>• A quote shaped around the actual property details</li>
+                    <li>• English, Turkish, and Russian support</li>
+                    <li>• Better suited to premium homes and guest-ready spaces</li>
+                  </ul>
+                </div>
+              </motion.div>
 
-                <button
-                  type="button"
-                  onClick={() =>
-                    window.dispatchEvent(new CustomEvent("open-clean-chat"))
-                  }
-                  className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-slate-50 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
-                >
-                  Ask the assistant
-                </button>
-              </div>
+              <motion.form
+                variants={softReveal}
+                onSubmit={handleSubmit}
+                className="rounded-[36px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9 lg:p-10"
+              >
+                <div className="grid gap-5 md:grid-cols-2">
+                  <Field>
+                    <Label>Full name</Label>
+                    <Input
+                      value={form.fullName}
+                      onChange={(e) => updateField("fullName", e.target.value)}
+                      placeholder="Your full name"
+                      required
+                    />
+                  </Field>
 
-              {submitted ? (
-                <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
-                  <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                    Your quote request has been sent.
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
-                    Thank you. We’ll review the details properly and get back to you by email with a clear next step.
+                  <Field>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={form.email}
+                      onChange={(e) => updateField("email", e.target.value)}
+                      placeholder="you@example.com"
+                      required
+                    />
+                  </Field>
+
+                  <Field>
+                    <Label>Preferred language</Label>
+                    <Select
+                      value={form.preferredLanguage}
+                      onChange={(e) =>
+                        updateField("preferredLanguage", e.target.value as LanguageType)
+                      }
+                    >
+                      <option>English</option>
+                      <option>Russian</option>
+                      <option>Turkish</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Area in Antalya</Label>
+                    <Input
+                      value={form.location}
+                      onChange={(e) => updateField("location", e.target.value)}
+                      placeholder="Area / neighbourhood"
+                      required
+                    />
+                  </Field>
+
+                  <Field>
+                    <Label>Service type</Label>
+                    <Select
+                      value={form.serviceType}
+                      onChange={(e) =>
+                        updateField("serviceType", e.target.value as ServiceType)
+                      }
+                    >
+                      <option>Regular Home Cleaning</option>
+                      <option>Deep Cleaning</option>
+                      <option>Airbnb Turnover Cleaning</option>
+                      <option>Move In / Move Out Cleaning</option>
+                      <option>After-party Cleanup</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Property type</Label>
+                    <Select
+                      value={form.propertyType}
+                      onChange={(e) =>
+                        updateField("propertyType", e.target.value as PropertyType)
+                      }
+                    >
+                      <option>Studio</option>
+                      <option>1 Bedroom Apartment</option>
+                      <option>2 Bedroom Apartment</option>
+                      <option>3 Bedroom Apartment</option>
+                      <option>Villa / Large Home</option>
+                      <option>Holiday Home</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Bathrooms</Label>
+                    <Select
+                      value={form.bathrooms}
+                      onChange={(e) => updateField("bathrooms", e.target.value)}
+                    >
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4+</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Approx property size</Label>
+                    <Input
+                      value={form.propertySize}
+                      onChange={(e) => updateField("propertySize", e.target.value)}
+                      placeholder="e.g. 90 m²"
+                    />
+                  </Field>
+
+                  <Field>
+                    <Label>Cleaning frequency</Label>
+                    <Select
+                      value={form.frequency}
+                      onChange={(e) =>
+                        updateField("frequency", e.target.value as FrequencyType)
+                      }
+                    >
+                      <option>One-time</option>
+                      <option>Weekly</option>
+                      <option>Bi-weekly</option>
+                      <option>Monthly</option>
+                      <option>Not sure yet</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Preferred date</Label>
+                    <Input
+                      type="date"
+                      value={form.preferredDate}
+                      onChange={(e) => updateField("preferredDate", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field>
+                    <Label>Preferred time</Label>
+                    <Input
+                      type="time"
+                      value={form.preferredTime}
+                      onChange={(e) => updateField("preferredTime", e.target.value)}
+                    />
+                  </Field>
+
+                  <Field>
+                    <Label>Is the property furnished?</Label>
+                    <Select
+                      value={form.furnished}
+                      onChange={(e) => updateField("furnished", e.target.value)}
+                    >
+                      <option>Yes</option>
+                      <option>No</option>
+                      <option>Partly</option>
+                    </Select>
+                  </Field>
+
+                  <Field>
+                    <Label>Any pets?</Label>
+                    <Select
+                      value={form.pets}
+                      onChange={(e) => updateField("pets", e.target.value)}
+                    >
+                      <option>No</option>
+                      <option>Yes</option>
+                    </Select>
+                  </Field>
+
+                  <Field className="md:col-span-2">
+                    <Label>Do you need cleaning supplies brought by the cleaner?</Label>
+                    <Select
+                      value={form.suppliesNeeded}
+                      onChange={(e) => updateField("suppliesNeeded", e.target.value)}
+                    >
+                      <option>No</option>
+                      <option>Yes</option>
+                    </Select>
+                  </Field>
+
+                  <Field className="md:col-span-2">
+                    <Label>Extra tasks</Label>
+                    <div className="flex flex-wrap gap-3">
+                      {extraTaskOptions.map((task) => {
+                        const active = form.extraTasks.includes(task);
+                        return (
+                          <button
+                            key={task}
+                            type="button"
+                            onClick={() => toggleExtraTask(task)}
+                            className={`rounded-full border px-4 py-2 text-sm transition ${
+                              active
+                                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                            }`}
+                          >
+                            {task}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+
+                  <Field className="md:col-span-2">
+                    <Label>Access details</Label>
+                    <Input
+                      value={form.accessDetails}
+                      onChange={(e) => updateField("accessDetails", e.target.value)}
+                      placeholder="Building access, key handover, guest timing, parking notes..."
+                    />
+                  </Field>
+
+                  <Field className="md:col-span-2">
+                    <Label>Anything else we should know?</Label>
+                    <Textarea
+                      value={form.specialNotes}
+                      onChange={(e) => updateField("specialNotes", e.target.value)}
+                      placeholder="You can mention the condition of the property, urgency, special requirements, guest check-out times, or anything useful for an accurate quote."
+                    />
+                  </Field>
+                </div>
+
+                <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
+                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    Estimated range
+                  </div>
+                  <div className="mt-2 text-3xl font-semibold tracking-tight">
+                    {estimate}
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                    This is an indicative range only. Final pricing is confirmed after review.
                   </p>
                 </div>
-              ) : null}
 
-              <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                Are you a cleaner in Antalya?{" "}
-                <a
-                  href="/apply"
-                  className="underline hover:text-black dark:hover:text-white"
-                >
-                  Apply to work with us
-                </a>
-              </p>
-            </motion.form>
+                <div className="mt-6 flex flex-col gap-4 sm:flex-row">
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
+                  >
+                    {sending ? "Sending..." : "Request quote by email"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      window.dispatchEvent(new CustomEvent("open-clean-chat"))
+                    }
+                    className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-slate-50 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
+                  >
+                    Ask the assistant
+                  </button>
+                </div>
+
+                {submitted ? (
+                  <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                      Your quote request has been sent.
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
+                      Thank you. We’ll review the details properly and get back to
+                      you by email with a clear next step.
+                    </p>
+                  </div>
+                ) : null}
+
+                <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                  Are you a cleaner in Antalya?{" "}
+                  <a
+                    href="/apply"
+                    className="underline hover:text-black dark:hover:text-white"
+                  >
+                    Apply to work with us
+                  </a>
+                </p>
+              </motion.form>
+            </div>
           </div>
         </motion.section>
 
@@ -1136,7 +1162,9 @@ export default function Home() {
                 <summary className="cursor-pointer list-none text-lg font-semibold marker:hidden">
                   <div className="flex items-center justify-between gap-4">
                     <span>{item.q}</span>
-                    <span className="text-slate-400 transition group-open:rotate-45">+</span>
+                    <span className="text-slate-400 transition group-open:rotate-45">
+                      +
+                    </span>
                   </div>
                 </summary>
                 <p className="mt-4 max-w-4xl leading-7 text-slate-600 dark:text-slate-300">
@@ -1155,8 +1183,6 @@ export default function Home() {
           className="mx-auto max-w-5xl px-6 pb-24 text-center md:px-8"
         >
           <div className="rounded-[36px] border border-slate-200 bg-white px-8 py-12 shadow-[0_18px_60px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/5 dark:shadow-none">
-           
-
             <h2 className="text-2xl font-semibold tracking-tight md:text-4xl">
               Cleaning in Antalya, designed around international expectations
             </h2>
