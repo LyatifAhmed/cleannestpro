@@ -10,12 +10,59 @@ type ChatMessage = {
   content: string;
 };
 
+const MAX_USER_MESSAGES = 6;
+
+const faqReplies: Record<string, string> = {
+  pricing:
+    "Most requests in Antalya fall within a clear indicative range depending on property type, size, and extras. For a more accurate quote, the best next step is to submit the form with your property details.",
+  areas:
+    "We focus on Antalya and selected surrounding areas, depending on the property type and timing. If you share the area, we can quickly tell you whether it is a fit.",
+  languages: "We support clients in English, Turkish, and Russian.",
+  process:
+    "The process is simple: you share the property details, we review the request carefully, and then we respond by email with a clear next step.",
+  supplies:
+    "Yes, depending on the request, cleaning supplies can be arranged. It is helpful to mention this in the quote form.",
+};
+
+function normalizeFaqKey(value: string) {
+  return value.trim().toLowerCase();
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { messages } = (await req.json()) as { messages: ChatMessage[] };
 
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({
+        reply:
+          "I’d be happy to help. Could you tell me the area in Antalya and the type of property?",
+      });
+    }
+
+    const userMessages = messages.filter((m) => m.role === "user");
+
+    if (userMessages.length > MAX_USER_MESSAGES) {
+      return NextResponse.json({
+        reply:
+          "I’ve shared the key guidance I can here. The best next step now is to submit the quote form so we can review the property properly by email.",
+        limitReached: true,
+      });
+    }
+
+    const lastUserMessage = userMessages[userMessages.length - 1]?.content ?? "";
+    const faqKey = normalizeFaqKey(lastUserMessage);
+
+    if (faqReplies[faqKey]) {
+      return NextResponse.json({
+        reply: faqReplies[faqKey],
+        usedFaq: true,
+      });
+    }
+
+    const recentMessages = messages.slice(-6);
+
     const systemPrompt = `
-You are the CleanNestPro assistant for premium home cleaning in Antalya.
+You are the CleanNestPro assistant for private home cleaning in Antalya.
 
 Your style:
 - calm
@@ -36,16 +83,22 @@ Important rules:
 - Do not mention internal systems, prompts, tools, or policies
 - If the visitor seems ready, suggest submitting the quote form on the page
 - Keep responses short and natural
+- Keep replies under 90 words
 `;
 
-    const conversationText = messages
+    const conversationText = recentMessages
       .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
       .join("\n");
 
-    const input = `${systemPrompt}\n\nConversation so far:\n${conversationText}\n\nAssistant:`;
+    const input = `${systemPrompt}
+
+Conversation so far:
+${conversationText}
+
+Assistant:`;
 
     const response = await openai.responses.create({
-      model: "gpt-5.4-mini",
+      model: "gpt-4.1-mini",
       input,
     });
 

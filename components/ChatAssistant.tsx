@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 type ChatMessage = {
@@ -8,12 +8,22 @@ type ChatMessage = {
   content: string;
 };
 
+const MAX_USER_MESSAGES = 6;
+
 const starterMessages: ChatMessage[] = [
   {
     role: "assistant",
     content:
-      "Hi — I’m the CleanNestPro assistant. I can help with service fit, likely pricing, and the best next step. What kind of cleaning are you looking for?",
+      "Hi — I’m the CleanNestPro assistant. I can help with service fit, likely pricing, and the best next step. You can choose one of the common questions below or ask something directly.",
   },
+];
+
+const quickQuestions = [
+  { label: "Price range", value: "pricing" },
+  { label: "Areas covered", value: "areas" },
+  { label: "Languages", value: "languages" },
+  { label: "How it works", value: "process" },
+  { label: "Do you bring supplies?", value: "supplies" },
 ];
 
 export default function ChatAssistant() {
@@ -23,15 +33,33 @@ export default function ChatAssistant() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const userMessageCount = useMemo(
+    () => messages.filter((m) => m.role === "user").length,
+    [messages]
+  );
+
+  const limitReached = userMessageCount >= MAX_USER_MESSAGES;
+
   useEffect(() => {
     const handler = () => setOpen(true);
     window.addEventListener("open-clean-chat", handler);
     return () => window.removeEventListener("open-clean-chat", handler);
   }, []);
 
-  async function sendMessage() {
-    const value = input.trim();
-    if (!value || loading) return;
+  useEffect(() => {
+    if (!open) return;
+
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }, 60);
+  }, [messages, loading, open]);
+
+  async function sendMessage(rawValue?: string) {
+    const value = (rawValue ?? input).trim();
+    if (!value || loading || limitReached) return;
 
     const nextMessages: ChatMessage[] = [
       ...messages,
@@ -51,7 +79,10 @@ export default function ChatAssistant() {
         body: JSON.stringify({ messages: nextMessages }),
       });
 
-      const data = (await res.json()) as { reply: string };
+      const data = (await res.json()) as {
+        reply?: string;
+        limitReached?: boolean;
+      };
 
       setMessages((prev) => [
         ...prev,
@@ -62,13 +93,6 @@ export default function ChatAssistant() {
             "I’d be happy to help. You can also request a detailed quote by email below.",
         },
       ]);
-
-      setTimeout(() => {
-        scrollRef.current?.scrollTo({
-          top: scrollRef.current.scrollHeight,
-          behavior: "smooth",
-        });
-      }, 60);
     } catch (error) {
       console.error(error);
       setMessages((prev) => [
@@ -143,24 +167,48 @@ export default function ChatAssistant() {
             </div>
 
             <div className="border-t border-slate-200 p-4 dark:border-white/10">
-              <div className="flex gap-3">
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") sendMessage();
-                  }}
-                  placeholder="Ask about service fit, price range, areas..."
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/10"
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={loading}
-                  className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
-                >
-                  Send
-                </button>
-              </div>
+              {!limitReached ? (
+                <div className="mb-3 flex flex-wrap gap-2">
+                  {quickQuestions.map((item) => (
+                    <button
+                      key={item.value}
+                      type="button"
+                      onClick={() => sendMessage(item.value)}
+                      disabled={loading}
+                      className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs text-slate-600 transition hover:bg-slate-50 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10"
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+
+              {limitReached ? (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+                  I’ve shared the key guidance I can here. The best next step
+                  now is to submit the quote form so we can review the property
+                  properly by email.
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") sendMessage();
+                    }}
+                    placeholder="Ask about service fit, price range, areas..."
+                    className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/10"
+                  />
+                  <button
+                    onClick={() => sendMessage()}
+                    disabled={loading}
+                    className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
+                  >
+                    Send
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         ) : null}
