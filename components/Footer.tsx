@@ -107,9 +107,7 @@ export default function Footer() {
               <p>Company No: 16274319</p>
               <p>ICO No: ZB883806</p>
               <p>Quote requests handled by email</p>
-              <p>
-                Internationally trusted payment infrastructure via Stripe
-              </p>
+              <p>Internationally trusted payment infrastructure via Stripe</p>
             </div>
           </div>
         </div>
