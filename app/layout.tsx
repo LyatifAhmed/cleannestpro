@@ -65,13 +65,14 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.png", type: "image/png", sizes: "512x512" },
-    ],
-    apple: "/apple-touch-icon.png",
+    icon: "/favicon.ico",
     shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
   },
+
+  manifest: "/manifest",
+
+  themeColor: "#fcfbf8",
 };
 
 export default function RootLayout({
