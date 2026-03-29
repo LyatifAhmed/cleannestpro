@@ -7,6 +7,7 @@ import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import Footer from "@/components/Footer";
 import HeroLens from "@/components/HeroLens";
 import ChatAssistant from "@/components/ChatAssistant";
+import Link from "next/link";
 
 type ServiceType =
   | "Regular Home Cleaning"
@@ -627,6 +628,27 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+          <div className="mx-auto mt-10 max-w-4xl text-center">
+  <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
+    Explore more
+  </p>
+
+  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+    <Link
+      href="/villa-cleaning-antalya"
+      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+    >
+      Villa Cleaning in Antalya
+    </Link>
+
+    <Link
+      href="/airbnb-cleaning-antalya"
+      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+    >
+      Airbnb Cleaning in Antalya
+    </Link>
+  </div>
+</div>
         </motion.section>
 
         <section id="gallery" className="relative py-24 md:py-32">
