@@ -90,13 +90,14 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
         {/* 🔥 CLARITY EKLENDİ */}
+        
+      </head>
+
+      <body className="min-h-full bg-[#fcfbf8] text-slate-900">
         <Script
           strategy="afterInteractive"
           src="https://www.clarity.ms/tag/w3i9ffghgo"
         />
-      </head>
-
-      <body className="min-h-full bg-[#fcfbf8] text-slate-900">
         {children}
       </body>
     </html>
