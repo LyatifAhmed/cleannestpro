@@ -4,11 +4,14 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "CleanNestPro",
     short_name: "CleanNestPro",
-    description: "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
+    description:
+      "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
     start_url: "/",
+    scope: "/",
     display: "standalone",
-    background_color: "#ffffff",
-    theme_color: "#ffffff",
+    orientation: "portrait",
+    background_color: "#fcfbf8",
+    theme_color: "#fcfbf8",
     icons: [
       {
         src: "/icon-192.png",

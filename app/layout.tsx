@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script"; // ✅ EKLENDİ
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -71,7 +71,6 @@ export const metadata: Metadata = {
   },
 
   manifest: "/manifest",
-
   themeColor: "#fcfbf8",
 };
 
@@ -85,15 +84,6 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <head>
-        <link rel="icon" href="/favicon.ico?v=2" />
-        <link rel="shortcut icon" href="/favicon.ico?v=2" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-        {/* 🔥 CLARITY EKLENDİ */}
-        
-      </head>
-
       <body className="min-h-full bg-[#fcfbf8] text-slate-900">
         <Script
           id="microsoft-clarity"
