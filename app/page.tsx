@@ -1,13 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Script from "next/script";
 import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import Footer from "@/components/Footer";
 import HeroLens from "@/components/HeroLens";
-import ChatAssistant from "@/components/ChatAssistant";
-import Link from "next/link";
+
+const ChatAssistant = dynamic(() => import("@/components/ChatAssistant"), {
+  ssr: false,
+  loading: () => null,
+});
 
 type ServiceType =
   | "Regular Home Cleaning"
@@ -629,26 +634,26 @@ export default function Home() {
             ))}
           </div>
           <div className="mx-auto mt-10 max-w-4xl text-center">
-  <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
-    Explore more
-  </p>
+            <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
+              Explore more
+            </p>
 
-  <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-    <Link
-      href="/villa-cleaning-antalya"
-      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-    >
-      Villa Cleaning in Antalya
-    </Link>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/villa-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Villa Cleaning in Antalya
+              </Link>
 
-    <Link
-      href="/airbnb-cleaning-antalya"
-      className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-    >
-      Airbnb Cleaning in Antalya
-    </Link>
-  </div>
-</div>
+              <Link
+                href="/airbnb-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Airbnb Cleaning in Antalya
+              </Link>
+            </div>
+          </div>
         </motion.section>
 
         <section id="gallery" className="relative py-24 md:py-32">
@@ -887,29 +892,37 @@ export default function Home() {
               >
                 <div className="grid gap-5 md:grid-cols-2">
                   <Field>
-                    <Label>Full name</Label>
+                    <Label htmlFor="fullName">Full name</Label>
                     <Input
+                      id="fullName"
+                      name="fullName"
                       value={form.fullName}
                       onChange={(e) => updateField("fullName", e.target.value)}
                       placeholder="Your full name"
                       required
+                      autoComplete="name"
                     />
                   </Field>
 
                   <Field>
-                    <Label>Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
+                      id="email"
+                      name="email"
                       type="email"
                       value={form.email}
                       onChange={(e) => updateField("email", e.target.value)}
                       placeholder="you@example.com"
                       required
+                      autoComplete="email"
                     />
                   </Field>
 
                   <Field>
-                    <Label>Preferred language</Label>
+                    <Label htmlFor="preferredLanguage">Preferred language</Label>
                     <Select
+                      id="preferredLanguage"
+                      name="preferredLanguage"
                       value={form.preferredLanguage}
                       onChange={(e) =>
                         updateField("preferredLanguage", e.target.value as LanguageType)
@@ -922,18 +935,23 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Area in Antalya</Label>
+                    <Label htmlFor="location">Area in Antalya</Label>
                     <Input
+                      id="location"
+                      name="location"
                       value={form.location}
                       onChange={(e) => updateField("location", e.target.value)}
                       placeholder="Area / neighbourhood"
                       required
+                      autoComplete="address-level2"
                     />
                   </Field>
 
                   <Field>
-                    <Label>Service type</Label>
+                    <Label htmlFor="serviceType">Service type</Label>
                     <Select
+                      id="serviceType"
+                      name="serviceType"
                       value={form.serviceType}
                       onChange={(e) =>
                         updateField("serviceType", e.target.value as ServiceType)
@@ -948,8 +966,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Property type</Label>
+                    <Label htmlFor="propertyType">Property type</Label>
                     <Select
+                      id="propertyType"
+                      name="propertyType"
                       value={form.propertyType}
                       onChange={(e) =>
                         updateField("propertyType", e.target.value as PropertyType)
@@ -965,8 +985,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Bathrooms</Label>
+                    <Label htmlFor="bathrooms">Bathrooms</Label>
                     <Select
+                      id="bathrooms"
+                      name="bathrooms"
                       value={form.bathrooms}
                       onChange={(e) => updateField("bathrooms", e.target.value)}
                     >
@@ -978,8 +1000,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Approx property size</Label>
+                    <Label htmlFor="propertySize">Approx property size</Label>
                     <Input
+                      id="propertySize"
+                      name="propertySize"
                       value={form.propertySize}
                       onChange={(e) => updateField("propertySize", e.target.value)}
                       placeholder="e.g. 90 m²"
@@ -987,8 +1011,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Cleaning frequency</Label>
+                    <Label htmlFor="frequency">Cleaning frequency</Label>
                     <Select
+                      id="frequency"
+                      name="frequency"
                       value={form.frequency}
                       onChange={(e) =>
                         updateField("frequency", e.target.value as FrequencyType)
@@ -1003,8 +1029,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Preferred date</Label>
+                    <Label htmlFor="preferredDate">Preferred date</Label>
                     <Input
+                      id="preferredDate"
+                      name="preferredDate"
                       type="date"
                       value={form.preferredDate}
                       onChange={(e) => updateField("preferredDate", e.target.value)}
@@ -1012,8 +1040,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Preferred time</Label>
+                    <Label htmlFor="preferredTime">Preferred time</Label>
                     <Input
+                      id="preferredTime"
+                      name="preferredTime"
                       type="time"
                       value={form.preferredTime}
                       onChange={(e) => updateField("preferredTime", e.target.value)}
@@ -1021,8 +1051,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Is the property furnished?</Label>
+                    <Label htmlFor="furnished">Is the property furnished?</Label>
                     <Select
+                      id="furnished"
+                      name="furnished"
                       value={form.furnished}
                       onChange={(e) => updateField("furnished", e.target.value)}
                     >
@@ -1033,8 +1065,10 @@ export default function Home() {
                   </Field>
 
                   <Field>
-                    <Label>Any pets?</Label>
+                    <Label htmlFor="pets">Any pets?</Label>
                     <Select
+                      id="pets"
+                      name="pets"
                       value={form.pets}
                       onChange={(e) => updateField("pets", e.target.value)}
                     >
@@ -1044,8 +1078,12 @@ export default function Home() {
                   </Field>
 
                   <Field className="md:col-span-2">
-                    <Label>Do you need cleaning supplies brought by the cleaner?</Label>
+                    <Label htmlFor="suppliesNeeded">
+                      Do you need cleaning supplies brought by the cleaner?
+                    </Label>
                     <Select
+                      id="suppliesNeeded"
+                      name="suppliesNeeded"
                       value={form.suppliesNeeded}
                       onChange={(e) => updateField("suppliesNeeded", e.target.value)}
                     >
@@ -1055,31 +1093,39 @@ export default function Home() {
                   </Field>
 
                   <Field className="md:col-span-2">
-                    <Label>Extra tasks</Label>
-                    <div className="flex flex-wrap gap-3">
-                      {extraTaskOptions.map((task) => {
-                        const active = form.extraTasks.includes(task);
-                        return (
-                          <button
-                            key={task}
-                            type="button"
-                            onClick={() => toggleExtraTask(task)}
-                            className={`rounded-full border px-4 py-2 text-sm transition ${
-                              active
-                                ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
-                                : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-                            }`}
-                          >
-                            {task}
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <fieldset>
+                      <legend className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                        Extra tasks
+                      </legend>
+
+                      <div className="flex flex-wrap gap-3">
+                        {extraTaskOptions.map((task) => {
+                          const active = form.extraTasks.includes(task);
+                          return (
+                            <button
+                              key={task}
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => toggleExtraTask(task)}
+                              className={`rounded-full border px-4 py-2 text-sm transition ${
+                                active
+                                  ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
+                                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+                              }`}
+                            >
+                              {task}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </fieldset>
                   </Field>
 
                   <Field className="md:col-span-2">
-                    <Label>Access details</Label>
+                    <Label htmlFor="accessDetails">Access details</Label>
                     <Input
+                      id="accessDetails"
+                      name="accessDetails"
                       value={form.accessDetails}
                       onChange={(e) => updateField("accessDetails", e.target.value)}
                       placeholder="Building access, key handover, guest timing, parking notes..."
@@ -1087,8 +1133,10 @@ export default function Home() {
                   </Field>
 
                   <Field className="md:col-span-2">
-                    <Label>Anything else we should know?</Label>
+                    <Label htmlFor="specialNotes">Anything else we should know?</Label>
                     <Textarea
+                      id="specialNotes"
+                      name="specialNotes"
                       value={form.specialNotes}
                       onChange={(e) => updateField("specialNotes", e.target.value)}
                       placeholder="You can mention the condition of the property, urgency, special requirements, guest check-out times, or anything useful for an accurate quote."
@@ -1142,12 +1190,12 @@ export default function Home() {
 
                 <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
                   Are you a cleaner in Antalya?{" "}
-                  <a
+                  <Link
                     href="/apply"
                     className="underline hover:text-black dark:hover:text-white"
                   >
                     Apply to work with us
-                  </a>
+                  </Link>
                 </p>
               </motion.form>
             </div>
@@ -1235,9 +1283,18 @@ function Field({
   return <div className={className}>{children}</div>;
 }
 
-function Label({ children }: { children: React.ReactNode }) {
+function Label({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor: string;
+}) {
   return (
-    <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+    <label
+      htmlFor={htmlFor}
+      className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
+    >
       {children}
     </label>
   );
