@@ -13,6 +13,13 @@ export const metadata: Metadata = {
     "cleaning partner network Antalya",
     "house cleaning work Antalya",
   ],
+  alternates: {
+    canonical: "https://cleannestpro.com/apply",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   openGraph: {
     title: "Work With CleanNestPro | Join Our Trusted Cleaning Network",
     description:
@@ -20,13 +27,21 @@ export const metadata: Metadata = {
     url: "https://cleannestpro.com/apply",
     siteName: "CleanNestPro",
     type: "website",
+    images: [
+      {
+        url: "https://cleannestpro.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Work with CleanNestPro in Antalya",
+      },
+    ],
   },
-  alternates: {
-    canonical: "https://cleannestpro.com/apply",
-  },
-  robots: {
-    index: true,
-    follow: true,
+  twitter: {
+    card: "summary_large_image",
+    title: "Work With CleanNestPro | Join Our Trusted Cleaning Network",
+    description:
+      "Apply as an individual cleaner or cleaning company. Work with international clients and premium properties in Antalya.",
+    images: ["https://cleannestpro.com/og-image.jpg"],
   },
 };
 

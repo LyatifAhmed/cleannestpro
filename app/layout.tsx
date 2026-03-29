@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://cleannestpro.com"),
+
   title: "Premium Home Cleaning in Antalya | CleanNestPro",
   description:
     "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts. English, Russian and Ukrainian support.",
+
   keywords: [
     "home cleaning Antalya",
     "cleaning service Antalya",
@@ -25,6 +28,41 @@ export const metadata: Metadata = {
     "holiday home cleaning Antalya",
     "villa cleaning Antalya",
   ],
+
+  alternates: {
+    canonical: "/",
+  },
+
+  openGraph: {
+    title: "Premium Home Cleaning in Antalya | CleanNestPro",
+    description:
+      "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
+    url: "https://cleannestpro.com",
+    siteName: "CleanNestPro",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "CleanNestPro premium cleaning service in Antalya",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "Premium Home Cleaning in Antalya | CleanNestPro",
+    description:
+      "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
+    images: ["/og-image.jpg"],
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+  },
+
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -34,6 +72,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.ico",
   },
 };
+
 export default function RootLayout({
   children,
 }: {
@@ -45,7 +84,6 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        {/* FAVICON OVERRIDE */}
         <link rel="icon" href="/favicon.ico?v=2" />
         <link rel="shortcut icon" href="/favicon.ico?v=2" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
