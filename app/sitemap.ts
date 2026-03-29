@@ -1,25 +1,37 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://cleannestpro.com";
+
   return [
     {
-      url: "https://cleannestpro.com",
+      url: `${baseUrl}/`,
       lastModified: new Date(),
     },
     {
-      url: "https://cleannestpro.com/about",
+      url: `${baseUrl}/about`,
       lastModified: new Date(),
     },
     {
-      url: "https://cleannestpro.com/apply",
+      url: `${baseUrl}/apply`,
       lastModified: new Date(),
     },
     {
-      url: "https://cleannestpro.com/privacy-policy",
+      url: `${baseUrl}/privacy-policy`,
       lastModified: new Date(),
     },
     {
-      url: "https://cleannestpro.com/terms",
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+    },
+
+    // 🔥 SEO PAGES (çok önemli)
+    {
+      url: `${baseUrl}/villa-cleaning-antalya`,
+      lastModified: new Date(),
+    },
+    {
+      url: `${baseUrl}/airbnb-cleaning-antalya`,
       lastModified: new Date(),
     },
   ];
