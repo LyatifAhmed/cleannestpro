@@ -9,6 +9,7 @@ import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import Footer from "@/components/Footer";
 import HeroLens from "@/components/HeroLens";
 
+
 const ChatAssistant = dynamic(() => import("@/components/ChatAssistant"), {
   ssr: false,
   loading: () => null,
@@ -462,7 +463,17 @@ export default function Home() {
 
           <div className="relative z-30 flex h-full w-full flex-col pt-8">
             <header className="mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md md:px-6">
-              <div className="flex items-center gap-2.5 text-lg font-semibold tracking-tight text-white">
+              
+
+              <div className="flex items-center gap-3 text-lg font-semibold tracking-tight text-white">
+                <Image
+                  src="/logo.png"
+                  alt="CleanNestPro"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 object-contain"
+                  priority
+                />
                 <span className="text-xl">CleanNestPro</span>
               </div>
 
