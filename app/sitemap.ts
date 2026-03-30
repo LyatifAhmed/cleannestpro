@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://cleannestpro.com";
+  const baseUrl = "https://www.cleannestpro.com";
 
   return [
     {
@@ -24,8 +24,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/terms`,
       lastModified: new Date(),
     },
-
-    // 🔥 SEO PAGES (çok önemli)
     {
       url: `${baseUrl}/villa-cleaning-antalya`,
       lastModified: new Date(),
