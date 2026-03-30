@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -367,6 +367,7 @@ function getLocalBusinessJsonLd() {
 export default function Home() {
   const [form, setForm] = useState<FormState>(initialState);
   const [submitted, setSubmitted] = useState(false);
+  const [showFloatingQuote, setShowFloatingQuote] = useState(false);
   const [sending, setSending] = useState(false);
 
   const heroRef = useRef<HTMLElement | null>(null);
@@ -375,6 +376,14 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.72]);
 
   const estimate = useMemo(() => estimateQuote(form), [form]);
+  useEffect(() => {
+  const handleScroll = () => {
+    setShowFloatingQuote(window.scrollY > 120);
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -462,7 +471,13 @@ export default function Home() {
           <HeroLens containerRef={heroRef} />
 
           <div className="relative z-30 flex h-full w-full flex-col pt-8">
-            <header className="mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md md:px-6">
+            <header
+  className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 ${
+    showFloatingQuote
+      ? "translate-y-[-20px] opacity-0 pointer-events-none"
+      : "translate-y-0 opacity-100"
+  }`}
+>
               
 
               <div className="flex items-center gap-3 text-lg font-semibold tracking-tight text-white">
