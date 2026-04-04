@@ -20,6 +20,8 @@ type CleanerApplyForm = {
   transport: string;
   teamSize: string;
   notes: string;
+  website: string;
+  formStartedAt: number;
 };
 
 const languageOptions: LanguageOption[] = [
@@ -29,7 +31,7 @@ const languageOptions: LanguageOption[] = [
   "Other",
 ];
 
-const initialState: CleanerApplyForm = {
+const createInitialState = (): CleanerApplyForm => ({
   applicationType: "Individual Cleaner",
   fullName: "",
   companyName: "",
@@ -43,10 +45,12 @@ const initialState: CleanerApplyForm = {
   transport: "No",
   teamSize: "",
   notes: "",
-};
+  website: "",
+  formStartedAt: Date.now(),
+});
 
 export default function ApplyPage() {
-  const [form, setForm] = useState<CleanerApplyForm>(initialState);
+  const [form, setForm] = useState<CleanerApplyForm>(createInitialState());
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
 
@@ -75,6 +79,19 @@ export default function ApplyPage() {
     setSubmitted(false);
 
     try {
+      if (form.website.trim() !== "") {
+        setSending(false);
+        return;
+      }
+
+      const secondsOnForm = Math.floor((Date.now() - form.formStartedAt) / 1000);
+
+      if (secondsOnForm < 4) {
+        setSending(false);
+        alert("Please take a little more time to complete the form.");
+        return;
+      }
+
       const res = await fetch("/api/partner-application", {
         method: "POST",
         headers: {
@@ -84,11 +101,12 @@ export default function ApplyPage() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to send application.");
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to send application.");
       }
 
       setSubmitted(true);
-      setForm(initialState);
+      setForm(createInitialState());
     } catch (error) {
       console.error(error);
       alert("Something went wrong while sending the application.");
@@ -180,6 +198,19 @@ export default function ApplyPage() {
             onSubmit={handleSubmit}
             className="rounded-[34px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9"
           >
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.website}
+                onChange={(e) => updateField("website", e.target.value)}
+              />
+            </div>
+
             <div className="flex flex-wrap gap-3">
               {(["Individual Cleaner", "Cleaning Company"] as ApplicationType[]).map(
                 (type) => {

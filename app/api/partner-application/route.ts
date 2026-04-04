@@ -17,7 +17,13 @@ type PartnerApplicationPayload = {
   transport: string;
   teamSize: string;
   notes: string;
+  website?: string;
+  formStartedAt?: number;
 };
+
+function clean(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
 
 function escapeHtml(value: string) {
   return value
@@ -26,6 +32,40 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function isEmailValid(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isPhoneReasonable(phone: string) {
+  return /^[+()\d\s-]{7,20}$/.test(phone);
+}
+
+function containsUrl(text: string) {
+  return /(https?:\/\/|www\.|<a\s|href=)/i.test(text);
+}
+
+function looksLikeGibberish(value: string) {
+  const text = value.replace(/\s+/g, "");
+  if (!text) return false;
+
+  if (text.length >= 16 && /^[A-Za-z]+$/.test(text) && !/[aeiouAEIOU]{2,}/.test(text)) {
+    return true;
+  }
+
+  if (text.length >= 18 && /^[A-Za-z0-9]+$/.test(text)) {
+    const vowelCount = (text.match(/[aeiouAEIOU]/g) || []).length;
+    const vowelRatio = vowelCount / text.length;
+    if (vowelRatio < 0.2) return true;
+  }
+
+  return false;
+}
+
+function tooManyFieldsLookRandom(fields: string[]) {
+  const suspiciousCount = fields.filter((field) => looksLikeGibberish(field)).length;
+  return suspiciousCount >= 3;
 }
 
 function row(label: string, value: string) {
@@ -113,18 +153,26 @@ function buildApplicantHtml(data: PartnerApplicationPayload) {
 
 export async function POST(req: NextRequest) {
   try {
-    const data = (await req.json()) as PartnerApplicationPayload;
+    const raw = (await req.json()) as PartnerApplicationPayload;
 
-    if (!data.fullName || !data.email || !data.location) {
-      return NextResponse.json(
-        { error: "Missing required fields." },
-        { status: 400 }
-      );
-    }
-
-    const adminEmail = process.env.QUOTE_TO_EMAIL;
-    const fromEmail =
-      process.env.QUOTE_FROM_EMAIL || "CleanNestPro <onboarding@resend.dev>";
+    const data: PartnerApplicationPayload = {
+      applicationType: raw.applicationType,
+      fullName: clean(raw.fullName),
+      companyName: clean(raw.companyName),
+      phone: clean(raw.phone),
+      email: clean(raw.email).toLowerCase(),
+      location: clean(raw.location),
+      experience: clean(raw.experience),
+      languages: Array.isArray(raw.languages) ? raw.languages : [],
+      availability: clean(raw.availability),
+      hasSupplies: clean(raw.hasSupplies),
+      transport: clean(raw.transport),
+      teamSize: clean(raw.teamSize),
+      notes: clean(raw.notes),
+      website: clean(raw.website),
+      formStartedAt:
+        typeof raw.formStartedAt === "number" ? raw.formStartedAt : 0,
+    };
 
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
@@ -133,10 +181,103 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const adminEmail = process.env.QUOTE_TO_EMAIL;
+    const fromEmail =
+      process.env.QUOTE_FROM_EMAIL || "CleanNestPro <onboarding@resend.dev>";
+
     if (!adminEmail) {
       return NextResponse.json(
         { error: "QUOTE_TO_EMAIL is not configured." },
         { status: 500 }
+      );
+    }
+
+    // Honeypot
+    if (data.website && data.website !== "") {
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
+
+    // Time trap
+    if (!data.formStartedAt || Date.now() - data.formStartedAt < 4000) {
+      return NextResponse.json(
+        { error: "Form submitted too quickly." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      data.applicationType !== "Individual Cleaner" &&
+      data.applicationType !== "Cleaning Company"
+    ) {
+      return NextResponse.json(
+        { error: "Invalid application type." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.fullName || data.fullName.length < 2 || data.fullName.length > 100) {
+      return NextResponse.json(
+        { error: "Please enter a valid name." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      data.applicationType === "Cleaning Company" &&
+      !data.companyName
+    ) {
+      return NextResponse.json(
+        { error: "Company name is required." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.phone || !isPhoneReasonable(data.phone)) {
+      return NextResponse.json(
+        { error: "Please enter a valid phone number." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.email || !isEmailValid(data.email)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.location || data.location.length < 2 || data.location.length > 120) {
+      return NextResponse.json(
+        { error: "Please enter a valid location." },
+        { status: 400 }
+      );
+    }
+
+    if (
+      [data.experience, data.notes, data.availability, data.location, data.companyName].some(
+        (value) => containsUrl(value)
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Links are not allowed in this form." },
+        { status: 400 }
+      );
+    }
+
+    const textFieldsToCheck = [
+      data.fullName,
+      data.companyName,
+      data.location,
+      data.experience,
+      data.availability,
+      data.teamSize,
+      data.notes,
+    ].filter(Boolean);
+
+    if (tooManyFieldsLookRandom(textFieldsToCheck)) {
+      return NextResponse.json(
+        { error: "Submission looks invalid." },
+        { status: 400 }
       );
     }
 
