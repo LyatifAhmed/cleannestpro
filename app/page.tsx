@@ -9,7 +9,6 @@ import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import Footer from "@/components/Footer";
 import HeroLens from "@/components/HeroLens";
 
-
 const ChatAssistant = dynamic(() => import("@/components/ChatAssistant"), {
   ssr: false,
   loading: () => null,
@@ -57,6 +56,8 @@ type FormState = {
   extraTasks: string[];
   accessDetails: string;
   specialNotes: string;
+  website: string;
+  formStartedAt: number;
 };
 
 const serviceCards = [
@@ -199,7 +200,7 @@ const faqs = [
   },
 ];
 
-const initialState: FormState = {
+const createInitialState = (): FormState => ({
   fullName: "",
   email: "",
   preferredLanguage: "English",
@@ -217,7 +218,9 @@ const initialState: FormState = {
   extraTasks: [],
   accessDetails: "",
   specialNotes: "",
-};
+  website: "",
+  formStartedAt: Date.now(),
+});
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 28 },
@@ -365,7 +368,7 @@ function getLocalBusinessJsonLd() {
 }
 
 export default function Home() {
-  const [form, setForm] = useState<FormState>(initialState);
+  const [form, setForm] = useState<FormState>(createInitialState());
   const [submitted, setSubmitted] = useState(false);
   const [showFloatingQuote, setShowFloatingQuote] = useState(false);
   const [sending, setSending] = useState(false);
@@ -376,14 +379,15 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.72]);
 
   const estimate = useMemo(() => estimateQuote(form), [form]);
-  useEffect(() => {
-  const handleScroll = () => {
-    setShowFloatingQuote(window.scrollY > 120);
-  };
 
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFloatingQuote(window.scrollY > 120);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -407,6 +411,19 @@ export default function Home() {
     setSubmitted(false);
 
     try {
+      if (form.website.trim() !== "") {
+        setSending(false);
+        return;
+      }
+
+      const secondsOnForm = Math.floor((Date.now() - form.formStartedAt) / 1000);
+
+      if (secondsOnForm < 4) {
+        setSending(false);
+        alert("Please take a little more time to complete the form.");
+        return;
+      }
+
       const payload = {
         ...form,
         estimatedRange: estimate,
@@ -421,11 +438,12 @@ export default function Home() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to send quote request.");
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to send quote request.");
       }
 
       setSubmitted(true);
-      setForm(initialState);
+      setForm(createInitialState());
     } catch (error) {
       console.error(error);
       alert("Something went wrong while sending your quote request.");
@@ -450,7 +468,10 @@ export default function Home() {
       />
 
       <main className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
-        <section ref={heroRef} className="relative h-screen w-full overflow-hidden text-white">
+        <section
+          ref={heroRef}
+          className="relative h-screen w-full overflow-hidden text-white"
+        >
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
             className="absolute inset-0"
@@ -472,14 +493,12 @@ export default function Home() {
 
           <div className="relative z-30 flex h-full w-full flex-col pt-8">
             <header
-  className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 ${
-    showFloatingQuote
-      ? "translate-y-[-20px] opacity-0 pointer-events-none"
-      : "translate-y-0 opacity-100"
-  }`}
->
-              
-
+              className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 ${
+                showFloatingQuote
+                  ? "pointer-events-none translate-y-[-20px] opacity-0"
+                  : "translate-y-0 opacity-100"
+              }`}
+            >
               <div className="flex items-center gap-3 text-lg font-semibold tracking-tight text-white">
                 <Image
                   src="/logo.png"
@@ -659,6 +678,7 @@ export default function Home() {
               </motion.div>
             ))}
           </div>
+
           <div className="mx-auto mt-10 max-w-4xl text-center">
             <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
               Explore more
@@ -916,6 +936,19 @@ export default function Home() {
                 onSubmit={handleSubmit}
                 className="rounded-[36px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9 lg:p-10"
               >
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => updateField("website", e.target.value)}
+                  />
+                </div>
+
                 <div className="grid gap-5 md:grid-cols-2">
                   <Field>
                     <Label htmlFor="fullName">Full name</Label>
