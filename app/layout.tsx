@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://cleannestpro.com"),
+  metadataBase: new URL("https://www.cleannestpro.com"),
 
   title: "Premium Home Cleaning in Antalya | CleanNestPro",
   description:
@@ -38,12 +38,12 @@ export const metadata: Metadata = {
     title: "Premium Home Cleaning in Antalya | CleanNestPro",
     description:
       "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
-    url: "https://cleannestpro.com",
+    url: "https://www.cleannestpro.com",
     siteName: "CleanNestPro",
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "https://www.cleannestpro.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "CleanNestPro premium cleaning service in Antalya",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     title: "Premium Home Cleaning in Antalya | CleanNestPro",
     description:
       "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts.",
-    images: ["/og-image.jpg"],
+    images: ["https://www.cleannestpro.com/og-image.jpg"],
   },
 
   robots: {
