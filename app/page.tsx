@@ -113,7 +113,7 @@ const trustBadges = [
   "Designed for expats & international residents",
   "English, Turkish & Russian support",
   "Clear quote by email",
-  "Secure international payment options",
+  "Secure booking with Stripe",
 ];
 
 const quoteReasons = [
@@ -139,13 +139,18 @@ const processSteps = [
   },
   {
     step: "02",
-    title: "Receive a thoughtful quote",
-    text: "We review the request properly and respond by email with a clear next step.",
+    title: "Receive your personalised quote",
+    text: "We review the request properly and email you a clear quote before any payment is requested.",
   },
   {
     step: "03",
-    title: "Confirm only if it feels right",
-    text: "No pressure, no noise — just a cleaner, more considered booking experience.",
+    title: "Secure your booking with Stripe",
+    text: "If the quote feels right, confirm your preferred date through a secure Stripe payment link.",
+  },
+  {
+    step: "04",
+    title: "Your cleaner is confirmed",
+    text: "Once payment is complete, we confirm the booking details and prepare the service for your agreed date.",
   },
 ];
 
@@ -192,11 +197,23 @@ const faqs = [
   },
   {
     q: "How is pricing confirmed?",
-    a: "The range shown on the page is only indicative. Final pricing is confirmed after we review your property details, timing, and any requested extras.",
+    a: "The range shown on the page is only indicative and includes VAT (KDV). Final pricing is confirmed after we review your property details, timing, and any requested extras.",
   },
   {
     q: "How do I request a quote?",
     a: "Simply complete the quote form with the property type, preferred timing, and any notes that would help us understand the request. We then reply by email with the next step.",
+  },
+  {
+    q: "How do I pay and confirm my booking?",
+    a: "After you accept the final quote, we send you a secure Stripe payment link by email. Your booking is confirmed once payment is completed.",
+  },
+  {
+    q: "What happens if CleanNestPro cannot provide the booked service?",
+    a: "If we are unable to provide the agreed service on the confirmed booking date due to our fault, you will receive a full refund of the amount paid for that booking.",
+  },
+  {
+    q: "What is the cancellation policy?",
+    a: "Customer cancellations made at least 48 hours before the confirmed appointment are eligible for a full refund. Cancellations made 24 to 48 hours before the appointment are eligible for a 50% refund. Cancellations within 24 hours may not be refundable because the cleaning team and time slot have already been reserved.",
   },
 ];
 
@@ -256,73 +273,117 @@ const staggerWrap: Variants = {
   },
 };
 
+// ─────────────────────────────────────────────────────────────
+// Antalya piyasa araştırmasına dayalı fiyat mantığı
+// Kaynaklar: Armut, TrendHizmet, Uğurlu Temizlik, Temizlik Express (2026)
+// Kur: 1 EUR ≈ 53,5 TL (temmuz 2026)
+// KDV: %20 (Türkiye standart oranı) — nihai fiyata dahil edilir
+// ─────────────────────────────────────────────────────────────
+
+const VAT_RATE = 0.2; // %20 KDV
+
 function estimateQuote(data: FormState) {
-  let min = 0;
-  let max = 0;
+  // 1) Emlak tipine göre BAZ fiyat aralığı (KDV hariç, € cinsinden)
+  //    Antalya'daki profesyonel firma paket fiyatlarından türetildi.
+  let baseMin = 0;
+  let baseMax = 0;
 
   switch (data.propertyType) {
     case "Studio":
-      min = 40;
-      max = 55;
+      baseMin = 70;
+      baseMax = 95;
       break;
     case "1 Bedroom Apartment":
-      min = 50;
-      max = 70;
+      // 1+1 daire: piyasada 5.000 TL'den başlıyor (~€93)
+      baseMin = 90;
+      baseMax = 125;
       break;
     case "2 Bedroom Apartment":
-      min = 70;
-      max = 100;
+      baseMin = 125;
+      baseMax = 165;
       break;
     case "3 Bedroom Apartment":
-      min = 95;
-      max = 135;
+      // 3+1 standart temizlik: 8.000–10.000 TL (~€150–187)
+      baseMin = 145;
+      baseMax = 185;
       break;
     case "Villa / Large Home":
-      min = 160;
-      max = 260;
+      // Villa: 50–85 TL/m², ortalama 250 m² villa için hesaplandı
+      baseMin = 220;
+      baseMax = 420;
       break;
     case "Holiday Home":
-      min = 80;
-      max = 130;
+      baseMin = 135;
+      baseMax = 200;
       break;
   }
 
-  if (data.serviceType === "Deep Cleaning") {
-    min += 25;
-    max += 55;
+  // 2) Hizmet tipine göre ÇARPAN (sabit ek yerine oransal artış —
+  //    çünkü örn. derin temizlik piyasada standart fiyatın
+  //    %50-70 üzerinde fiyatlanıyor, sabit € eklemek gerçekçi değil)
+  let serviceMultiplierMin = 1;
+  let serviceMultiplierMax = 1;
+
+  switch (data.serviceType) {
+    case "Regular Home Cleaning":
+      serviceMultiplierMin = 1;
+      serviceMultiplierMax = 1;
+      break;
+    case "Deep Cleaning":
+      // Piyasa: standart fiyatın %50-70 üzerinde
+      serviceMultiplierMin = 1.45;
+      serviceMultiplierMax = 1.7;
+      break;
+    case "Airbnb Turnover Cleaning":
+      // Genelde standart temizliğe yakın, çarşaf değişimi vb. ile hafif üstünde
+      serviceMultiplierMin = 1.05;
+      serviceMultiplierMax = 1.25;
+      break;
+    case "Move In / Move Out Cleaning":
+      // Taşınma sonrası / detaylı temizlik, inşaat sonrasına yakın ama daha hafif
+      serviceMultiplierMin = 1.4;
+      serviceMultiplierMax = 1.65;
+      break;
+    case "After-party Cleanup":
+      serviceMultiplierMin = 1.15;
+      serviceMultiplierMax = 1.4;
+      break;
   }
 
-  if (data.serviceType === "Airbnb Turnover Cleaning") {
-    min += 10;
-    max += 25;
-  }
+  let min = baseMin * serviceMultiplierMin;
+  let max = baseMax * serviceMultiplierMax;
 
-  if (data.serviceType === "Move In / Move Out Cleaning") {
-    min += 30;
-    max += 65;
-  }
-
-  if (data.serviceType === "After-party Cleanup") {
-    min += 35;
-    max += 75;
-  }
-
+  // 3) Malzeme (temizlik ürünleri getirilmesi)
   if (data.suppliesNeeded === "Yes") {
     min += 10;
-    max += 20;
+    max += 18;
   }
 
+  // 4) Ekstra görevler — her biri yaklaşık 20-30 dk ek işçiliğe denk gelir
   if (data.extraTasks.length > 0) {
-    min += data.extraTasks.length * 6;
+    min += data.extraTasks.length * 7;
     max += data.extraTasks.length * 14;
   }
 
+  // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
+  //    tek seferliklere göre ortalama %15-20 daha uygun
   if (data.frequency === "Weekly" || data.frequency === "Bi-weekly") {
-    min = Math.max(35, min - 8);
-    max = Math.max(min + 8, max - 12);
+    min *= 0.83;
+    max *= 0.86;
+  } else if (data.frequency === "Monthly") {
+    min *= 0.92;
+    max *= 0.95;
   }
 
-  return `€${min}–€${max}`;
+  // Mantıklı bir taban belirle (çok küçük gösterimleri önlemek için)
+  min = Math.max(35, min);
+  max = Math.max(min + 15, max);
+
+  // 6) %20 KDV ekle (fiyata dahil olarak gösterilecek)
+  const minWithVat = Math.round(min * (1 + VAT_RATE));
+  const maxWithVat = Math.round(max * (1 + VAT_RATE));
+
+  return `€${minWithVat}–€${maxWithVat}`;
 }
 
 function getFaqJsonLd() {
@@ -871,7 +932,26 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
+          <div className="mx-auto mt-10 max-w-4xl rounded-[30px] border border-emerald-200 bg-emerald-50/80 p-6 text-left shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-xl dark:bg-emerald-500/15">
+                ✓
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  Your booking is protected
+                </h3>
+                <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">
+                  Payment is only requested after you receive and accept your
+                  final quote. Payments are processed securely through Stripe,
+                  and you receive a full refund if we cannot provide the agreed
+                  service on the confirmed date due to our fault.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-4">
             {processSteps.map((item) => (
               <motion.div
                 key={item.step}
@@ -925,8 +1005,9 @@ export default function Home() {
                   <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
                     <li>• More thoughtful communication from the start</li>
                     <li>• A quote shaped around the actual property details</li>
-                    <li>• English, Turkish, and Russian support</li>
-                    <li>• Better suited to premium homes and guest-ready spaces</li>
+                    <li>• No payment before you receive and accept the final quote</li>
+                    <li>• Secure booking confirmation through Stripe</li>
+                    <li>• Full refund if we fail to provide the confirmed service</li>
                   </ul>
                 </div>
               </motion.div>
@@ -1205,14 +1286,39 @@ export default function Home() {
 
                 <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
                   <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Estimated range
+                    Estimated range (VAT / KDV included)
                   </div>
                   <div className="mt-2 text-3xl font-semibold tracking-tight">
                     {estimate}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                    This is an indicative range only. Final pricing is confirmed after review.
+                    This is an indicative range only, calculated from current
+                    Antalya market rates and inclusive of 20% VAT (KDV). Final
+                    pricing is confirmed after review.
                   </p>
+                </div>
+
+                <div className="mt-5 rounded-[24px] border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-slate-950/40">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-base dark:bg-white/10">
+                      🔒
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Secure booking, clear protection
+                      </h3>
+                      <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                        If you accept the final quote, we will email you a secure
+                        Stripe payment link. Your booking is confirmed after
+                        payment. If we cannot provide the agreed service on the
+                        confirmed date due to our fault, you will receive a full
+                        refund.
+                      </p>
+                      <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
+                        Secure payments powered by Stripe
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-6 flex flex-col gap-4 sm:flex-row">
@@ -1241,8 +1347,9 @@ export default function Home() {
                       Your quote request has been sent.
                     </p>
                     <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
-                      Thank you. We’ll review the details properly and get back to
-                      you by email with a clear next step.
+                      Thank you. We’ll review the details and email your final
+                      quote. No payment is requested unless you choose to accept
+                      it and secure the booking.
                     </p>
                   </div>
                 ) : null}
@@ -1363,7 +1470,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/25 dark:focus:ring-white/10"
+      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/25 dark:focus:ring-white/10 dark:[color-scheme:dark]"
     />
   );
 }
@@ -1372,8 +1479,10 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/10"
-    />
+      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 [color-scheme:light] dark:border-white/15 dark:bg-slate-900 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/10 dark:[color-scheme:dark]"
+    >
+      {props.children}
+    </select>
   );
 }
 
