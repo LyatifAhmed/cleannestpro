@@ -1,7 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import Script from "next/script";
@@ -281,6 +288,67 @@ const staggerWrap: Variants = {
 // ─────────────────────────────────────────────────────────────
 
 const VAT_RATE = 0.2; // %20 KDV
+const MAX_PROPERTY_PHOTOS = 5;
+const MAX_PHOTO_BYTES = 700 * 1024;
+const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
+
+async function compressPropertyPhoto(file: File): Promise<File> {
+  if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
+    throw new Error(`${file.name}: please choose a JPG, PNG or WebP image.`);
+  }
+
+  const sourceUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = document.createElement("img");
+      element.onload = () => resolve(element);
+      element.onerror = () => reject(new Error(`${file.name}: the image could not be read.`));
+      element.src = sourceUrl;
+    });
+
+    const maxDimension = 1600;
+    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error(`${file.name}: the image could not be processed.`);
+
+    context.drawImage(image, 0, 0, width, height);
+
+    let quality = 0.78;
+    let blob: Blob | null = null;
+
+    while (quality >= 0.48) {
+      blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality)
+      );
+      if (blob && blob.size <= MAX_PHOTO_BYTES) break;
+      quality -= 0.08;
+    }
+
+    if (!blob || blob.size > MAX_PHOTO_BYTES) {
+      throw new Error(`${file.name}: the compressed image is still too large.`);
+    }
+
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "property-photo";
+    return new File([blob], `${baseName}.jpg`, {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
 
 function estimateQuote(data: FormState) {
   // 1) Emlak tipine göre BAZ fiyat aralığı (KDV hariç, € cinsinden)
@@ -433,13 +501,24 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [showFloatingQuote, setShowFloatingQuote] = useState(false);
   const [sending, setSending] = useState(false);
+  const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [propertyPhotos, setPropertyPhotos] = useState<File[]>([]);
 
   const heroRef = useRef<HTMLElement | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.72]);
 
   const estimate = useMemo(() => estimateQuote(form), [form]);
+  const photoPreviews = useMemo(
+    () => propertyPhotos.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [propertyPhotos]
+  );
+
+  useEffect(() => {
+    return () => photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+  }, [photoPreviews]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -466,6 +545,38 @@ export default function Home() {
     });
   }
 
+  async function handlePhotoSelection(e: ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!selected.length) return;
+
+    if (propertyPhotos.length + selected.length > MAX_PROPERTY_PHOTOS) {
+      alert(`You can upload up to ${MAX_PROPERTY_PHOTOS} property photos.`);
+      return;
+    }
+
+    setProcessingPhotos(true);
+    try {
+      const compressed = await Promise.all(selected.map(compressPropertyPhoto));
+      const nextPhotos = [...propertyPhotos, ...compressed];
+      const totalBytes = nextPhotos.reduce((sum, file) => sum + file.size, 0);
+
+      if (totalBytes > MAX_TOTAL_PHOTO_BYTES) {
+        throw new Error("The selected photos are too large in total. Please remove one or more photos.");
+      }
+
+      setPropertyPhotos(nextPhotos);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "The photos could not be processed.");
+    } finally {
+      setProcessingPhotos(false);
+    }
+  }
+
+  function removePropertyPhoto(index: number) {
+    setPropertyPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index));
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSending(true);
@@ -490,12 +601,13 @@ export default function Home() {
         estimatedRange: estimate,
       };
 
+      const requestBody = new FormData();
+      requestBody.append("payload", JSON.stringify(payload));
+      propertyPhotos.forEach((photo) => requestBody.append("propertyPhotos", photo));
+
       const res = await fetch("/api/quote", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+        body: requestBody,
       });
 
       if (!res.ok) {
@@ -505,6 +617,8 @@ export default function Home() {
 
       setSubmitted(true);
       setForm(createInitialState());
+      setPropertyPhotos([]);
+      if (photoInputRef.current) photoInputRef.current.value = "";
     } catch (error) {
       console.error(error);
       alert("Something went wrong while sending your quote request.");
@@ -1282,6 +1396,66 @@ export default function Home() {
                       placeholder="You can mention the condition of the property, urgency, special requirements, guest check-out times, or anything useful for an accurate quote."
                     />
                   </Field>
+
+                  <Field className="md:col-span-2">
+                    <Label htmlFor="propertyPhotos">Property photos (optional)</Label>
+                    <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                      A few photos help us prepare a more accurate quote. Please do not
+                      include people, documents, screens, family photographs, or other
+                      sensitive information.
+                    </p>
+
+                    <input
+                      ref={photoInputRef}
+                      id="propertyPhotos"
+                      name="propertyPhotos"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      multiple
+                      onChange={handlePhotoSelection}
+                      disabled={sending || processingPhotos || propertyPhotos.length >= MAX_PROPERTY_PHOTOS}
+                      className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-90 disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900"
+                    />
+
+                    <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                      JPG, PNG or WebP · Maximum {MAX_PROPERTY_PHOTOS} photos · Photos are
+                      resized before upload and used only to prepare and coordinate your quote.
+                    </p>
+
+                    {processingPhotos ? (
+                      <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
+                        Preparing photos…
+                      </p>
+                    ) : null}
+
+                    {photoPreviews.length ? (
+                      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        {photoPreviews.map((preview, index) => (
+                          <div
+                            key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
+                            className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5"
+                          >
+                            <Image
+                              src={preview.url}
+                              alt={`Selected property photo ${index + 1}`}
+                              width={320}
+                              height={224}
+                              unoptimized
+                              className="h-28 w-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removePropertyPhoto(index)}
+                              aria-label={`Remove property photo ${index + 1}`}
+                              className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur hover:bg-black"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </Field>
                 </div>
 
                 <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
@@ -1324,10 +1498,14 @@ export default function Home() {
                 <div className="mt-6 flex flex-col gap-4 sm:flex-row">
                   <button
                     type="submit"
-                    disabled={sending}
+                    disabled={sending || processingPhotos}
                     className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
                   >
-                    {sending ? "Sending..." : "Request quote by email"}
+                    {processingPhotos
+                      ? "Preparing photos..."
+                      : sending
+                        ? "Sending..."
+                        : "Request quote by email"}
                   </button>
 
                   <button
