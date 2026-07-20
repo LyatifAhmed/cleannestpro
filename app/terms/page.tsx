@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service | CleanNestPro",
   description:
-    "Terms of service governing the use of CleanNestPro, a premium home cleaning coordination service operating between the UK and Antalya.",
+    "Terms governing CleanNestPro managed cleaning services, online quotes, payments, bookings, and local service delivery in Antalya.",
 };
 
 export default function TermsPage() {
@@ -19,8 +19,8 @@ export default function TermsPage() {
 
           <p className="mt-6 leading-8 text-slate-600">
             These Terms of Service govern your use of the CleanNestPro website,
-            quote process, bookings, payments, and any cleaning services
-            coordinated through CleanNestPro. By using this website, submitting
+            quote process, bookings, payments, and managed cleaning services.
+            By using this website, submitting
             a request, accepting a quote, or completing payment, you agree to
             these terms.
           </p>
@@ -33,44 +33,50 @@ export default function TermsPage() {
 
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  CleanNestPro operates as a cleaning coordination and service
-                  facilitation platform. We receive enquiries, review service
-                  requirements, prepare or communicate quotes, coordinate
-                  bookings, collect payments where applicable, and connect
-                  customers with selected independent local service providers in
-                  Antalya.
+                  CleanNestPro provides a managed cleaning service for customers
+                  in Antalya. We receive enquiries, review requirements, issue
+                  quotes, take payment, provide multilingual customer support,
+                  manage bookings, appoint local service partners, and handle
+                  service follow-up.
                 </p>
 
                 <p>
-                  Unless explicitly stated otherwise in writing, CleanNestPro
-                  does not directly employ the cleaners who attend the property.
-                  Cleaning services may be delivered by independent
-                  professionals or local cleaning companies.
+                  Your quote, booking, and payment are with CleanNestPro, operated
+                  by Generation Beta Digital Ltd. Unless we explicitly state
+                  otherwise before you accept a quote, CleanNestPro is your
+                  contracting service provider and remains your customer-service
+                  contact throughout the booking.
                 </p>
 
                 <p>
-                  The identity of the contracting or attending service provider,
-                  and any service-specific arrangements, may be confirmed in the
-                  quotation, booking confirmation, or related correspondence.
+                  The physical cleaning may be performed on our behalf by an
+                  independent cleaner or local cleaning company appointed as a
+                  service partner or subcontractor. The use of a local service
+                  partner does not transfer your CleanNestPro booking or payment
+                  relationship to that partner.
                 </p>
               </div>
             </section>
 
             <section>
               <h2 className="text-2xl font-semibold">
-                2. Third-party service providers
+                2. Local service partners and subcontracting
               </h2>
 
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  Cleaning services may be performed by independent third-party
-                  providers who are not employees of CleanNestPro.
+                  CleanNestPro may appoint independent local cleaners or cleaning
+                  companies to perform all or part of the on-site service. They
+                  are independent service partners and are not normally employees
+                  of CleanNestPro.
                 </p>
 
                 <p>
-                  We aim to work with suitable and trusted local providers, but
-                  the availability, identity, and composition of the assigned
-                  cleaning team may change where reasonably necessary.
+                  We select a service partner according to the information
+                  available to us, including the requested location, scope,
+                  timing, availability, and relevant capability. We may replace
+                  an assigned partner where reasonably necessary, provided this
+                  does not materially reduce the agreed service.
                 </p>
 
                 <p>
@@ -81,8 +87,18 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  Nothing in these terms removes any responsibility that
-                  CleanNestPro or a service provider cannot lawfully exclude.
+                  The attending service partner performs the physical work, but
+                  CleanNestPro continues to manage your booking, payment,
+                  multilingual communication, complaints, and any appropriate
+                  service remedy. Please contact CleanNestPro rather than making
+                  separate payment or scope arrangements with the attending
+                  partner.
+                </p>
+
+                <p>
+                  Nothing in these terms removes responsibility or consumer
+                  rights that cannot lawfully be excluded because we use an
+                  independent service partner or subcontractor.
                 </p>
               </div>
             </section>
@@ -116,9 +132,10 @@ export default function TermsPage() {
 
                 <p>
                   If the property condition or scope of work is materially
-                  different from the information supplied, the provider may
-                  pause the service and request approval for an adjusted price,
-                  reduced scope, additional time, or rescheduling. No additional
+                  different from the information supplied, the attending partner
+                  may pause the work and notify CleanNestPro. We may request your
+                  approval for an adjusted price, reduced scope, additional time,
+                  or rescheduling. No additional
                   charge will be taken without appropriate notice and agreement.
                 </p>
               </div>
@@ -173,6 +190,14 @@ export default function TermsPage() {
                 </p>
 
                 <p>
+                  Unless we expressly confirm otherwise in writing, the amount
+                  in the final quote is payable to CleanNestPro. An attending
+                  service partner is not authorised to request a separate payment
+                  from you for the agreed scope. Any additional work and charge
+                  must first be approved through CleanNestPro.
+                </p>
+
+                <p>
                   CleanNestPro does not store your full card number or card
                   security code on its website or servers. Payment information
                   is processed by the relevant payment provider under its own
@@ -212,6 +237,19 @@ export default function TermsPage() {
                   your booking correspondence.
                 </p>
 
+                <p>
+                  Where mandatory distance-contract cancellation rights apply,
+                  you may have a legal right to cancel within 14 days after the
+                  contract is formed. If you ask for an appointment or other
+                  performance to begin during that period, we may ask you to
+                  expressly request early performance and acknowledge the effect
+                  this may have on your cancellation right. If you then cancel
+                  after performance has begun, you may be required to pay a
+                  proportionate amount for services already supplied. The right
+                  may end once the service has been fully performed where the
+                  legally required consent and acknowledgement have been given.
+                </p>
+
                 <div className="overflow-hidden rounded-2xl border border-slate-200">
                   <div className="grid grid-cols-[1.2fr_0.8fr] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
                     <span>Notice before appointment</span>
@@ -237,7 +275,11 @@ export default function TermsPage() {
                 <p>
                   The reduced or non-refundable amount reflects time reserved,
                   provider commitments, preparation, and the reduced likelihood
-                  of filling the appointment at short notice.
+                  of filling the appointment at short notice. Any amount retained
+                  will remain subject to mandatory consumer law and will not
+                  exceed the reasonable net costs or losses arising directly from
+                  the cancellation. If we can reasonably avoid or recover those
+                  losses, we will take that into account.
                 </p>
 
                 <p>
@@ -248,10 +290,11 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  If CleanNestPro cannot provide the agreed service on the
-                  confirmed booking date due to our fault and no acceptable
-                  replacement or rescheduled appointment is agreed, you will
-                  receive a full refund of the amount paid for that booking.
+                  If an appointed service partner becomes unavailable and
+                  CleanNestPro cannot arrange a suitable replacement, or if we
+                  otherwise cannot provide the agreed service on the confirmed
+                  date, you may choose an agreed rescheduled appointment or a
+                  full refund of the amount paid for the undelivered service.
                 </p>
 
                 <p>
@@ -337,10 +380,11 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  A provider may refuse, stop, reduce, or reschedule work where
-                  conditions are unsafe, unlawful, abusive, materially different
-                  from those disclosed, or require specialist equipment or
-                  qualifications that were not agreed in advance.
+                  The attending service partner may refuse or pause unsafe or
+                  unlawful work and must notify CleanNestPro. We may then reduce,
+                  cancel, or reschedule work where conditions are abusive,
+                  materially different from those disclosed, or require specialist
+                  equipment or qualifications that were not agreed in advance.
                 </p>
               </div>
             </section>
@@ -352,9 +396,10 @@ export default function TermsPage() {
 
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  Services will be arranged and carried out with reasonable care
-                  and skill, subject to the agreed scope, available time,
-                  property condition, and access.
+                  CleanNestPro will manage the service with reasonable care and
+                  skill and will require appointed service partners to carry out
+                  the on-site work with reasonable care and skill, subject to the
+                  agreed scope, available time, property condition, and access.
                 </p>
 
                 <p>
@@ -459,25 +504,29 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  Subject to the paragraphs above and to the maximum extent
-                  permitted by law, CleanNestPro is not liable for indirect or
-                  consequential loss, loss of profit, loss of business, loss of
-                  opportunity, or losses that were not reasonably foreseeable
-                  when the booking was made.
+                  CleanNestPro is responsible for loss or damage that is a
+                  reasonably foreseeable result of our breach of these terms or
+                  our failure to use reasonable care and skill. We do not exclude
+                  responsibility merely because on-site performance was assigned
+                  to an independent service partner acting on our behalf.
                 </p>
 
                 <p>
                   CleanNestPro is not responsible for pre-existing damage,
                   ordinary wear and tear, inherent defects, manufacturer
                   defects, colour fading, unstable fittings, or damage resulting
-                  from inaccurate instructions or undisclosed risks.
+                  from inaccurate instructions or undisclosed risks, except to
+                  the extent that our breach or negligence, or that of a service
+                  partner performing the booking on our behalf, caused or
+                  materially worsened the loss.
                 </p>
 
                 <p>
-                  Where the law permits a financial limitation, CleanNestPro&apos;s
-                  total liability arising from a booking will not exceed the
-                  amount paid for that booking. This limitation does not apply
-                  where it would be unlawful or unfair to do so.
+                  If you use the service as a consumer, we are not responsible
+                  for business losses such as loss of profit, revenue, business,
+                  opportunity, or business interruption. Any other limitation of
+                  liability applies only where it is lawful, fair, transparent,
+                  and consistent with your mandatory consumer rights.
                 </p>
               </div>
             </section>
@@ -600,6 +649,7 @@ export default function TermsPage() {
 
                 <p>Company Number: 16274319</p>
                 <p>ICO Registration: ZB883806</p>
+                <p>Customer support: support@cleannestpro.com</p>
               </div>
             </section>
 
@@ -624,8 +674,8 @@ export default function TermsPage() {
               <p className="mt-4 leading-8 text-slate-600">
                 For questions, cancellation requests, complaints, or refund
                 enquiries relating to these terms, please contact CleanNestPro
-                using the website or the email address included in your quote or
-                booking correspondence.
+                using the website, your booking correspondence, or
+                support@cleannestpro.com.
               </p>
             </section>
           </div>
