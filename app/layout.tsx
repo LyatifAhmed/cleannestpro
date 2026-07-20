@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
   title: "Premium Home Cleaning in Antalya | CleanNestPro",
   description:
-    "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts. English, Russian and Ukrainian support.",
+    "Premium home cleaning in Antalya for expats, holiday homeowners, and Airbnb hosts. English, Russian and Turkish support.",
 
   keywords: [
     "home cleaning Antalya",

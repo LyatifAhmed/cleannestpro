@@ -15,13 +15,13 @@ export const metadata: Metadata = {
     "Antalya cleaning service Airbnb",
   ],
   alternates: {
-    canonical: "https://cleannestpro.com/airbnb-cleaning-antalya",
+    canonical: "https://www.cleannestpro.com/airbnb-cleaning-antalya",
   },
   openGraph: {
     title: "Airbnb Cleaning in Antalya | Reliable Turnover Service",
     description:
       "Professional Airbnb cleaning in Antalya for hosts who need fast, consistent guest-ready turnovers.",
-    url: "https://cleannestpro.com/airbnb-cleaning-antalya",
+    url: "https://www.cleannestpro.com/airbnb-cleaning-antalya",
     siteName: "CleanNestPro",
     type: "website",
     images: [
@@ -60,7 +60,7 @@ const faqs = [
   {
     question: "Do you work with international hosts?",
     answer:
-      "Yes. Many clients manage their Airbnb remotely. We support English, Russian, and Ukrainian communication.",
+      "Yes. Many clients manage their Airbnb remotely. We support English, Russian, and Turkish communication.",
   },
   {
     question: "What is included in a turnover clean?",
@@ -237,7 +237,7 @@ export default function AirbnbCleaningAntalyaPage() {
 
           <div className="mt-6 flex gap-4">
             <Link
-              href="/#contact"
+              href="/#quote-form"
               className="rounded-full bg-slate-900 px-6 py-3 text-sm text-white"
             >
               Request a quote

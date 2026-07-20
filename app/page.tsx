@@ -70,36 +70,42 @@ type FormState = {
 const serviceCards = [
   {
     title: "Regular Home Cleaning",
+    href: "/apartment-cleaning-antalya",
     description:
       "Ongoing cleaning for apartments, private residences, and second homes.",
     icon: "🏡",
   },
   {
     title: "Deep Cleaning",
+    href: "/deep-cleaning-antalya",
     description:
       "A more detailed reset when your home needs extra care and attention.",
     icon: "✨",
   },
   {
     title: "Airbnb Turnover Cleaning",
+    href: "/airbnb-cleaning-antalya",
     description:
       "Fast, presentation-focused cleaning between guest stays and check-ins.",
     icon: "🛏️",
   },
   {
     title: "Move In / Move Out Cleaning",
+    href: "/move-in-move-out-cleaning-antalya",
     description:
       "Detailed cleaning for property transitions, handovers, and fresh starts.",
     icon: "🧳",
   },
   {
     title: "After-party Cleanup",
+    href: "/#quote-form",
     description:
       "Fast recovery cleaning after gatherings, events, and extra mess.",
     icon: "🥂",
   },
   {
     title: "Holiday Home Cleaning",
+    href: "/villa-cleaning-antalya",
     description:
       "Ideal for owners who want their Antalya property kept guest-ready and elegant.",
     icon: "🌿",
@@ -478,7 +484,7 @@ function getLocalBusinessJsonLd() {
       "/premium-villa-cleaning-service-antalya-turkey.avif",
       "/logo-droplet.png",
     ],
-    url: "https://cleannestpro.com",
+    url: "https://www.cleannestpro.com",
     areaServed: {
       "@type": "City",
       name: "Antalya",
@@ -849,6 +855,13 @@ export default function Home() {
                     <span className="inline-block h-2 w-2 rounded-full bg-slate-400/70 dark:bg-white/60" />
                     Premium care
                   </div>
+
+                  <Link
+                    href={card.href}
+                    className="mt-5 inline-flex text-sm font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 transition hover:decoration-slate-900 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
+                  >
+                    View service details
+                  </Link>
                 </div>
               </motion.div>
             ))}
@@ -872,6 +885,24 @@ export default function Home() {
                 className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
               >
                 Airbnb Cleaning in Antalya
+              </Link>
+              <Link
+                href="/deep-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Deep Cleaning in Antalya
+              </Link>
+              <Link
+                href="/cleaning-service-konyaalti"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Cleaning in Konyaaltı
+              </Link>
+              <Link
+                href="/cleaning-service-muratpasa"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Cleaning in Muratpaşa
               </Link>
             </div>
           </div>

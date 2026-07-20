@@ -15,13 +15,13 @@ export const metadata: Metadata = {
     "Antalya cleaning service for villas",
   ],
   alternates: {
-    canonical: "https://cleannestpro.com/villa-cleaning-antalya",
+    canonical: "https://www.cleannestpro.com/villa-cleaning-antalya",
   },
   openGraph: {
     title: "Villa Cleaning in Antalya | Premium Holiday Home Cleaning",
     description:
       "Trusted villa cleaning in Antalya for holiday homes, expats, and premium properties.",
-    url: "https://cleannestpro.com/villa-cleaning-antalya",
+    url: "https://www.cleannestpro.com/villa-cleaning-antalya",
     siteName: "CleanNestPro",
     type: "website",
     images: [
@@ -65,7 +65,7 @@ const faqs = [
   {
     question: "Which languages do you support?",
     answer:
-      "We support English, Russian, and Ukrainian, which makes coordination easier for international clients and property owners.",
+      "We support English, Russian, and Turkish, which makes coordination easier for international clients and property owners.",
   },
 ];
 
@@ -116,7 +116,7 @@ export default function VillaCleaningAntalyaPage() {
               International support
             </h2>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              English, Russian, and Ukrainian support for smoother coordination
+              English, Russian, and Turkish support for smoother coordination
               with international clients.
             </p>
           </div>
@@ -284,7 +284,7 @@ export default function VillaCleaningAntalyaPage() {
 
             <div className="mt-6 flex flex-wrap gap-4">
               <Link
-                href="/#contact"
+                href="/#quote-form"
                 className="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:opacity-90"
               >
                 Request a quote

@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#0b1020]">
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.15fr_0.85fr_1fr]">
+        <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-[1.15fr_0.8fr_0.8fr_1fr]">
           <div>
             <h3 className="text-lg font-semibold tracking-tight">
               CleanNestPro
@@ -35,58 +35,73 @@ export default function Footer() {
 
           <div>
             <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
-              Navigation
+              Services
             </h4>
 
             <ul className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
               <li>
                 <a
-                  href="/#services"
+                  href="/deep-cleaning-antalya"
                   className="transition hover:text-black dark:hover:text-white"
                 >
-                  Services
+                  Deep cleaning
                 </a>
               </li>
               <li>
                 <a
-                  href="/#why-us"
+                  href="/apartment-cleaning-antalya"
                   className="transition hover:text-black dark:hover:text-white"
                 >
-                  Why us
+                  Apartment cleaning
                 </a>
               </li>
               <li>
                 <a
-                  href="/#how-it-works"
+                  href="/villa-cleaning-antalya"
                   className="transition hover:text-black dark:hover:text-white"
                 >
-                  How it works
+                  Villa cleaning
                 </a>
               </li>
               <li>
                 <a
+                  href="/airbnb-cleaning-antalya"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Airbnb cleaning
+                </a>
+              </li>
+              <li>
+                <Link
+                  href="/move-in-move-out-cleaning-antalya"
+                  className="transition hover:text-black dark:hover:text-white"
+                >
+                  Move in / move out
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/#quote-form"
                   className="transition hover:text-black dark:hover:text-white"
                 >
-                  Quote
-                </a>
-              </li>
-              <li>
-                <Link
-                  href="/about"
-                  className="transition hover:text-black dark:hover:text-white"
-                >
-                  About
+                  Request a quote
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/apply"
-                  className="transition hover:text-black dark:hover:text-white"
-                >
-                  Work with us
-                </Link>
-              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium text-slate-900 dark:text-slate-100">
+              Areas
+            </h4>
+
+            <ul className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+              <li><Link href="/cleaning-service-konyaalti" className="transition hover:text-black dark:hover:text-white">Konyaaltı cleaning</Link></li>
+              <li><Link href="/cleaning-service-konyaalti" className="transition hover:text-black dark:hover:text-white">Hurma cleaning</Link></li>
+              <li><Link href="/cleaning-service-muratpasa" className="transition hover:text-black dark:hover:text-white">Muratpaşa cleaning</Link></li>
+              <li><Link href="/cleaning-service-muratpasa" className="transition hover:text-black dark:hover:text-white">Lara cleaning</Link></li>
+              <li><Link href="/about" className="transition hover:text-black dark:hover:text-white">About</Link></li>
+              <li><Link href="/apply" className="transition hover:text-black dark:hover:text-white">Work with us</Link></li>
             </ul>
           </div>
 
