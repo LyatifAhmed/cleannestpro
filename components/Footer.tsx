@@ -1,6 +1,21 @@
 import Link from "next/link";
 
-export default function Footer() {
+export default function Footer({ locale = "en" }: { locale?: "en" | "ru" }) {
+  if (locale === "ru") {
+    return (
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+            <div><h3 className="text-lg font-semibold">CleanNestPro</h3><p className="mt-4 text-sm leading-6 text-slate-600">Уборка квартир и домов в Анталье с понятным онлайн-запросом и поддержкой на русском языке.</p></div>
+            <div><h4 className="text-sm font-medium">Услуги</h4><ul className="mt-4 space-y-3 text-sm text-slate-600"><li><Link href="/ru/generalnaya-uborka-antaliya">Генеральная уборка</Link></li><li><Link href="/ru/uborka-kvartir-antaliya">Уборка квартир</Link></li><li><Link href="/ru/klining-konyaalti">Клининг в Коньяалты</Link></li><li><Link href="/#quote-form">Получить расчёт</Link></li></ul></div>
+            <div><h4 className="text-sm font-medium">Районы</h4><ul className="mt-4 space-y-3 text-sm text-slate-600"><li><Link href="/ru/klining-konyaalti">Хурма</Link></li><li><Link href="/ru/klining-konyaalti">Лиман</Link></li><li><Link href="/ru/klining-konyaalti">Коньяалты</Link></li><li><Link href="/cleaning-service-muratpasa">Муратпаша</Link></li></ul></div>
+            <div><h4 className="text-sm font-medium">Компания</h4><div className="mt-4 space-y-3 text-sm leading-6 text-slate-600"><p><strong>Generation Beta Digital Ltd</strong></p><p>Company No: 16274319</p><p>ICO No: ZB883806</p><Link href="/" className="inline-block underline">English version</Link></div></div>
+          </div>
+          <div className="mt-12 border-t pt-6 text-sm text-slate-500">© {new Date().getFullYear()} CleanNestPro. Все права защищены.</div>
+        </div>
+      </footer>
+    );
+  }
   return (
     <footer className="border-t border-slate-200 bg-white dark:border-white/10 dark:bg-[#0b1020]">
       <div className="mx-auto max-w-7xl px-6 py-12 md:px-8">
@@ -102,6 +117,7 @@ export default function Footer() {
               <li><Link href="/cleaning-service-muratpasa" className="transition hover:text-black dark:hover:text-white">Lara cleaning</Link></li>
               <li><Link href="/about" className="transition hover:text-black dark:hover:text-white">About</Link></li>
               <li><Link href="/apply" className="transition hover:text-black dark:hover:text-white">Work with us</Link></li>
+              <li><Link href="/ru" lang="ru" className="transition hover:text-black dark:hover:text-white">Русская версия</Link></li>
             </ul>
           </div>
 

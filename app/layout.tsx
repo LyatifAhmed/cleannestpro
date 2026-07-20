@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -32,6 +32,11 @@ export const metadata: Metadata = {
 
   alternates: {
     canonical: "/",
+    languages: {
+      en: "https://www.cleannestpro.com/",
+      ru: "https://www.cleannestpro.com/ru",
+      "x-default": "https://www.cleannestpro.com/",
+    },
   },
 
   openGraph: {
@@ -71,6 +76,9 @@ export const metadata: Metadata = {
   },
 
   manifest: "/manifest",
+};
+
+export const viewport: Viewport = {
   themeColor: "#fcfbf8",
 };
 

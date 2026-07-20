@@ -5,7 +5,7 @@ const canonical = "https://www.cleannestpro.com/cleaning-service-konyaalti";
 export const metadata: Metadata = {
   title: "Cleaning Service in Konyaaltı | Hurma & Nearby Areas",
   description: "Home and apartment cleaning in Konyaaltı, Antalya, including Hurma, Liman and Sarısu. Clear quotes and multilingual coordination for international clients.",
-  alternates: { canonical },
+  alternates: { canonical, languages: { en: canonical, ru: "https://www.cleannestpro.com/ru/klining-konyaalti", "x-default": canonical } },
   openGraph: { title: "Cleaning Service in Konyaaltı | CleanNestPro", description: "Apartment, deep and holiday-home cleaning across Konyaaltı, including Hurma.", url: canonical, siteName: "CleanNestPro", type: "website", images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Cleaning service in Konyaaltı Antalya" }] },
 };
 

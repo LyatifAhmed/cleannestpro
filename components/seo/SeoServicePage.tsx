@@ -9,6 +9,7 @@ import ServicePageHero from "./ServicePageHero";
 import ServiceScope from "./ServiceScope";
 
 export type SeoPageConfig = {
+  locale?: "en" | "ru";
   canonical: string;
   breadcrumb: string;
   eyebrow: string;
@@ -32,6 +33,7 @@ export type SeoPageConfig = {
 };
 
 export default function SeoServicePage({ config }: { config: SeoPageConfig }) {
+  const locale = config.locale ?? "en";
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -52,10 +54,10 @@ export default function SeoServicePage({ config }: { config: SeoPageConfig }) {
   };
 
   return (
-    <main className="min-h-screen bg-[#fcfbf8] text-slate-900">
+    <main lang={locale} className="min-h-screen bg-[#fcfbf8] text-slate-900">
       <Script id={`faq-${config.breadcrumb.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <Script id={`service-${config.breadcrumb.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }} />
-      <ServicePageHero eyebrow={config.eyebrow} title={config.title} intro={config.intro} breadcrumb={config.breadcrumb} />
+      <ServicePageHero eyebrow={config.eyebrow} title={config.title} intro={config.intro} breadcrumb={config.breadcrumb} locale={locale} />
       <ServiceBenefits items={config.benefits} />
 
       <section className="mx-auto grid max-w-6xl gap-8 px-6 py-12 md:px-8 md:py-16 lg:grid-cols-[1.12fr_0.88fr]">
@@ -75,17 +77,17 @@ export default function SeoServicePage({ config }: { config: SeoPageConfig }) {
 
       <section className="mx-auto max-w-6xl px-6 py-6 md:px-8"><ServiceScope title={config.scopeTitle} intro={config.scopeIntro} items={config.scope} /></section>
       <ServiceAreas title={config.areasTitle} intro={config.areasIntro} areas={config.areas} />
-      <ServiceFaq items={config.faqs} />
+      <ServiceFaq items={config.faqs} title={locale === "ru" ? "Часто задаваемые вопросы" : "Frequently asked questions"} />
 
       <section className="mx-auto max-w-6xl px-6 py-4 md:px-8">
-        <h2 className="text-xl font-semibold text-slate-950">Related cleaning services</h2>
+        <h2 className="text-xl font-semibold text-slate-950">{locale === "ru" ? "Другие услуги уборки" : "Related cleaning services"}</h2>
         <div className="mt-4 flex flex-wrap gap-3">
           {config.related.map((link) => <Link key={link.href} href={link.href} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50">{link.label}</Link>)}
         </div>
       </section>
 
-      <div id="quote"><QuoteCTA title={config.ctaTitle} text={config.ctaText} /></div>
-      <Footer />
+      <div id="quote"><QuoteCTA title={config.ctaTitle} text={config.ctaText} locale={locale} /></div>
+      <Footer locale={locale} />
     </main>
   );
 }

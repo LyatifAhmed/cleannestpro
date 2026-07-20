@@ -5,7 +5,7 @@ const canonical = "https://www.cleannestpro.com/deep-cleaning-antalya";
 export const metadata: Metadata = {
   title: "Deep Cleaning in Antalya | Apartments & Villas",
   description: "Professional deep cleaning in Antalya for furnished apartments, villas and holiday homes. Clear scope, multilingual coordination and secure booking.",
-  alternates: { canonical },
+  alternates: { canonical, languages: { en: canonical, ru: "https://www.cleannestpro.com/ru/generalnaya-uborka-antaliya", "x-default": canonical } },
   openGraph: { title: "Deep Cleaning in Antalya | CleanNestPro", description: "Detailed one-off cleaning for apartments, villas and holiday homes in Antalya.", url: canonical, siteName: "CleanNestPro", type: "website", images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Deep cleaning service in Antalya" }] },
   robots: { index: true, follow: true },
 };

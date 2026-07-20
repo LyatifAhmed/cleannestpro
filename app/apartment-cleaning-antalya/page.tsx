@@ -5,7 +5,7 @@ const canonical = "https://www.cleannestpro.com/apartment-cleaning-antalya";
 export const metadata: Metadata = {
   title: "Apartment Cleaning in Antalya | Clear Online Quotes",
   description: "Apartment cleaning in Antalya for residents, expats and remote property owners. One-off, regular and detailed cleaning with multilingual coordination.",
-  alternates: { canonical },
+  alternates: { canonical, languages: { en: canonical, ru: "https://www.cleannestpro.com/ru/uborka-kvartir-antaliya", "x-default": canonical } },
   openGraph: { title: "Apartment Cleaning in Antalya | CleanNestPro", description: "Reliable apartment cleaning for residents and international homeowners in Antalya.", url: canonical, siteName: "CleanNestPro", type: "website", images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Apartment cleaning in Antalya" }] },
 };
 
