@@ -114,9 +114,12 @@ const serviceCards = [
 
 const extraTaskOptions = [
   "Interior windows",
+  "Exterior windows (where safely accessible)",
   "Balcony / terrace",
   "Inside fridge",
   "Inside oven",
+  "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
+  "Sofa & armchair deep cleaning",
   "Linen change",
   "Ironing",
   "After-party extra mess",
