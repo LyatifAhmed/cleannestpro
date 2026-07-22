@@ -407,13 +407,13 @@ function estimateCurtainCleaning(data: FormState): [number, number] {
   const count = parsePositiveCount(data.curtainCount);
   const type = data.curtainType.toLowerCase();
 
-  // Per panel, including collection/handling allowance. Blackout, roller and
-  // similarly heavy curtains normally cost more than standard/sheers.
+  // Curtains are often priced favourably when they are added to a larger
+  // booking. Keep the online range gentle; unusual/heavy systems are reviewed.
   let typeMultiplier = 1;
-  if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.25;
-  else if (/sheer|tulle|voile/.test(type)) typeMultiplier = 0.9;
+  if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.35;
+  else if (/sheer|tulle|voile|standard|normal/.test(type)) typeMultiplier = 0.75;
 
-  return [count * 16 * typeMultiplier, count * 23 * typeMultiplier];
+  return [count * 3 * typeMultiplier, count * 6 * typeMultiplier];
 }
 
 function estimateMattressCleaning(data: FormState): [number, number] {
@@ -424,26 +424,26 @@ function estimateMattressCleaning(data: FormState): [number, number] {
   // one of each and price any remaining mattresses at the unknown-size rate.
   if (/single|twin|85|90/.test(sizes) && /double|king|queen|160|180|200/.test(sizes)) {
     const remaining = Math.max(0, count - 2);
-    return [24 + 30 + remaining * 27, 30 + 38 + remaining * 35];
+    return [28 + 34 + remaining * 31, 34 + 42 + remaining * 39];
   }
 
-  if (/king|queen|180|200/.test(sizes)) return [count * 34, count * 42];
-  if (/double|140|150|160/.test(sizes)) return [count * 30, count * 38];
-  if (/single|twin|80|85|90|100|120/.test(sizes)) return [count * 24, count * 30];
+  if (/king|queen|180|200/.test(sizes)) return [count * 36, count * 44];
+  if (/double|140|150|160/.test(sizes)) return [count * 34, count * 42];
+  if (/single|twin|80|85|90|100|120/.test(sizes)) return [count * 28, count * 34];
 
-  return [count * 27, count * 35];
+  return [count * 31, count * 39];
 }
 
 function estimateSofaCleaning(data: FormState): [number, number] {
   const details = data.sofaDetails.toLowerCase();
 
-  // A standard Antalya salon set is calibrated from a 3,000 TL + VAT local
-  // quote. L-shaped/sectional or explicitly large sets receive more headroom.
+  // Calibrated from the first completed supplier quote: a normal salon set
+  // costs about 3,000 TL locally. The customer range includes coordination.
   if (/l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)) {
-    return [95, 125];
+    return [82, 105];
   }
 
-  return [82, 98];
+  return [65, 78];
 }
 
 function estimateQuote(data: FormState) {
@@ -455,28 +455,28 @@ function estimateQuote(data: FormState) {
 
   switch (data.propertyType) {
     case "Studio":
-      baseMin = 65;
-      baseMax = 85;
+      baseMin = 60;
+      baseMax = 75;
       break;
     case "1 Bedroom Apartment":
-      baseMin = 90;
-      baseMax = 110;
+      baseMin = 78;
+      baseMax = 95;
       break;
     case "2 Bedroom Apartment":
-      baseMin = 120;
-      baseMax = 135;
+      baseMin = 105;
+      baseMax = 120;
       break;
     case "3 Bedroom Apartment":
-      baseMin = 140;
-      baseMax = 165;
+      baseMin = 128;
+      baseMax = 150;
       break;
     case "Villa / Large Home":
       baseMin = 220;
       baseMax = 380;
       break;
     case "Holiday Home":
-      baseMin = 130;
-      baseMax = 180;
+      baseMin = 115;
+      baseMax = 155;
       break;
   }
 
@@ -492,8 +492,8 @@ function estimateQuote(data: FormState) {
       serviceMultiplierMax = 1;
       break;
     case "Deep Cleaning":
-      serviceMultiplierMin = 1.4;
-      serviceMultiplierMax = 1.5;
+      serviceMultiplierMin = 1.42;
+      serviceMultiplierMax = 1.55;
       break;
     case "Airbnb Turnover Cleaning":
       // Genelde standart temizliğe yakın, çarşaf değişimi vb. ile hafif üstünde
@@ -513,21 +513,36 @@ function estimateQuote(data: FormState) {
   let min = baseMin * serviceMultiplierMin;
   let max = baseMax * serviceMultiplierMax;
 
-  // 3) Malzeme (temizlik ürünleri getirilmesi)
+  // Supplies are usually a small part of a full booking and should not make
+  // the displayed total feel punitive.
   if (data.suppliesNeeded === "Yes") {
-    min += 8;
-    max += 10;
+    min += 5;
+    max += 8;
   }
 
-  // Ek işler aynı maliyette değildir. Özellikle profesyonel koltuk yıkama,
-  // ayrı personel ve makine gerektirdiği için bağımsız fiyatlandırılır.
+  // Common deep-cleaning extras are bundled. Adding five related tasks should
+  // not look like five separate call-outs when one team can do them together.
+  const bundleTasks = new Set([
+    "Interior windows",
+    "Balcony / terrace",
+    "Inside fridge",
+    "Inside oven",
+    "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
+  ]);
+  const bundleCount = data.extraTasks.filter((task) => bundleTasks.has(task)).length;
+
+  if (bundleCount > 0) {
+    const deepStyleService =
+      data.serviceType === "Deep Cleaning" ||
+      data.serviceType === "Move In / Move Out Cleaning";
+    const included = deepStyleService ? 2 : 0;
+    const chargeable = Math.max(0, bundleCount - included);
+    min += (deepStyleService ? 8 : 10) + chargeable * 4;
+    max += (deepStyleService ? 14 : 16) + chargeable * 7;
+  }
+
   const extraPrices: Record<string, [number, number]> = {
-    "Interior windows": [8, 12],
-    "Exterior windows (where safely accessible)": [10, 16],
-    "Balcony / terrace": [8, 12],
-    "Inside fridge": [6, 9],
-    "Inside oven": [7, 10],
-    "Inside kitchen cupboards & drawers (empty, clean & replace contents)": [10, 15],
+    "Exterior windows (where safely accessible)": [8, 14],
     "Linen change": [5, 8],
     Ironing: [10, 18],
     "After-party extra mess": [18, 30],
@@ -537,7 +552,8 @@ function estimateQuote(data: FormState) {
     if (
       task === "Sofa & armchair deep cleaning" ||
       task === "Curtain cleaning" ||
-      task === "Mattress deep cleaning"
+      task === "Mattress deep cleaning" ||
+      bundleTasks.has(task)
     ) {
       continue;
     }
@@ -548,14 +564,37 @@ function estimateQuote(data: FormState) {
 
   // Property condition materially changes team time and product usage.
   if (data.propertyCondition === "Needs extra attention") {
-    min *= 1.08;
-    max *= 1.14;
+    min *= 1.06;
+    max *= 1.1;
   } else if (data.propertyCondition === "Heavily soiled") {
-    min *= 1.18;
-    max *= 1.3;
+    min *= 1.14;
+    max *= 1.22;
   } else if (data.propertyCondition === "Empty / recently renovated") {
-    min *= 1.1;
-    max *= 1.2;
+    min *= 1.08;
+    max *= 1.15;
+  }
+
+  // Use the information already collected without letting a small difference
+  // in size create a frightening jump. Only clearly larger homes are adjusted.
+  const sizeM2 = Number.parseInt(data.propertySize.match(/\d+/)?.[0] ?? "", 10);
+  const typicalSize: Record<PropertyType, number> = {
+    Studio: 40,
+    "1 Bedroom Apartment": 65,
+    "2 Bedroom Apartment": 100,
+    "3 Bedroom Apartment": 135,
+    "Villa / Large Home": 220,
+    "Holiday Home": 140,
+  };
+  if (Number.isFinite(sizeM2) && sizeM2 > typicalSize[data.propertyType] * 1.15) {
+    const oversizeRatio = Math.min(0.18, (sizeM2 / typicalSize[data.propertyType] - 1) * 0.3);
+    min *= 1 + oversizeRatio * 0.7;
+    max *= 1 + oversizeRatio;
+  }
+
+  const bathroomCount = data.bathrooms === "4+" ? 4 : Number.parseInt(data.bathrooms, 10);
+  if (Number.isFinite(bathroomCount) && bathroomCount > 1) {
+    min += (bathroomCount - 1) * 7;
+    max += (bathroomCount - 1) * 10;
   }
 
   // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
@@ -589,17 +628,23 @@ function estimateQuote(data: FormState) {
     max += mattressMax;
   }
 
-  // CleanNestPro koordinasyonu, çok dilli destek, Stripe maliyeti ve makul
-  // operasyon tamponu. Nihai teklif yine gerçek sağlayıcı fiyatıyla doğrulanır.
-  min *= 1.13;
-  max *= 1.13;
+  // Base prices already contain a modest managed-service allowance. Do not
+  // add another blanket percentage here: it compounded every extra and made
+  // larger, otherwise sensible requests look disproportionately expensive.
 
   min = Math.max(35, min);
   max = Math.max(min + 15, max);
 
+  // Keep the indicative range useful rather than alarming. The raw supplier
+  // uncertainty is narrowed around the midpoint; manual review still confirms
+  // the final figure before any payment is requested.
+  const midpoint = (min + max) / 2;
+  const displayMin = Math.max(min, midpoint * 0.9);
+  const displayMax = Math.min(max, midpoint * 1.1);
+
   // Daha okunabilir fiyat noktaları için en yakın €5'e yuvarla.
-  const roundedMin = Math.round(min / 5) * 5;
-  const roundedMax = Math.round(max / 5) * 5;
+  const roundedMin = Math.round(displayMin / 5) * 5;
+  const roundedMax = Math.max(roundedMin + 10, Math.round(displayMax / 5) * 5);
 
   return `€${roundedMin}–€${roundedMax}`;
 }
