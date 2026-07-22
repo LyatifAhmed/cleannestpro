@@ -48,19 +48,32 @@ type LanguageType = "Turkish" | "English" | "Russian";
 type FormState = {
   fullName: string;
   email: string;
+  whatsapp: string;
   preferredLanguage: LanguageType;
   location: string;
+  fullAddress: string;
   serviceType: ServiceType;
   propertyType: PropertyType;
   bathrooms: string;
   propertySize: string;
+  propertyCondition: string;
+  floorNumber: string;
+  elevator: string;
   frequency: FrequencyType;
   preferredDate: string;
   preferredTime: string;
+  dateFlexibility: string;
   furnished: string;
   pets: string;
   suppliesNeeded: string;
   extraTasks: string[];
+  sofaDetails: string;
+  curtainCount: string;
+  curtainType: string;
+  mattressCount: string;
+  mattressSizes: string;
+  allergies: string;
+  parkingAvailable: string;
   accessDetails: string;
   specialNotes: string;
   website: string;
@@ -120,6 +133,8 @@ const extraTaskOptions = [
   "Inside oven",
   "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
   "Sofa & armchair deep cleaning",
+  "Curtain cleaning",
+  "Mattress deep cleaning",
   "Linen change",
   "Ironing",
   "After-party extra mess",
@@ -244,19 +259,32 @@ const faqs = [
 const createInitialState = (): FormState => ({
   fullName: "",
   email: "",
+  whatsapp: "",
   preferredLanguage: "English",
   location: "",
+  fullAddress: "",
   serviceType: "Regular Home Cleaning",
   propertyType: "1 Bedroom Apartment",
   bathrooms: "1",
   propertySize: "",
+  propertyCondition: "Normally maintained",
+  floorNumber: "",
+  elevator: "Yes",
   frequency: "One-time",
   preferredDate: "",
   preferredTime: "",
+  dateFlexibility: "Exact date preferred",
   furnished: "Yes",
   pets: "No",
   suppliesNeeded: "No",
   extraTasks: [],
+  sofaDetails: "",
+  curtainCount: "",
+  curtainType: "",
+  mattressCount: "",
+  mattressSizes: "",
+  allergies: "",
+  parkingAvailable: "Not sure",
   accessDetails: "",
   specialNotes: "",
   website: "",
@@ -370,6 +398,54 @@ async function compressPropertyPhoto(file: File): Promise<File> {
   }
 }
 
+function parsePositiveCount(value: string, fallback = 1) {
+  const parsed = Number.parseInt(value.match(/\d+/)?.[0] ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function estimateCurtainCleaning(data: FormState): [number, number] {
+  const count = parsePositiveCount(data.curtainCount);
+  const type = data.curtainType.toLowerCase();
+
+  // Per panel, including collection/handling allowance. Blackout, roller and
+  // similarly heavy curtains normally cost more than standard/sheers.
+  let typeMultiplier = 1;
+  if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.25;
+  else if (/sheer|tulle|voile/.test(type)) typeMultiplier = 0.9;
+
+  return [count * 16 * typeMultiplier, count * 23 * typeMultiplier];
+}
+
+function estimateMattressCleaning(data: FormState): [number, number] {
+  const count = parsePositiveCount(data.mattressCount);
+  const sizes = data.mattressSizes.toLowerCase();
+
+  // When both types are entered (for example "one single, one double"), use
+  // one of each and price any remaining mattresses at the unknown-size rate.
+  if (/single|twin|85|90/.test(sizes) && /double|king|queen|160|180|200/.test(sizes)) {
+    const remaining = Math.max(0, count - 2);
+    return [24 + 30 + remaining * 27, 30 + 38 + remaining * 35];
+  }
+
+  if (/king|queen|180|200/.test(sizes)) return [count * 34, count * 42];
+  if (/double|140|150|160/.test(sizes)) return [count * 30, count * 38];
+  if (/single|twin|80|85|90|100|120/.test(sizes)) return [count * 24, count * 30];
+
+  return [count * 27, count * 35];
+}
+
+function estimateSofaCleaning(data: FormState): [number, number] {
+  const details = data.sofaDetails.toLowerCase();
+
+  // A standard Antalya salon set is calibrated from a 3,000 TL + VAT local
+  // quote. L-shaped/sectional or explicitly large sets receive more headroom.
+  if (/l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)) {
+    return [95, 125];
+  }
+
+  return [82, 98];
+}
+
 function estimateQuote(data: FormState) {
   // Müşteriye gösterilen yönetilen hizmet aralığı (€).
   // Yerel sağlayıcının kendi KDV'si tedarikçi maliyetinin içindedir;
@@ -452,16 +528,34 @@ function estimateQuote(data: FormState) {
     "Inside fridge": [6, 9],
     "Inside oven": [7, 10],
     "Inside kitchen cupboards & drawers (empty, clean & replace contents)": [10, 15],
-    "Sofa & armchair deep cleaning": [70, 80],
     "Linen change": [5, 8],
     Ironing: [10, 18],
     "After-party extra mess": [18, 30],
   };
 
   for (const task of data.extraTasks) {
+    if (
+      task === "Sofa & armchair deep cleaning" ||
+      task === "Curtain cleaning" ||
+      task === "Mattress deep cleaning"
+    ) {
+      continue;
+    }
     const [extraMin, extraMax] = extraPrices[task] ?? [7, 12];
     min += extraMin;
     max += extraMax;
+  }
+
+  // Property condition materially changes team time and product usage.
+  if (data.propertyCondition === "Needs extra attention") {
+    min *= 1.08;
+    max *= 1.14;
+  } else if (data.propertyCondition === "Heavily soiled") {
+    min *= 1.18;
+    max *= 1.3;
+  } else if (data.propertyCondition === "Empty / recently renovated") {
+    min *= 1.1;
+    max *= 1.2;
   }
 
   // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
@@ -472,6 +566,27 @@ function estimateQuote(data: FormState) {
   } else if (data.frequency === "Monthly") {
     min *= 0.92;
     max *= 0.95;
+  }
+
+  // Specialist machine-cleaning services are priced after frequency and
+  // property-condition adjustments. A weekly home-cleaning discount must not
+  // accidentally discount one-off curtain, mattress or upholstery work.
+  if (data.extraTasks.includes("Sofa & armchair deep cleaning")) {
+    const [sofaMin, sofaMax] = estimateSofaCleaning(data);
+    min += sofaMin;
+    max += sofaMax;
+  }
+
+  if (data.extraTasks.includes("Curtain cleaning")) {
+    const [curtainMin, curtainMax] = estimateCurtainCleaning(data);
+    min += curtainMin;
+    max += curtainMax;
+  }
+
+  if (data.extraTasks.includes("Mattress deep cleaning")) {
+    const [mattressMin, mattressMax] = estimateMattressCleaning(data);
+    min += mattressMin;
+    max += mattressMax;
   }
 
   // CleanNestPro koordinasyonu, çok dilli destek, Stripe maliyeti ve makul
@@ -528,6 +643,7 @@ function getCoordinationServiceJsonLd() {
 
 export default function Home() {
   const [form, setForm] = useState<FormState>(createInitialState());
+  const [formStep, setFormStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [showFloatingQuote, setShowFloatingQuote] = useState(false);
   const [sending, setSending] = useState(false);
@@ -573,6 +689,26 @@ export default function Home() {
           : [...prev.extraTasks, task],
       };
     });
+  }
+
+  const quoteSteps = ["Property", "Services", "Schedule", "Contact & review"];
+
+  function goToNextStep() {
+    if (formStep === 0 && !form.location.trim()) {
+      alert("Please add the area or neighbourhood in Antalya.");
+      return;
+    }
+
+    if (formStep === 2 && !form.preferredDate) {
+      alert("Please choose a preferred date.");
+      return;
+    }
+
+    setFormStep((current) => Math.min(current + 1, quoteSteps.length - 1));
+  }
+
+  function goToPreviousStep() {
+    setFormStep((current) => Math.max(current - 1, 0));
   }
 
   async function handlePhotoSelection(e: ChangeEvent<HTMLInputElement>) {
@@ -647,6 +783,7 @@ export default function Home() {
 
       setSubmitted(true);
       setForm(createInitialState());
+      setFormStep(0);
       setPropertyPhotos([]);
       if (photoInputRef.current) photoInputRef.current.value = "";
     } catch (error) {
@@ -1154,8 +1291,8 @@ export default function Home() {
           className="w-full px-6 py-24 md:px-10 lg:px-16"
         >
           <div className="mx-auto w-full max-w-[1440px]">
-            <div className="grid items-start gap-12 lg:grid-cols-[1.05fr_1.15fr] xl:gap-16">
-              <motion.div variants={fadeUp} className="max-w-2xl">
+            <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] xl:gap-14">
+              <motion.div variants={fadeUp} className="max-w-2xl lg:sticky lg:top-8">
                 <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
                   One coordinated quote
                 </div>
@@ -1192,415 +1329,145 @@ export default function Home() {
               <motion.form
                 variants={softReveal}
                 onSubmit={handleSubmit}
-                className="rounded-[36px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9 lg:p-10"
+                className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#11182a] dark:shadow-none"
               >
+                <div className="border-b border-slate-200 bg-[#f7f5f0] px-6 py-6 dark:border-white/10 dark:bg-white/[0.035] md:px-9">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        Step {formStep + 1} of {quoteSteps.length}
+                      </p>
+                      <h3 className="mt-1 text-xl font-semibold tracking-tight">
+                        {quoteSteps[formStep]}
+                      </h3>
+                    </div>
+                    <div className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold dark:border-white/10 dark:bg-white/5">
+                      {estimate}
+                    </div>
+                  </div>
+                  <div className="mt-5 grid grid-cols-4 gap-2">
+                    {quoteSteps.map((step, index) => (
+                      <button
+                        key={step}
+                        type="button"
+                        onClick={() => index < formStep && setFormStep(index)}
+                        className="group text-left"
+                        aria-label={`Go to ${step}`}
+                      >
+                        <span
+                          className={`block h-1.5 rounded-full transition ${
+                            index <= formStep
+                              ? "bg-slate-950 dark:bg-white"
+                              : "bg-slate-200 dark:bg-white/10"
+                          }`}
+                        />
+                        <span className="mt-2 hidden text-[11px] font-medium text-slate-500 sm:block">
+                          {step}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="hidden" aria-hidden="true">
                   <label htmlFor="website">Website</label>
-                  <input
-                    id="website"
-                    name="website"
-                    type="text"
-                    tabIndex={-1}
-                    autoComplete="off"
-                    value={form.website}
-                    onChange={(e) => updateField("website", e.target.value)}
-                  />
+                  <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => updateField("website", e.target.value)} />
                 </div>
 
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Field>
-                    <Label htmlFor="fullName">Full name</Label>
-                    <Input
-                      id="fullName"
-                      name="fullName"
-                      value={form.fullName}
-                      onChange={(e) => updateField("fullName", e.target.value)}
-                      placeholder="Your full name"
-                      required
-                      autoComplete="name"
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={(e) => updateField("email", e.target.value)}
-                      placeholder="you@example.com"
-                      required
-                      autoComplete="email"
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="preferredLanguage">Preferred language</Label>
-                    <Select
-                      id="preferredLanguage"
-                      name="preferredLanguage"
-                      value={form.preferredLanguage}
-                      onChange={(e) =>
-                        updateField("preferredLanguage", e.target.value as LanguageType)
-                      }
-                    >
-                      <option>English</option>
-                      <option>Russian</option>
-                      <option>Turkish</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="location">Area in Antalya</Label>
-                    <Input
-                      id="location"
-                      name="location"
-                      value={form.location}
-                      onChange={(e) => updateField("location", e.target.value)}
-                      placeholder="Area / neighbourhood"
-                      required
-                      autoComplete="address-level2"
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="serviceType">Service type</Label>
-                    <Select
-                      id="serviceType"
-                      name="serviceType"
-                      value={form.serviceType}
-                      onChange={(e) =>
-                        updateField("serviceType", e.target.value as ServiceType)
-                      }
-                    >
-                      <option>Regular Home Cleaning</option>
-                      <option>Deep Cleaning</option>
-                      <option>Airbnb Turnover Cleaning</option>
-                      <option>Move In / Move Out Cleaning</option>
-                      <option>After-party Cleanup</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="propertyType">Property type</Label>
-                    <Select
-                      id="propertyType"
-                      name="propertyType"
-                      value={form.propertyType}
-                      onChange={(e) =>
-                        updateField("propertyType", e.target.value as PropertyType)
-                      }
-                    >
-                      <option>Studio</option>
-                      <option>1 Bedroom Apartment</option>
-                      <option>2 Bedroom Apartment</option>
-                      <option>3 Bedroom Apartment</option>
-                      <option>Villa / Large Home</option>
-                      <option>Holiday Home</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="bathrooms">Bathrooms</Label>
-                    <Select
-                      id="bathrooms"
-                      name="bathrooms"
-                      value={form.bathrooms}
-                      onChange={(e) => updateField("bathrooms", e.target.value)}
-                    >
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4+</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="propertySize">Approx property size</Label>
-                    <Input
-                      id="propertySize"
-                      name="propertySize"
-                      value={form.propertySize}
-                      onChange={(e) => updateField("propertySize", e.target.value)}
-                      placeholder="e.g. 90 m²"
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="frequency">Cleaning frequency</Label>
-                    <Select
-                      id="frequency"
-                      name="frequency"
-                      value={form.frequency}
-                      onChange={(e) =>
-                        updateField("frequency", e.target.value as FrequencyType)
-                      }
-                    >
-                      <option>One-time</option>
-                      <option>Weekly</option>
-                      <option>Bi-weekly</option>
-                      <option>Monthly</option>
-                      <option>Not sure yet</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="preferredDate">Preferred date</Label>
-                    <Input
-                      id="preferredDate"
-                      name="preferredDate"
-                      type="date"
-                      value={form.preferredDate}
-                      onChange={(e) => updateField("preferredDate", e.target.value)}
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="preferredTime">Preferred time</Label>
-                    <Input
-                      id="preferredTime"
-                      name="preferredTime"
-                      type="time"
-                      value={form.preferredTime}
-                      onChange={(e) => updateField("preferredTime", e.target.value)}
-                    />
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="furnished">Is the property furnished?</Label>
-                    <Select
-                      id="furnished"
-                      name="furnished"
-                      value={form.furnished}
-                      onChange={(e) => updateField("furnished", e.target.value)}
-                    >
-                      <option>Yes</option>
-                      <option>No</option>
-                      <option>Partly</option>
-                    </Select>
-                  </Field>
-
-                  <Field>
-                    <Label htmlFor="pets">Any pets?</Label>
-                    <Select
-                      id="pets"
-                      name="pets"
-                      value={form.pets}
-                      onChange={(e) => updateField("pets", e.target.value)}
-                    >
-                      <option>No</option>
-                      <option>Yes</option>
-                    </Select>
-                  </Field>
-
-                  <Field className="md:col-span-2">
-                    <Label htmlFor="suppliesNeeded">
-                      Do you need cleaning supplies brought by the cleaner?
-                    </Label>
-                    <Select
-                      id="suppliesNeeded"
-                      name="suppliesNeeded"
-                      value={form.suppliesNeeded}
-                      onChange={(e) => updateField("suppliesNeeded", e.target.value)}
-                    >
-                      <option>No</option>
-                      <option>Yes</option>
-                    </Select>
-                  </Field>
-
-                  <Field className="md:col-span-2">
-                    <fieldset>
-                      <legend className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
-                        Extra tasks
-                      </legend>
-
-                      <div className="flex flex-wrap gap-3">
-                        {extraTaskOptions.map((task) => {
-                          const active = form.extraTasks.includes(task);
-                          return (
-                            <button
-                              key={task}
-                              type="button"
-                              aria-pressed={active}
-                              onClick={() => toggleExtraTask(task)}
-                              className={`rounded-full border px-4 py-2 text-sm transition ${
-                                active
-                                  ? "border-slate-900 bg-slate-900 text-white dark:border-white dark:bg-white dark:text-slate-900"
-                                  : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
-                              }`}
-                            >
-                              {task}
-                            </button>
-                          );
-                        })}
+                <div className="min-h-[520px] p-6 md:p-9">
+                  {formStep === 0 ? (
+                    <div className="space-y-7">
+                      <StepIntro eyebrow="Your space" title="What are we cleaning?" text="A few property details help us match the right local team and equipment." />
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field><Label htmlFor="serviceType">Service type</Label><Select id="serviceType" value={form.serviceType} onChange={(e) => updateField("serviceType", e.target.value as ServiceType)}><option>Regular Home Cleaning</option><option>Deep Cleaning</option><option>Airbnb Turnover Cleaning</option><option>Move In / Move Out Cleaning</option><option>After-party Cleanup</option></Select></Field>
+                        <Field><Label htmlFor="propertyType">Property type</Label><Select id="propertyType" value={form.propertyType} onChange={(e) => updateField("propertyType", e.target.value as PropertyType)}><option>Studio</option><option>1 Bedroom Apartment</option><option>2 Bedroom Apartment</option><option>3 Bedroom Apartment</option><option>Villa / Large Home</option><option>Holiday Home</option></Select></Field>
+                        <Field><Label htmlFor="bathrooms">Bathrooms</Label><Select id="bathrooms" value={form.bathrooms} onChange={(e) => updateField("bathrooms", e.target.value)}><option>1</option><option>2</option><option>3</option><option>4+</option></Select></Field>
+                        <Field><Label htmlFor="propertySize">Approximate size</Label><Input id="propertySize" value={form.propertySize} onChange={(e) => updateField("propertySize", e.target.value)} placeholder="e.g. 100 m²" /></Field>
+                        <Field><Label htmlFor="furnished">Furnished?</Label><Select id="furnished" value={form.furnished} onChange={(e) => updateField("furnished", e.target.value)}><option>Yes</option><option>No</option><option>Partly</option></Select></Field>
+                        <Field><Label htmlFor="propertyCondition">Current condition</Label><Select id="propertyCondition" value={form.propertyCondition} onChange={(e) => updateField("propertyCondition", e.target.value)}><option>Normally maintained</option><option>Needs extra attention</option><option>Heavily soiled</option><option>Empty / recently renovated</option><option>Not sure</option></Select></Field>
+                        <Field><Label htmlFor="location">Area in Antalya</Label><Input id="location" value={form.location} onChange={(e) => updateField("location", e.target.value)} placeholder="Muratpaşa / neighbourhood" autoComplete="address-level2" /></Field>
+                        <Field><Label htmlFor="floorNumber">Floor</Label><Input id="floorNumber" value={form.floorNumber} onChange={(e) => updateField("floorNumber", e.target.value)} placeholder="e.g. 7th floor" /></Field>
+                        <Field><Label htmlFor="elevator">Elevator available?</Label><Select id="elevator" value={form.elevator} onChange={(e) => updateField("elevator", e.target.value)}><option>Yes</option><option>No</option><option>Not applicable</option></Select></Field>
+                        <Field><Label htmlFor="fullAddress">Address or nearby landmark (optional)</Label><Input id="fullAddress" value={form.fullAddress} onChange={(e) => updateField("fullAddress", e.target.value)} placeholder="Street, building or a nearby landmark" autoComplete="street-address" /></Field>
                       </div>
-                    </fieldset>
-                  </Field>
+                    </div>
+                  ) : null}
 
-                  <Field className="md:col-span-2">
-                    <Label htmlFor="accessDetails">Access details</Label>
-                    <Input
-                      id="accessDetails"
-                      name="accessDetails"
-                      value={form.accessDetails}
-                      onChange={(e) => updateField("accessDetails", e.target.value)}
-                      placeholder="Building access, key handover, guest timing, parking notes..."
-                    />
-                  </Field>
-
-                  <Field className="md:col-span-2">
-                    <Label htmlFor="specialNotes">Anything else we should know?</Label>
-                    <Textarea
-                      id="specialNotes"
-                      name="specialNotes"
-                      value={form.specialNotes}
-                      onChange={(e) => updateField("specialNotes", e.target.value)}
-                      placeholder="You can mention the condition of the property, urgency, special requirements, guest check-out times, or anything useful for an accurate quote."
-                    />
-                  </Field>
-
-                  <Field className="md:col-span-2">
-                    <Label htmlFor="propertyPhotos">Property photos (optional)</Label>
-                    <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                      A few photos help us prepare a more accurate quote. Please do not
-                      include people, documents, screens, family photographs, or other
-                      sensitive information.
-                    </p>
-
-                    <input
-                      ref={photoInputRef}
-                      id="propertyPhotos"
-                      name="propertyPhotos"
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      multiple
-                      onChange={handlePhotoSelection}
-                      disabled={sending || processingPhotos || propertyPhotos.length >= MAX_PROPERTY_PHOTOS}
-                      className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-90 disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900"
-                    />
-
-                    <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                      JPG, PNG or WebP · Maximum {MAX_PROPERTY_PHOTOS} photos · Photos are
-                      resized before upload and used only to prepare and coordinate your quote.
-                    </p>
-
-                    {processingPhotos ? (
-                      <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">
-                        Preparing photos…
-                      </p>
-                    ) : null}
-
-                    {photoPreviews.length ? (
-                      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        {photoPreviews.map((preview, index) => (
-                          <div
-                            key={`${preview.file.name}-${preview.file.lastModified}-${index}`}
-                            className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5"
-                          >
-                            <Image
-                              src={preview.url}
-                              alt={`Selected property photo ${index + 1}`}
-                              width={320}
-                              height={224}
-                              unoptimized
-                              className="h-28 w-full object-cover"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removePropertyPhoto(index)}
-                              aria-label={`Remove property photo ${index + 1}`}
-                              className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur hover:bg-black"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
+                  {formStep === 1 ? (
+                    <div className="space-y-7">
+                      <StepIntro eyebrow="Build the scope" title="Choose everything you need" text="Select as much as you like. Specialist details only appear when relevant." />
+                      <Field><Label htmlFor="suppliesNeeded">Should the team bring all supplies and equipment?</Label><Select id="suppliesNeeded" value={form.suppliesNeeded} onChange={(e) => updateField("suppliesNeeded", e.target.value)}><option>No</option><option>Yes</option></Select></Field>
+                      <fieldset>
+                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">Additional services</legend>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {extraTaskOptions.map((task) => {
+                            const active = form.extraTasks.includes(task);
+                            return (
+                              <button key={task} type="button" aria-pressed={active} onClick={() => toggleExtraTask(task)} className={`flex min-h-14 items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${active ? "border-slate-950 bg-slate-950 text-white shadow-sm dark:border-white dark:bg-white dark:text-slate-950" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-slate-400 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]"}`}>
+                                <span>{task}</span><span className={`ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${active ? "border-white/30 bg-white/15 dark:border-slate-900/20 dark:bg-slate-900/10" : "border-slate-300 dark:border-white/15"}`}>{active ? "✓" : "+"}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </fieldset>
+                      {form.extraTasks.includes("Sofa & armchair deep cleaning") ? <DetailPanel title="Sofa & armchair details"><Input value={form.sofaDetails} onChange={(e) => updateField("sofaDetails", e.target.value)} placeholder="e.g. one 3-seat sofa, one 2-seat sofa and two armchairs" /></DetailPanel> : null}
+                      {form.extraTasks.includes("Curtain cleaning") ? <DetailPanel title="Curtain details"><div className="grid gap-4 sm:grid-cols-2"><Input value={form.curtainCount} onChange={(e) => updateField("curtainCount", e.target.value)} placeholder="Number of curtains / rooms" /><Input value={form.curtainType} onChange={(e) => updateField("curtainType", e.target.value)} placeholder="Sheer, blackout, roller, unknown…" /></div></DetailPanel> : null}
+                      {form.extraTasks.includes("Mattress deep cleaning") ? <DetailPanel title="Mattress details"><div className="grid gap-4 sm:grid-cols-2"><Input value={form.mattressCount} onChange={(e) => updateField("mattressCount", e.target.value)} placeholder="Number of mattresses" /><Input value={form.mattressSizes} onChange={(e) => updateField("mattressSizes", e.target.value)} placeholder="Single, double, king…" /></div></DetailPanel> : null}
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field><Label htmlFor="pets">Any pets?</Label><Select id="pets" value={form.pets} onChange={(e) => updateField("pets", e.target.value)}><option>No</option><option>Yes</option></Select></Field>
+                        <Field><Label htmlFor="allergies">Allergies or product restrictions</Label><Input id="allergies" value={form.allergies} onChange={(e) => updateField("allergies", e.target.value)} placeholder="None, fragrance-free products…" /></Field>
                       </div>
-                    ) : null}
-                  </Field>
-                </div>
-
-                <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
-                  <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Estimated all-in service range
-                  </div>
-                  <div className="mt-2 text-3xl font-semibold tracking-tight">
-                    {estimate}
-                  </div>
-                  <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                    This is an indicative range based on current Antalya provider
-                    costs and the services selected. Your final all-in price is
-                    confirmed after we review the full scope and availability.
-                  </p>
-                </div>
-
-                <div className="mt-5 rounded-[24px] border border-slate-200 bg-white p-5 dark:border-white/10 dark:bg-slate-950/40">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-base dark:bg-white/10">
-                      🔒
                     </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                        Secure booking, clear protection
-                      </h3>
-                      <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                        If you accept the final quote, we will email you a secure
-                        Stripe payment link. Your booking is confirmed after
-                        payment. If the selected provider becomes unavailable and
-                        we cannot coordinate a suitable replacement for the
-                        confirmed date, you will receive a full refund.
-                      </p>
-                      <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
-                        On-site work is performed by an independent local service
-                        partner appointed by CleanNestPro. Your booking and payment
-                        are with us. See our <Link href="/terms" className="underline">Terms</Link> for the service model and cancellation rules.
-                      </p>
-                      <p className="mt-3 text-xs font-medium uppercase tracking-[0.14em] text-slate-400">
-                        Secure payments powered by Stripe
-                      </p>
+                  ) : null}
+
+                  {formStep === 2 ? (
+                    <div className="space-y-7">
+                      <StepIntro eyebrow="Timing & access" title="When should the team arrive?" text="Tell us what is fixed and where you have flexibility." />
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field><Label htmlFor="preferredDate">Preferred date</Label><Input id="preferredDate" type="date" value={form.preferredDate} onChange={(e) => updateField("preferredDate", e.target.value)} /></Field>
+                        <Field><Label htmlFor="preferredTime">Preferred time</Label><Input id="preferredTime" type="time" value={form.preferredTime} onChange={(e) => updateField("preferredTime", e.target.value)} /></Field>
+                        <Field><Label htmlFor="dateFlexibility">Date flexibility</Label><Select id="dateFlexibility" value={form.dateFlexibility} onChange={(e) => updateField("dateFlexibility", e.target.value)}><option>Exact date preferred</option><option>Flexible by 1 day</option><option>Flexible within the same week</option><option>Please suggest the earliest option</option></Select></Field>
+                        <Field><Label htmlFor="frequency">Cleaning frequency</Label><Select id="frequency" value={form.frequency} onChange={(e) => updateField("frequency", e.target.value as FrequencyType)}><option>One-time</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option><option>Not sure yet</option></Select></Field>
+                        <Field><Label htmlFor="parkingAvailable">Parking nearby?</Label><Select id="parkingAvailable" value={form.parkingAvailable} onChange={(e) => updateField("parkingAvailable", e.target.value)}><option>Not sure</option><option>Yes</option><option>No</option><option>Paid parking only</option></Select></Field>
+                        <Field><Label htmlFor="accessDetails">Access arrangement</Label><Input id="accessDetails" value={form.accessDetails} onChange={(e) => updateField("accessDetails", e.target.value)} placeholder="I will be home, key handover, reception…" /></Field>
+                      </div>
                     </div>
+                  ) : null}
+
+                  {formStep === 3 ? (
+                    <div className="space-y-7">
+                      <StepIntro eyebrow="Almost done" title="Where should we send your quote?" text="We review every request before confirming the final scope and price." />
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field><Label htmlFor="fullName">Full name</Label><Input id="fullName" value={form.fullName} onChange={(e) => updateField("fullName", e.target.value)} placeholder="Your full name" required autoComplete="name" /></Field>
+                        <Field><Label htmlFor="email">Email</Label><Input id="email" type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" /></Field>
+                        <Field><Label htmlFor="whatsapp">WhatsApp number (optional)</Label><Input id="whatsapp" type="tel" value={form.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="Include country code" autoComplete="tel" /></Field>
+                        <Field><Label htmlFor="preferredLanguage">Preferred language</Label><Select id="preferredLanguage" value={form.preferredLanguage} onChange={(e) => updateField("preferredLanguage", e.target.value as LanguageType)}><option>English</option><option>Russian</option><option>Turkish</option></Select></Field>
+                        <Field className="md:col-span-2"><Label htmlFor="specialNotes">Anything else we should know?</Label><Textarea id="specialNotes" value={form.specialNotes} onChange={(e) => updateField("specialNotes", e.target.value)} placeholder="Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately." /></Field>
+                      </div>
+                      <DetailPanel title="Property photos (optional)">
+                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">Photos improve quote accuracy. Please exclude people, documents, screens and family photographs.</p>
+                        <input ref={photoInputRef} id="propertyPhotos" name="propertyPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handlePhotoSelection} disabled={sending || processingPhotos || propertyPhotos.length >= MAX_PROPERTY_PHOTOS} className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900" />
+                        {photoPreviews.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{photoPreviews.map((preview, index) => <div key={`${preview.file.name}-${index}`} className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10"><Image src={preview.url} alt={`Selected property photo ${index + 1}`} width={320} height={224} unoptimized className="h-24 w-full object-cover" /><button type="button" onClick={() => removePropertyPhoto(index)} className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white">Remove</button></div>)}</div> : null}
+                      </DetailPanel>
+                      <div className="grid gap-4 rounded-[28px] border border-slate-200 bg-[#f7f5f0] p-5 dark:border-white/10 dark:bg-white/[0.035] sm:grid-cols-[1fr_auto] sm:items-center">
+                        <div><p className="text-sm font-semibold">Indicative all-in range</p><p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">Final price follows a manual scope and availability review.</p></div>
+                        <div className="text-3xl font-semibold tracking-tight">{estimate}</div>
+                      </div>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">🔒 No payment is requested now. If you accept the final quote, we send a secure Stripe payment link.</div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="border-t border-slate-200 bg-slate-50/70 px-6 py-5 dark:border-white/10 dark:bg-white/[0.025] md:px-9">
+                  <div className="flex items-center justify-between gap-3">
+                    <button type="button" onClick={goToPreviousStep} disabled={formStep === 0} className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium transition hover:bg-white disabled:invisible dark:border-white/15 dark:hover:bg-white/5">Back</button>
+                    {formStep < quoteSteps.length - 1 ? <button type="button" onClick={goToNextStep} className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-950">Continue <span aria-hidden="true">→</span></button> : <button type="submit" disabled={sending || processingPhotos} className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-950">{processingPhotos ? "Preparing photos…" : sending ? "Sending…" : "Request my quote"}</button>}
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-col gap-4 sm:flex-row">
-                  <button
-                    type="submit"
-                    disabled={sending || processingPhotos}
-                    className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
-                  >
-                    {processingPhotos
-                      ? "Preparing photos..."
-                      : sending
-                        ? "Sending..."
-                        : "Request quote by email"}
-                  </button>
+                {submitted ? <div className="m-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10"><p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Your quote request has been sent.</p><p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">Thank you. We’ll review the scope and email your final quote.</p></div> : null}
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      window.dispatchEvent(new CustomEvent("open-clean-chat"))
-                    }
-                    className="inline-flex w-full items-center justify-center rounded-2xl border border-slate-300 px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-slate-50 dark:border-white/15 dark:text-white dark:hover:bg-white/10"
-                  >
-                    Ask the assistant
-                  </button>
-                </div>
-
-                {submitted ? (
-                  <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
-                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                      Your quote request has been sent.
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
-                      Thank you. We’ll review the details and email your final
-                      quote. No payment is requested unless you choose to accept
-                      it and secure the booking.
-                    </p>
-                  </div>
-                ) : null}
-
-                <p className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                <p className="mx-6 mb-6 mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
                   Are you a cleaner in Antalya?{" "}
                   <Link
                     href="/apply"
@@ -1693,6 +1560,47 @@ function Field({
   className?: string;
 }) {
   return <div className={className}>{children}</div>;
+}
+
+function StepIntro({
+  eyebrow,
+  title,
+  text,
+}: {
+  eyebrow: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+        {eyebrow}
+      </p>
+      <h4 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
+        {title}
+      </h4>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+function DetailPanel({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[24px] border border-slate-200 bg-slate-50/70 p-5 dark:border-white/10 dark:bg-white/[0.035]">
+      <p className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+        {title}
+      </p>
+      {children}
+    </div>
+  );
 }
 
 function Label({
