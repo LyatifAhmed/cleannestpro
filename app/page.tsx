@@ -221,7 +221,7 @@ const faqs = [
   },
   {
     q: "How is pricing confirmed?",
-    a: "The range shown on the page is only indicative and includes VAT (KDV). Final pricing is confirmed after we review your property details, timing, and any requested extras.",
+    a: "The range shown on the page is indicative and includes the quoted service costs. Final pricing is confirmed after we review your property details, timing, requested extras, and current local provider availability.",
   },
   {
     q: "How do I request a quote?",
@@ -298,13 +298,16 @@ const staggerWrap: Variants = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Antalya piyasa araştırmasına dayalı fiyat mantığı
-// Kaynaklar: Armut, TrendHizmet, Uğurlu Temizlik, Temizlik Express (2026)
-// Kur: 1 EUR ≈ 53,5 TL (temmuz 2026)
-// KDV: %20 (Türkiye standart oranı) — nihai fiyata dahil edilir
+// Antalya piyasa araştırmasına ve ilk tamamlanan tedarikçi tekliflerine
+// dayalı müşteri fiyat aralığı (Temmuz 2026).
+//
+// Bu yalnızca yönlendirici bir aralıktır. Nihai fiyat, yerel sağlayıcının
+// KDV dahil maliyeti kesinleştikten sonra şu hedefle kontrol edilir:
+//   finalQuoteEur = supplierCostTry / currentEurTryRate / 0.72
+// 0.72; ödeme/kur maliyetleri, operasyon payı ve yaklaşık %18-20 hedef
+// marj için güvenli bir geri-kazanım katsayısıdır.
 // ─────────────────────────────────────────────────────────────
 
-const VAT_RATE = 0.2; // %20 KDV
 const MAX_PROPERTY_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 700 * 1024;
 const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
@@ -368,38 +371,36 @@ async function compressPropertyPhoto(file: File): Promise<File> {
 }
 
 function estimateQuote(data: FormState) {
-  // 1) Emlak tipine göre BAZ fiyat aralığı (KDV hariç, € cinsinden)
-  //    Antalya'daki profesyonel firma paket fiyatlarından türetildi.
+  // Müşteriye gösterilen yönetilen hizmet aralığı (€).
+  // Yerel sağlayıcının kendi KDV'si tedarikçi maliyetinin içindedir;
+  // CleanNestPro müşteriye ayrıca Türk KDV'si tahsil ediyor gibi gösterilmez.
   let baseMin = 0;
   let baseMax = 0;
 
   switch (data.propertyType) {
     case "Studio":
-      baseMin = 70;
-      baseMax = 95;
+      baseMin = 65;
+      baseMax = 85;
       break;
     case "1 Bedroom Apartment":
-      // 1+1 daire: piyasada 5.000 TL'den başlıyor (~€93)
       baseMin = 90;
-      baseMax = 125;
+      baseMax = 110;
       break;
     case "2 Bedroom Apartment":
-      baseMin = 125;
-      baseMax = 165;
+      baseMin = 120;
+      baseMax = 135;
       break;
     case "3 Bedroom Apartment":
-      // 3+1 standart temizlik: 8.000–10.000 TL (~€150–187)
-      baseMin = 145;
-      baseMax = 185;
+      baseMin = 140;
+      baseMax = 165;
       break;
     case "Villa / Large Home":
-      // Villa: 50–85 TL/m², ortalama 250 m² villa için hesaplandı
       baseMin = 220;
-      baseMax = 420;
+      baseMax = 380;
       break;
     case "Holiday Home":
-      baseMin = 135;
-      baseMax = 200;
+      baseMin = 130;
+      baseMax = 180;
       break;
   }
 
@@ -415,9 +416,8 @@ function estimateQuote(data: FormState) {
       serviceMultiplierMax = 1;
       break;
     case "Deep Cleaning":
-      // Piyasa: standart fiyatın %50-70 üzerinde
-      serviceMultiplierMin = 1.45;
-      serviceMultiplierMax = 1.7;
+      serviceMultiplierMin = 1.4;
+      serviceMultiplierMax = 1.5;
       break;
     case "Airbnb Turnover Cleaning":
       // Genelde standart temizliğe yakın, çarşaf değişimi vb. ile hafif üstünde
@@ -425,9 +425,8 @@ function estimateQuote(data: FormState) {
       serviceMultiplierMax = 1.25;
       break;
     case "Move In / Move Out Cleaning":
-      // Taşınma sonrası / detaylı temizlik, inşaat sonrasına yakın ama daha hafif
-      serviceMultiplierMin = 1.4;
-      serviceMultiplierMax = 1.65;
+      serviceMultiplierMin = 1.35;
+      serviceMultiplierMax = 1.55;
       break;
     case "After-party Cleanup":
       serviceMultiplierMin = 1.15;
@@ -440,14 +439,29 @@ function estimateQuote(data: FormState) {
 
   // 3) Malzeme (temizlik ürünleri getirilmesi)
   if (data.suppliesNeeded === "Yes") {
-    min += 10;
-    max += 18;
+    min += 8;
+    max += 10;
   }
 
-  // 4) Ekstra görevler — her biri yaklaşık 20-30 dk ek işçiliğe denk gelir
-  if (data.extraTasks.length > 0) {
-    min += data.extraTasks.length * 7;
-    max += data.extraTasks.length * 14;
+  // Ek işler aynı maliyette değildir. Özellikle profesyonel koltuk yıkama,
+  // ayrı personel ve makine gerektirdiği için bağımsız fiyatlandırılır.
+  const extraPrices: Record<string, [number, number]> = {
+    "Interior windows": [8, 12],
+    "Exterior windows (where safely accessible)": [10, 16],
+    "Balcony / terrace": [8, 12],
+    "Inside fridge": [6, 9],
+    "Inside oven": [7, 10],
+    "Inside kitchen cupboards & drawers (empty, clean & replace contents)": [10, 15],
+    "Sofa & armchair deep cleaning": [70, 80],
+    "Linen change": [5, 8],
+    Ironing: [10, 18],
+    "After-party extra mess": [18, 30],
+  };
+
+  for (const task of data.extraTasks) {
+    const [extraMin, extraMax] = extraPrices[task] ?? [7, 12];
+    min += extraMin;
+    max += extraMax;
   }
 
   // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
@@ -460,15 +474,19 @@ function estimateQuote(data: FormState) {
     max *= 0.95;
   }
 
-  // Mantıklı bir taban belirle (çok küçük gösterimleri önlemek için)
+  // CleanNestPro koordinasyonu, çok dilli destek, Stripe maliyeti ve makul
+  // operasyon tamponu. Nihai teklif yine gerçek sağlayıcı fiyatıyla doğrulanır.
+  min *= 1.13;
+  max *= 1.13;
+
   min = Math.max(35, min);
   max = Math.max(min + 15, max);
 
-  // 6) %20 KDV ekle (fiyata dahil olarak gösterilecek)
-  const minWithVat = Math.round(min * (1 + VAT_RATE));
-  const maxWithVat = Math.round(max * (1 + VAT_RATE));
+  // Daha okunabilir fiyat noktaları için en yakın €5'e yuvarla.
+  const roundedMin = Math.round(min / 5) * 5;
+  const roundedMax = Math.round(max / 5) * 5;
 
-  return `€${minWithVat}–€${maxWithVat}`;
+  return `€${roundedMin}–€${roundedMax}`;
 }
 
 function getFaqJsonLd() {
@@ -1505,15 +1523,15 @@ export default function Home() {
 
                 <div className="mt-8 rounded-[28px] border border-slate-200 bg-[#f6f3ee] p-5 dark:border-white/10 dark:bg-white/5">
                   <div className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                    Estimated range (VAT / KDV included)
+                    Estimated all-in service range
                   </div>
                   <div className="mt-2 text-3xl font-semibold tracking-tight">
                     {estimate}
                   </div>
                   <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                    This is an indicative range only, calculated from current
-                    Antalya market rates and inclusive of 20% VAT (KDV). Final
-                    pricing is confirmed after review.
+                    This is an indicative range based on current Antalya provider
+                    costs and the services selected. Your final all-in price is
+                    confirmed after we review the full scope and availability.
                   </p>
                 </div>
 
