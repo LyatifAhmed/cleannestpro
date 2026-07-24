@@ -45,6 +45,9 @@ type FrequencyType =
 
 type LanguageType = "Turkish" | "English" | "Russian";
 
+const TERMS_VERSION = "2026-07-24";
+const PRIVACY_VERSION = "2026-07-24";
+
 type FormState = {
   fullName: string;
   email: string;
@@ -76,6 +79,7 @@ type FormState = {
   parkingAvailable: string;
   accessDetails: string;
   specialNotes: string;
+  termsAccepted: boolean;
   website: string;
   formStartedAt: number;
 };
@@ -291,6 +295,7 @@ const createInitialState = (): FormState => ({
   parkingAvailable: "Not sure",
   accessDetails: "",
   specialNotes: "",
+  termsAccepted: false,
   website: "",
   formStartedAt: Date.now(),
 });
@@ -821,6 +826,14 @@ export default function Home() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    if (!form.termsAccepted) {
+      alert(
+        "Please accept the Terms of Service and acknowledge the Privacy Policy.",
+      );
+      return;
+    }
+
     setSending(true);
     setSubmitted(false);
 
@@ -843,6 +856,10 @@ export default function Home() {
       const payload = {
         ...form,
         estimatedRange: estimate,
+        termsVersion: TERMS_VERSION,
+        termsAcceptedAt: new Date().toISOString(),
+        privacyAcknowledged: true,
+        privacyVersion: PRIVACY_VERSION,
       };
 
       const requestBody = new FormData();
@@ -2063,6 +2080,46 @@ export default function Home() {
                         availability. If you choose an available date and accept
                         the final quote, we send a secure Stripe payment link
                         and confirm the booking in writing.
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.035]">
+                        <label
+                          htmlFor="termsAccepted"
+                          className="flex cursor-pointer items-start gap-3"
+                        >
+                          <input
+                            id="termsAccepted"
+                            name="termsAccepted"
+                            type="checkbox"
+                            required
+                            checked={form.termsAccepted}
+                            onChange={(e) =>
+                              updateField("termsAccepted", e.target.checked)
+                            }
+                            className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 accent-slate-950"
+                          />
+                          <span className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+                            I understand that this is an availability and quote
+                            request, not a confirmed booking. I agree to the{" "}
+                            <Link
+                              href="/terms"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
+                            >
+                              Terms of Service
+                            </Link>{" "}
+                            and acknowledge the{" "}
+                            <Link
+                              href="/privacy-policy"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
+                            >
+                              Privacy Policy
+                            </Link>
+                            .
+                          </span>
+                        </label>
                       </div>
                     </div>
                   ) : null}
