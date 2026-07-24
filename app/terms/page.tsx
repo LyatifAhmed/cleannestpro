@@ -1,686 +1,2362 @@
-import type { Metadata } from "next";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | CleanNestPro",
-  description:
-    "Terms governing CleanNestPro managed cleaning services, online quotes, payments, bookings, and local service delivery in Antalya.",
+import dynamic from "next/dynamic";
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import Image from "next/image";
+import Link from "next/link";
+import Script from "next/script";
+import { motion, Variants, useScroll, useTransform } from "framer-motion";
+import Footer from "@/components/Footer";
+import HeroLens from "@/components/HeroLens";
+
+const ChatAssistant = dynamic(() => import("@/components/ChatAssistant"), {
+  ssr: false,
+  loading: () => null,
+});
+
+type ServiceType =
+  | "Regular Home Cleaning"
+  | "Deep Cleaning"
+  | "Airbnb Turnover Cleaning"
+  | "Move In / Move Out Cleaning"
+  | "After-party Cleanup";
+
+type PropertyType =
+  | "Studio"
+  | "1 Bedroom Apartment"
+  | "2 Bedroom Apartment"
+  | "3 Bedroom Apartment"
+  | "Villa / Large Home"
+  | "Holiday Home";
+
+type FrequencyType =
+  | "One-time"
+  | "Weekly"
+  | "Bi-weekly"
+  | "Monthly"
+  | "Not sure yet";
+
+type LanguageType = "Turkish" | "English" | "Russian";
+
+const TERMS_VERSION = "2026-07-24";
+const PRIVACY_VERSION = "2026-07-24";
+
+type FormState = {
+  fullName: string;
+  email: string;
+  whatsapp: string;
+  preferredLanguage: LanguageType;
+  location: string;
+  fullAddress: string;
+  serviceType: ServiceType;
+  propertyType: PropertyType;
+  bathrooms: string;
+  propertySize: string;
+  propertyCondition: string;
+  floorNumber: string;
+  elevator: string;
+  frequency: FrequencyType;
+  preferredDate: string;
+  preferredTime: string;
+  dateFlexibility: string;
+  furnished: string;
+  pets: string;
+  suppliesNeeded: string;
+  extraTasks: string[];
+  sofaDetails: string;
+  curtainCount: string;
+  curtainType: string;
+  mattressCount: string;
+  mattressSizes: string;
+  allergies: string;
+  parkingAvailable: string;
+  accessDetails: string;
+  specialNotes: string;
+  termsAccepted: boolean;
+  website: string;
+  formStartedAt: number;
 };
 
-export default function TermsPage() {
+const serviceCards = [
+  {
+    title: "Regular Home Cleaning",
+    href: "/apartment-cleaning-antalya",
+    description:
+      "Ongoing cleaning for apartments, private residences, and second homes.",
+    icon: "🏡",
+  },
+  {
+    title: "Deep Cleaning",
+    href: "/deep-cleaning-antalya",
+    description:
+      "A more detailed reset when your home needs extra care and attention.",
+    icon: "✨",
+  },
+  {
+    title: "Airbnb Turnover Cleaning",
+    href: "/airbnb-cleaning-antalya",
+    description:
+      "Fast, presentation-focused cleaning between guest stays and check-ins.",
+    icon: "🛏️",
+  },
+  {
+    title: "Move In / Move Out Cleaning",
+    href: "/move-in-move-out-cleaning-antalya",
+    description:
+      "Detailed cleaning for property transitions, handovers, and fresh starts.",
+    icon: "🧳",
+  },
+  {
+    title: "After-party Cleanup",
+    href: "/#quote-form",
+    description:
+      "Fast recovery cleaning after gatherings, events, and extra mess.",
+    icon: "🥂",
+  },
+  {
+    title: "Holiday Home Cleaning",
+    href: "/villa-cleaning-antalya",
+    description:
+      "Ideal for owners who want their Antalya property kept guest-ready and elegant.",
+    icon: "🌿",
+  },
+];
+
+const extraTaskOptions = [
+  "Interior windows",
+  "Exterior windows (where safely accessible)",
+  "Balcony / terrace",
+  "Inside fridge",
+  "Inside oven",
+  "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
+  "Sofa & armchair deep cleaning",
+  "Curtain cleaning",
+  "Mattress deep cleaning",
+  "Linen change",
+  "Ironing",
+  "After-party extra mess",
+];
+
+const trustBadges = [
+  "Independent local provider coordination",
+  "English, Turkish & Russian support",
+  "Flexible date options by email",
+  "Secure booking with Stripe",
+];
+
+const quoteReasons = [
+  {
+    title: "One request, not endless calls",
+    text: "Tell us your preferred date, flexibility, and cleaning needs once. We approach suitable local providers and coordinate the available options on your behalf.",
+  },
+  {
+    title: "Choose what works for you",
+    text: "We bring the available timing, written scope, requested extras, and provider pricing together clearly. You are free to accept or decline any option.",
+  },
+  {
+    title: "Local delivery, managed by us",
+    text: "An independent local service partner performs the on-site work, while CleanNestPro remains your international point of contact for the quote, payment, booking, and service follow-up.",
+  },
+];
+
+const processSteps = [
+  {
+    step: "01",
+    title: "Tell us what works for you",
+    text: "Share your preferred date, how flexible you are, and the property details. Your preferred date is a request, not yet a confirmed appointment.",
+  },
+  {
+    step: "02",
+    title: "We check suitable local options",
+    text: "We review the scope and approach suitable independent providers to check current availability and pricing on your behalf.",
+  },
+  {
+    step: "03",
+    title: "Choose your preferred option",
+    text: "We email an available date or suitable alternatives with a written scope and clear final quote. You are never required to accept an alternative.",
+  },
+  {
+    step: "04",
+    title: "Confirm securely",
+    text: "Once an option is available, accept it and pay CleanNestPro securely through Stripe. We then confirm the agreed appointment in writing.",
+  },
+];
+
+const lifestylePanels = [
+  {
+    eyebrow: "Luxury villas",
+    title: "Presented beautifully, maintained quietly",
+    text: "From private villas to guest-ready homes, the experience is designed to feel discreet, polished, and dependable.",
+    image: "/luxury-villa-cleaning.jpg",
+    alt: "Luxury villa in Antalya prepared for premium home cleaning service",
+  },
+  {
+    eyebrow: "Bathrooms & amenities",
+    title: "Attention to the details guests notice",
+    text: "Bathrooms, fresh towels, toiletries, and finishing touches all shape how a property feels from the very first moment.",
+    image: "/bathroom-toiletries.jpg",
+    alt: "Elegant bathroom toiletries and towels in a premium Antalya property",
+  },
+  {
+    eyebrow: "Guest-ready spaces",
+    title: "Cleaner visuals, calmer check-ins",
+    text: "Ideal for holiday homes and Airbnb properties that need to look bright, settled, and beautifully prepared before every arrival.",
+    image: "/guest-ready-bedroom.jpg",
+    alt: "Guest-ready premium bedroom in a holiday home in Antalya",
+  },
+];
+
+const faqs = [
+  {
+    q: "How does the CleanNestPro service work?",
+    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. You tell us your preferred timing, flexibility, and requirements once. We approach suitable independent local providers and email you an available option, written scope, and clear final quote. If you accept and pay, we confirm the appointment and remain your point of contact.",
+  },
+  {
+    q: "Who carries out the cleaning and who do I contact?",
+    a: "The on-site cleaning is performed by an independent local service partner appointed by CleanNestPro. Your booking and payment remain with CleanNestPro, and we remain your point of contact before, during, and after the appointment, including if a service issue needs to be resolved.",
+  },
+  {
+    q: "Which areas in Antalya do you currently cover?",
+    a: "We currently focus on selected areas in Antalya. Send your location in the quote form and we will check current local provider availability before offering a booking option.",
+  },
+  {
+    q: "Do you offer cleaning for Airbnb and holiday homes?",
+    a: "Yes. Airbnb turnover cleaning and holiday home cleaning are part of the service. We can also note guest timing, access details, and linen-related needs in your request.",
+  },
+  {
+    q: "Can the cleaner bring supplies?",
+    a: "Yes. You can select this in the quote form if you would like cleaning supplies to be brought by the cleaner.",
+  },
+  {
+    q: "Do you support international clients?",
+    a: "Yes. The service is designed with expats, international residents, and holiday homeowners in mind, with support in English, Turkish, and Russian.",
+  },
+  {
+    q: "How is pricing confirmed?",
+    a: "The range shown on the page is indicative. Final pricing is confirmed only after we review your property details, requested extras, preferred timing, flexibility, and current local provider availability.",
+  },
+  {
+    q: "How do I request a quote?",
+    a: "Complete the quote form with the property type, preferred date, date flexibility, and any useful notes. This is an availability and quote request, not a confirmed booking. We then email you with an available option or suitable alternatives.",
+  },
+  {
+    q: "How do I pay and confirm my booking?",
+    a: "We first coordinate an available local provider and email you the proposed date, written scope, and final price. If you choose that option, we send a secure Stripe payment link. Your booking is confirmed only after you accept the available option, complete payment, and receive our written booking confirmation.",
+  },
+  {
+    q: "Is my preferred date guaranteed?",
+    a: "Your selected date is your first preference, not a guaranteed appointment. Availability depends on suitable independent local providers. If your first choice is unavailable, we may offer alternative dates or times. You are free to accept or decline them, and there is nothing to pay unless you choose an available option.",
+  },
+  {
+    q: "What happens if CleanNestPro cannot provide the booked service?",
+    a: "If a confirmed provider later becomes unavailable, we will make reasonable efforts to coordinate a suitable replacement or offer alternative dates. If we cannot do so, or the alternatives do not work for you, we will issue a full refund of the amount paid for the affected booking.",
+  },
+  {
+    q: "What is the cancellation policy?",
+    a: "Customer cancellations made at least 48 hours before the confirmed appointment are eligible for a full refund. Cancellations made 24 to 48 hours before the appointment are eligible for a 50% refund. Cancellations within 24 hours may not be refundable because the independent provider and time slot have already been reserved.",
+  },
+];
+
+const createInitialState = (): FormState => ({
+  fullName: "",
+  email: "",
+  whatsapp: "",
+  preferredLanguage: "English",
+  location: "",
+  fullAddress: "",
+  serviceType: "Regular Home Cleaning",
+  propertyType: "1 Bedroom Apartment",
+  bathrooms: "1",
+  propertySize: "",
+  propertyCondition: "Normally maintained",
+  floorNumber: "",
+  elevator: "Yes",
+  frequency: "One-time",
+  preferredDate: "",
+  preferredTime: "",
+  dateFlexibility: "Flexible by 3 days",
+  furnished: "Yes",
+  pets: "No",
+  suppliesNeeded: "No",
+  extraTasks: [],
+  sofaDetails: "",
+  curtainCount: "",
+  curtainType: "",
+  mattressCount: "",
+  mattressSizes: "",
+  allergies: "",
+  parkingAvailable: "Not sure",
+  accessDetails: "",
+  specialNotes: "",
+  termsAccepted: false,
+  website: "",
+  formStartedAt: Date.now(),
+});
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const softReveal: Variants = {
+  hidden: { opacity: 0, y: 40, scale: 0.985 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.8,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
+
+const staggerWrap: Variants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.12,
+    },
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// Antalya piyasa araştırmasına ve ilk tamamlanan tedarikçi tekliflerine
+// dayalı müşteri fiyat aralığı (Temmuz 2026).
+//
+// Bu yalnızca yönlendirici bir aralıktır. Nihai fiyat, yerel sağlayıcının
+// KDV dahil maliyeti kesinleştikten sonra şu hedefle kontrol edilir:
+//   finalQuoteEur = supplierCostTry / currentEurTryRate / 0.72
+// 0.72; ödeme/kur maliyetleri, operasyon payı ve yaklaşık %18-20 hedef
+// marj için güvenli bir geri-kazanım katsayısıdır.
+// ─────────────────────────────────────────────────────────────
+
+const MAX_PROPERTY_PHOTOS = 5;
+const MAX_PHOTO_BYTES = 700 * 1024;
+const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
+const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+async function compressPropertyPhoto(file: File): Promise<File> {
+  if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
+    throw new Error(`${file.name}: please choose a JPG, PNG or WebP image.`);
+  }
+
+  const sourceUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const element = document.createElement("img");
+      element.onload = () => resolve(element);
+      element.onerror = () =>
+        reject(new Error(`${file.name}: the image could not be read.`));
+      element.src = sourceUrl;
+    });
+
+    const maxDimension = 1600;
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(image.width, image.height),
+    );
+    const width = Math.max(1, Math.round(image.width * scale));
+    const height = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+
+    const context = canvas.getContext("2d");
+    if (!context)
+      throw new Error(`${file.name}: the image could not be processed.`);
+
+    context.drawImage(image, 0, 0, width, height);
+
+    let quality = 0.78;
+    let blob: Blob | null = null;
+
+    while (quality >= 0.48) {
+      blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/jpeg", quality),
+      );
+      if (blob && blob.size <= MAX_PHOTO_BYTES) break;
+      quality -= 0.08;
+    }
+
+    if (!blob || blob.size > MAX_PHOTO_BYTES) {
+      throw new Error(`${file.name}: the compressed image is still too large.`);
+    }
+
+    const baseName = file.name.replace(/\.[^.]+$/, "") || "property-photo";
+    return new File([blob], `${baseName}.jpg`, {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+function parsePositiveCount(value: string, fallback = 1) {
+  const parsed = Number.parseInt(value.match(/\d+/)?.[0] ?? "", 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function estimateCurtainCleaning(data: FormState): [number, number] {
+  const count = parsePositiveCount(data.curtainCount);
+  const type = data.curtainType.toLowerCase();
+
+  // Curtains are often priced favourably when they are added to a larger
+  // booking. Keep the online range gentle; unusual/heavy systems are reviewed.
+  let typeMultiplier = 1;
+  if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.35;
+  else if (/sheer|tulle|voile|standard|normal/.test(type))
+    typeMultiplier = 0.75;
+
+  return [count * 3 * typeMultiplier, count * 6 * typeMultiplier];
+}
+
+function estimateMattressCleaning(data: FormState): [number, number] {
+  const count = parsePositiveCount(data.mattressCount);
+  const sizes = data.mattressSizes.toLowerCase();
+
+  // When both types are entered (for example "one single, one double"), use
+  // one of each and price any remaining mattresses at the unknown-size rate.
+  if (
+    /single|twin|85|90/.test(sizes) &&
+    /double|king|queen|160|180|200/.test(sizes)
+  ) {
+    const remaining = Math.max(0, count - 2);
+    return [28 + 34 + remaining * 31, 34 + 42 + remaining * 39];
+  }
+
+  if (/king|queen|180|200/.test(sizes)) return [count * 36, count * 44];
+  if (/double|140|150|160/.test(sizes)) return [count * 34, count * 42];
+  if (/single|twin|80|85|90|100|120/.test(sizes))
+    return [count * 28, count * 34];
+
+  return [count * 31, count * 39];
+}
+
+function estimateSofaCleaning(data: FormState): [number, number] {
+  const details = data.sofaDetails.toLowerCase();
+
+  // Calibrated from the first completed supplier quote: a normal salon set
+  // costs about 3,000 TL locally. The customer range includes coordination.
+  if (
+    /l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)
+  ) {
+    return [82, 105];
+  }
+
+  return [65, 78];
+}
+
+function estimateQuote(data: FormState) {
+  // Müşteriye gösterilen yönetilen hizmet aralığı (€).
+  // Yerel sağlayıcının kendi KDV'si tedarikçi maliyetinin içindedir;
+  // CleanNestPro müşteriye ayrıca Türk KDV'si tahsil ediyor gibi gösterilmez.
+  let baseMin = 0;
+  let baseMax = 0;
+
+  switch (data.propertyType) {
+    case "Studio":
+      baseMin = 60;
+      baseMax = 75;
+      break;
+    case "1 Bedroom Apartment":
+      baseMin = 78;
+      baseMax = 95;
+      break;
+    case "2 Bedroom Apartment":
+      baseMin = 105;
+      baseMax = 120;
+      break;
+    case "3 Bedroom Apartment":
+      baseMin = 128;
+      baseMax = 150;
+      break;
+    case "Villa / Large Home":
+      baseMin = 220;
+      baseMax = 380;
+      break;
+    case "Holiday Home":
+      baseMin = 115;
+      baseMax = 155;
+      break;
+  }
+
+  // 2) Hizmet tipine göre ÇARPAN (sabit ek yerine oransal artış —
+  //    çünkü örn. derin temizlik piyasada standart fiyatın
+  //    %50-70 üzerinde fiyatlanıyor, sabit € eklemek gerçekçi değil)
+  let serviceMultiplierMin = 1;
+  let serviceMultiplierMax = 1;
+
+  switch (data.serviceType) {
+    case "Regular Home Cleaning":
+      serviceMultiplierMin = 1;
+      serviceMultiplierMax = 1;
+      break;
+    case "Deep Cleaning":
+      serviceMultiplierMin = 1.42;
+      serviceMultiplierMax = 1.55;
+      break;
+    case "Airbnb Turnover Cleaning":
+      // Genelde standart temizliğe yakın, çarşaf değişimi vb. ile hafif üstünde
+      serviceMultiplierMin = 1.05;
+      serviceMultiplierMax = 1.25;
+      break;
+    case "Move In / Move Out Cleaning":
+      serviceMultiplierMin = 1.35;
+      serviceMultiplierMax = 1.55;
+      break;
+    case "After-party Cleanup":
+      serviceMultiplierMin = 1.15;
+      serviceMultiplierMax = 1.4;
+      break;
+  }
+
+  let min = baseMin * serviceMultiplierMin;
+  let max = baseMax * serviceMultiplierMax;
+
+  // Supplies are usually a small part of a full booking and should not make
+  // the displayed total feel punitive.
+  if (data.suppliesNeeded === "Yes") {
+    min += 5;
+    max += 8;
+  }
+
+  // Common deep-cleaning extras are bundled. Adding five related tasks should
+  // not look like five separate call-outs when one team can do them together.
+  const bundleTasks = new Set([
+    "Interior windows",
+    "Balcony / terrace",
+    "Inside fridge",
+    "Inside oven",
+    "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
+  ]);
+  const bundleCount = data.extraTasks.filter((task) =>
+    bundleTasks.has(task),
+  ).length;
+
+  if (bundleCount > 0) {
+    const deepStyleService =
+      data.serviceType === "Deep Cleaning" ||
+      data.serviceType === "Move In / Move Out Cleaning";
+    const included = deepStyleService ? 2 : 0;
+    const chargeable = Math.max(0, bundleCount - included);
+    min += (deepStyleService ? 8 : 10) + chargeable * 4;
+    max += (deepStyleService ? 14 : 16) + chargeable * 7;
+  }
+
+  const extraPrices: Record<string, [number, number]> = {
+    "Exterior windows (where safely accessible)": [8, 14],
+    "Linen change": [5, 8],
+    Ironing: [10, 18],
+    "After-party extra mess": [18, 30],
+  };
+
+  for (const task of data.extraTasks) {
+    if (
+      task === "Sofa & armchair deep cleaning" ||
+      task === "Curtain cleaning" ||
+      task === "Mattress deep cleaning" ||
+      bundleTasks.has(task)
+    ) {
+      continue;
+    }
+    const [extraMin, extraMax] = extraPrices[task] ?? [7, 12];
+    min += extraMin;
+    max += extraMax;
+  }
+
+  // Property condition materially changes team time and product usage.
+  if (data.propertyCondition === "Needs extra attention") {
+    min *= 1.06;
+    max *= 1.1;
+  } else if (data.propertyCondition === "Heavily soiled") {
+    min *= 1.14;
+    max *= 1.22;
+  } else if (data.propertyCondition === "Empty / recently renovated") {
+    min *= 1.08;
+    max *= 1.15;
+  }
+
+  // Use the information already collected without letting a small difference
+  // in size create a frightening jump. Only clearly larger homes are adjusted.
+  const sizeM2 = Number.parseInt(data.propertySize.match(/\d+/)?.[0] ?? "", 10);
+  const typicalSize: Record<PropertyType, number> = {
+    Studio: 40,
+    "1 Bedroom Apartment": 65,
+    "2 Bedroom Apartment": 100,
+    "3 Bedroom Apartment": 135,
+    "Villa / Large Home": 220,
+    "Holiday Home": 140,
+  };
+  if (
+    Number.isFinite(sizeM2) &&
+    sizeM2 > typicalSize[data.propertyType] * 1.15
+  ) {
+    const oversizeRatio = Math.min(
+      0.18,
+      (sizeM2 / typicalSize[data.propertyType] - 1) * 0.3,
+    );
+    min *= 1 + oversizeRatio * 0.7;
+    max *= 1 + oversizeRatio;
+  }
+
+  const bathroomCount =
+    data.bathrooms === "4+" ? 4 : Number.parseInt(data.bathrooms, 10);
+  if (Number.isFinite(bathroomCount) && bathroomCount > 1) {
+    min += (bathroomCount - 1) * 7;
+    max += (bathroomCount - 1) * 10;
+  }
+
+  // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
+  //    tek seferliklere göre ortalama %15-20 daha uygun
+  if (data.frequency === "Weekly" || data.frequency === "Bi-weekly") {
+    min *= 0.83;
+    max *= 0.86;
+  } else if (data.frequency === "Monthly") {
+    min *= 0.92;
+    max *= 0.95;
+  }
+
+  // Specialist machine-cleaning services are priced after frequency and
+  // property-condition adjustments. A weekly home-cleaning discount must not
+  // accidentally discount one-off curtain, mattress or upholstery work.
+  if (data.extraTasks.includes("Sofa & armchair deep cleaning")) {
+    const [sofaMin, sofaMax] = estimateSofaCleaning(data);
+    min += sofaMin;
+    max += sofaMax;
+  }
+
+  if (data.extraTasks.includes("Curtain cleaning")) {
+    const [curtainMin, curtainMax] = estimateCurtainCleaning(data);
+    min += curtainMin;
+    max += curtainMax;
+  }
+
+  if (data.extraTasks.includes("Mattress deep cleaning")) {
+    const [mattressMin, mattressMax] = estimateMattressCleaning(data);
+    min += mattressMin;
+    max += mattressMax;
+  }
+
+  // Base prices already contain a modest managed-service allowance. Do not
+  // add another blanket percentage here: it compounded every extra and made
+  // larger, otherwise sensible requests look disproportionately expensive.
+
+  min = Math.max(35, min);
+  max = Math.max(min + 15, max);
+
+  // Keep the indicative range useful rather than alarming. The raw supplier
+  // uncertainty is narrowed around the midpoint; manual review still confirms
+  // the final figure before any payment is requested.
+  const midpoint = (min + max) / 2;
+  const displayMin = Math.max(min, midpoint * 0.9);
+  const displayMax = Math.min(max, midpoint * 1.1);
+
+  // Daha okunabilir fiyat noktaları için en yakın €5'e yuvarla.
+  const roundedMin = Math.round(displayMin / 5) * 5;
+  const roundedMax = Math.max(roundedMin + 10, Math.round(displayMax / 5) * 5);
+
+  return `€${roundedMin}–€${roundedMax}`;
+}
+
+function getFaqJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.a,
+      },
+    })),
+  };
+}
+
+function getCoordinationServiceJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: "CleanNestPro",
+    url: "https://www.cleannestpro.com",
+    serviceType: "Managed home cleaning service",
+    provider: {
+      "@type": "Organization",
+      name: "CleanNestPro",
+      url: "https://www.cleannestpro.com",
+    },
+    areaServed: {
+      "@type": "City",
+      name: "Antalya",
+    },
+    availableLanguage: ["English", "Turkish", "Russian"],
+    description:
+      "A UK-based cleaning coordination service for international clients in Antalya. Share your preferred timing once; CleanNestPro checks suitable local options and manages the quote, secure payment, multilingual support, written booking and follow-up.",
+  };
+}
+
+export default function Home() {
+  const [form, setForm] = useState<FormState>(createInitialState());
+  const [formStep, setFormStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [showFloatingQuote, setShowFloatingQuote] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [processingPhotos, setProcessingPhotos] = useState(false);
+  const [propertyPhotos, setPropertyPhotos] = useState<File[]>([]);
+
+  const heroRef = useRef<HTMLElement | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.72]);
+
+  const estimate = useMemo(() => estimateQuote(form), [form]);
+  const photoPreviews = useMemo(
+    () =>
+      propertyPhotos.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [propertyPhotos],
+  );
+
+  useEffect(() => {
+    return () =>
+      photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+  }, [photoPreviews]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowFloatingQuote(window.scrollY > 120);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setForm((prev) => ({ ...prev, [key]: value }));
+  }
+
+  function toggleExtraTask(task: string) {
+    setForm((prev) => {
+      const exists = prev.extraTasks.includes(task);
+      return {
+        ...prev,
+        extraTasks: exists
+          ? prev.extraTasks.filter((item) => item !== task)
+          : [...prev.extraTasks, task],
+      };
+    });
+  }
+
+  const quoteSteps = ["Property", "Services", "Schedule", "Contact & review"];
+
+  function goToNextStep() {
+    if (formStep === 0 && !form.location.trim()) {
+      alert("Please add the area or neighbourhood in Antalya.");
+      return;
+    }
+
+    if (formStep === 2 && !form.preferredDate) {
+      alert("Please choose a preferred date.");
+      return;
+    }
+
+    setFormStep((current) => Math.min(current + 1, quoteSteps.length - 1));
+  }
+
+  function goToPreviousStep() {
+    setFormStep((current) => Math.max(current - 1, 0));
+  }
+
+  async function handlePhotoSelection(e: ChangeEvent<HTMLInputElement>) {
+    const selected = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!selected.length) return;
+
+    if (propertyPhotos.length + selected.length > MAX_PROPERTY_PHOTOS) {
+      alert(`You can upload up to ${MAX_PROPERTY_PHOTOS} property photos.`);
+      return;
+    }
+
+    setProcessingPhotos(true);
+    try {
+      const compressed = await Promise.all(selected.map(compressPropertyPhoto));
+      const nextPhotos = [...propertyPhotos, ...compressed];
+      const totalBytes = nextPhotos.reduce((sum, file) => sum + file.size, 0);
+
+      if (totalBytes > MAX_TOTAL_PHOTO_BYTES) {
+        throw new Error(
+          "The selected photos are too large in total. Please remove one or more photos.",
+        );
+      }
+
+      setPropertyPhotos(nextPhotos);
+    } catch (error) {
+      alert(
+        error instanceof Error
+          ? error.message
+          : "The photos could not be processed.",
+      );
+    } finally {
+      setProcessingPhotos(false);
+    }
+  }
+
+  function removePropertyPhoto(index: number) {
+    setPropertyPhotos((current) =>
+      current.filter((_, photoIndex) => photoIndex !== index),
+    );
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (!form.termsAccepted) {
+      alert(
+        "Please accept the Terms of Service and acknowledge the Privacy Policy.",
+      );
+      return;
+    }
+
+    setSending(true);
+    setSubmitted(false);
+
+    try {
+      if (form.website.trim() !== "") {
+        setSending(false);
+        return;
+      }
+
+      const secondsOnForm = Math.floor(
+        (Date.now() - form.formStartedAt) / 1000,
+      );
+
+      if (secondsOnForm < 4) {
+        setSending(false);
+        alert("Please take a little more time to complete the form.");
+        return;
+      }
+
+      const payload = {
+        ...form,
+        estimatedRange: estimate,
+        termsVersion: TERMS_VERSION,
+        termsAcceptedAt: new Date().toISOString(),
+        privacyAcknowledged: true,
+        privacyVersion: PRIVACY_VERSION,
+      };
+
+      const requestBody = new FormData();
+      requestBody.append("payload", JSON.stringify(payload));
+      propertyPhotos.forEach((photo) =>
+        requestBody.append("propertyPhotos", photo),
+      );
+
+      const res = await fetch("/api/quote", {
+        method: "POST",
+        body: requestBody,
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.error || "Failed to send quote request.");
+      }
+
+      setSubmitted(true);
+      setForm(createInitialState());
+      setFormStep(0);
+      setPropertyPhotos([]);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong while sending your quote request.");
+    } finally {
+      setSending(false);
+    }
+  }
+
   return (
-    <main className="min-h-screen bg-[#fcfbf8] text-slate-900">
-      <section className="mx-auto max-w-4xl px-6 py-16 md:px-8">
-        <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm md:p-12">
-          <p className="text-sm text-slate-500">Last updated: July 2026</p>
+    <>
+      <Script
+        id="cleannestpro-faq-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getFaqJsonLd()) }}
+      />
+      <Script
+        id="cleannestpro-coordination-service-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(getCoordinationServiceJsonLd()),
+        }}
+      />
 
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
-            Terms of Service
-          </h1>
+      <main className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
+        <section
+          ref={heroRef}
+          className="relative h-screen w-full overflow-hidden text-white"
+        >
+          <motion.div
+            style={{ y: heroY, opacity: heroOpacity }}
+            className="absolute inset-0"
+          >
+            <Image
+              src="/premium-villa-cleaning-service-antalya-turkey.avif"
+              alt="Premium home cleaning in Antalya for international residents"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover scale-[1.02]"
+            />
+            <div className="absolute inset-0 bg-black/12" />
+          </motion.div>
 
-          <p className="mt-6 leading-8 text-slate-600">
-            These Terms of Service govern your use of the CleanNestPro website,
-            quote process, bookings, payments, and managed cleaning services.
-            By using this website, submitting
-            a request, accepting a quote, or completing payment, you agree to
-            these terms.
-          </p>
+          <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-black/10 to-transparent" />
 
-          <div className="mt-10 space-y-10">
-            <section>
-              <h2 className="text-2xl font-semibold">
-                1. Nature of the service
-              </h2>
+          <HeroLens containerRef={heroRef} />
 
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro provides a managed cleaning service for customers
-                  in Antalya. We receive enquiries, review requirements, issue
-                  quotes, take payment, provide multilingual customer support,
-                  manage bookings, appoint local service partners, and handle
-                  service follow-up.
-                </p>
-
-                <p>
-                  Your quote, booking, and payment are with CleanNestPro, operated
-                  by Generation Beta Digital Ltd. Unless we explicitly state
-                  otherwise before you accept a quote, CleanNestPro is your
-                  contracting service provider and remains your customer-service
-                  contact throughout the booking.
-                </p>
-
-                <p>
-                  The physical cleaning may be performed on our behalf by an
-                  independent cleaner or local cleaning company appointed as a
-                  service partner or subcontractor. The use of a local service
-                  partner does not transfer your CleanNestPro booking or payment
-                  relationship to that partner.
-                </p>
+          <div className="relative z-30 flex h-full w-full flex-col pt-8">
+            <header
+              className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 ${
+                showFloatingQuote
+                  ? "pointer-events-none translate-y-[-20px] opacity-0"
+                  : "translate-y-0 opacity-100"
+              }`}
+            >
+              <div className="flex items-center gap-3 text-lg font-semibold tracking-tight text-white">
+                <Image
+                  src="/logo.png"
+                  alt="CleanNestPro"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 object-contain"
+                  priority
+                />
+                <span className="text-xl">CleanNestPro</span>
               </div>
-            </section>
 
-            <section>
-              <h2 className="text-2xl font-semibold">
-                2. Local service partners and subcontracting
-              </h2>
+              <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
+                <a href="#services" className="hover:text-white">
+                  Services
+                </a>
+                <a href="#gallery" className="hover:text-white">
+                  Experience
+                </a>
+                <a href="#why-us" className="hover:text-white">
+                  Why us
+                </a>
+                <a href="#how-it-works" className="hover:text-white">
+                  How it works
+                </a>
+                <a href="#faq" className="hover:text-white">
+                  FAQ
+                </a>
+                <a href="/about" className="hover:text-white">
+                  About
+                </a>
+              </nav>
 
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro may appoint independent local cleaners or cleaning
-                  companies to perform all or part of the on-site service. They
-                  are independent service partners and are not normally employees
-                  of CleanNestPro.
-                </p>
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("quote-form")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="rounded-full bg-white/92 px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-white"
+              >
+                Request quote
+              </button>
+            </header>
 
-                <p>
-                  We select a service partner according to the information
-                  available to us, including the requested location, scope,
-                  timing, availability, and relevant capability. We may replace
-                  an assigned partner where reasonably necessary, provided this
-                  does not materially reduce the agreed service.
-                </p>
+            <div className="flex w-full flex-1 items-center justify-center px-6">
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={staggerWrap}
+                className="w-full pt-20 text-center md:pt-28"
+              >
+                <motion.div
+                  variants={fadeUp}
+                  className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
+                >
+                  UK-based cleaning coordination for international clients in
+                  Antalya
+                </motion.div>
 
-                <p>
-                  CleanNestPro may share information reasonably required to
-                  assess, prepare for, and deliver the service, including your
-                  name, contact details, property location, access instructions,
-                  booking time, property details, and requested tasks.
-                </p>
+                <motion.h1
+                  variants={fadeUp}
+                  className="mx-auto mt-8 max-w-7xl text-[56px] font-light leading-[0.95] tracking-[-0.04em] text-white sm:text-[72px] md:text-[96px] lg:text-[128px]"
+                >
+                  Local cleaning in Antalya,
+                  <br />
+                  without the local hassle
+                </motion.h1>
 
-                <p>
-                  The attending service partner performs the physical work, but
-                  CleanNestPro continues to manage your booking, payment,
-                  multilingual communication, complaints, and any appropriate
-                  service remedy. Please contact CleanNestPro rather than making
-                  separate payment or scope arrangements with the attending
-                  partner.
-                </p>
+                <motion.p
+                  variants={fadeUp}
+                  className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/85 md:text-2xl md:leading-10"
+                >
+                  Share your preferred date and requirements once. We coordinate
+                  suitable independent local options, present what is available
+                  clearly, and remain your English-speaking point of contact.
+                </motion.p>
 
-                <p>
-                  Nothing in these terms removes responsibility or consumer
-                  rights that cannot lawfully be excluded because we use an
-                  independent service partner or subcontractor.
-                </p>
-              </div>
-            </section>
+                <motion.div
+                  variants={fadeUp}
+                  className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-3"
+                >
+                  {trustBadges.map((badge) => (
+                    <span
+                      key={badge}
+                      className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur"
+                    >
+                      {badge}
+                    </span>
+                  ))}
+                </motion.div>
 
-            <section>
-              <h2 className="text-2xl font-semibold">
-                3. Quotes and estimates
-              </h2>
+                <motion.div
+                  variants={fadeUp}
+                  className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+                >
+                  <a
+                    href="#quote-form"
+                    className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90"
+                  >
+                    Check local availability
+                  </a>
 
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Any price range displayed automatically on the website is an
-                  indicative estimate only and does not constitute a binding
-                  offer.
-                </p>
+                  <button
+                    onClick={() =>
+                      window.dispatchEvent(new CustomEvent("open-clean-chat"))
+                    }
+                    className="inline-flex min-w-[220px] items-center justify-center rounded-2xl border border-white/20 bg-black/16 px-6 py-4 text-base font-medium text-white transition hover:bg-black/24"
+                  >
+                    Ask the assistant
+                  </button>
+                </motion.div>
 
-                <p>
-                  Final pricing may vary based on the property type, size,
-                  condition, access requirements, furnishing, number of
-                  bathrooms, requested extras, timing, availability, supplies,
-                  and any information provided by the customer.
-                </p>
+                <motion.p
+                  variants={fadeUp}
+                  className="mx-auto mt-5 max-w-3xl text-sm leading-6 text-white/70"
+                >
+                  Preferred dates are subject to local availability. If your
+                  first choice is unavailable, we may offer alternatives before
+                  you book. You only pay after choosing an available option.
+                </motion.p>
+              </motion.div>
+            </div>
+          </div>
+        </section>
 
-                <p>
-                  A final quote becomes valid only when it has been issued or
-                  confirmed by CleanNestPro through email or another agreed
-                  communication channel. Unless otherwise stated, a quote is
-                  subject to availability and may expire if it is not accepted
-                  within the period stated in the communication.
-                </p>
+        <motion.section
+          id="services"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={staggerWrap}
+          className="mx-auto max-w-7xl px-6 py-24 md:px-8"
+        >
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+              Services
+            </div>
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
+              Services tailored to your property
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+              Choose the service your property needs. CleanNestPro coordinates
+              the request with suitable independent local providers and brings
+              the details together into one clear quote.
+            </p>
+          </motion.div>
 
-                <p>
-                  If the property condition or scope of work is materially
-                  different from the information supplied, the attending partner
-                  may pause the work and notify CleanNestPro. We may request your
-                  approval for an adjusted price, reduced scope, additional time,
-                  or rescheduling. No additional
-                  charge will be taken without appropriate notice and agreement.
-                </p>
-              </div>
-            </section>
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {serviceCards.map((card, index) => (
+              <motion.div
+                key={card.title}
+                variants={softReveal}
+                whileHover={{ y: -10 }}
+                className="group relative overflow-hidden rounded-[34px] border border-white/40 bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,245,240,0.88))] p-8 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition duration-500 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.03))] dark:shadow-none"
+              >
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.9),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.05),transparent_30%)] opacity-80 dark:bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.06),transparent_30%)]" />
 
-            <section>
-              <h2 className="text-2xl font-semibold">
-                4. Booking and confirmation
-              </h2>
+                <div className="pointer-events-none absolute inset-0 rounded-[34px] ring-1 ring-inset ring-white/50 dark:ring-white/10" />
 
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Submitting a form, requesting a quote, or receiving an
-                  estimated price does not create a confirmed booking.
-                </p>
+                <div className="pointer-events-none absolute -left-1/3 top-0 h-full w-1/2 -skew-x-12 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.72),transparent)] opacity-0 blur-xl transition-all duration-700 group-hover:left-[120%] group-hover:opacity-100 dark:bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent)]" />
 
-                <p>A booking is confirmed only after:</p>
+                <div className="relative z-10">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="relative flex h-16 w-16 items-center justify-center rounded-[20px] border border-white/60 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(234,228,218,0.75))] text-3xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_10px_30px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[linear-gradient(145deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03))] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                      <div className="pointer-events-none absolute inset-0 rounded-[20px] bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.95),transparent_45%)] opacity-90 dark:opacity-40" />
+                      <span className="relative z-10">{card.icon}</span>
+                    </div>
 
-                <ol className="list-decimal space-y-2 pl-6">
-                  <li>CleanNestPro has issued or confirmed the final quote;</li>
-                  <li>you have accepted the quote;</li>
-                  <li>
-                    any payment required to reserve the booking has been
-                    successfully completed; and
-                  </li>
-                  <li>
-                    CleanNestPro has sent a booking confirmation by email or
-                    another agreed communication channel.
-                  </li>
-                </ol>
-
-                <p>
-                  A preferred date or time is not guaranteed until the booking
-                  has been confirmed. Where a quote states that a slot is being
-                  held temporarily, the slot may be released if payment is not
-                  received within the stated period.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                5. Payments and Stripe processing
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro may require full or partial advance payment to
-                  secure a booking. Where payment is required, we may send a
-                  secure payment link provided by Stripe or another authorised
-                  payment provider.
-                </p>
-
-                <p>
-                  Unless we expressly confirm otherwise in writing, the amount
-                  in the final quote is payable to CleanNestPro. An attending
-                  service partner is not authorised to request a separate payment
-                  from you for the agreed scope. Any additional work and charge
-                  must first be approved through CleanNestPro.
-                </p>
-
-                <p>
-                  CleanNestPro does not store your full card number or card
-                  security code on its website or servers. Payment information
-                  is processed by the relevant payment provider under its own
-                  terms and privacy notice.
-                </p>
-
-                <p>
-                  You are responsible for ensuring that the payment information
-                  provided is accurate and that you are authorised to use the
-                  selected payment method.
-                </p>
-
-                <p>
-                  A payment may be refused, delayed, reviewed, or cancelled
-                  where required for fraud prevention, sanctions compliance,
-                  payment verification, technical security, or legal reasons.
-                </p>
-
-                <p>
-                  Prices will be shown in the currency stated in the final quote.
-                  Your bank or card provider may apply exchange-rate differences
-                  or international transaction charges, which are outside
-                  CleanNestPro&apos;s control.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                6. Cancellations, changes, and refunds
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Cancellation or change requests must be communicated to
-                  CleanNestPro as early as possible using the contact details in
-                  your booking correspondence.
-                </p>
-
-                <p>
-                  Where mandatory distance-contract cancellation rights apply,
-                  you may have a legal right to cancel within 14 days after the
-                  contract is formed. If you ask for an appointment or other
-                  performance to begin during that period, we may ask you to
-                  expressly request early performance and acknowledge the effect
-                  this may have on your cancellation right. If you then cancel
-                  after performance has begun, you may be required to pay a
-                  proportionate amount for services already supplied. The right
-                  may end once the service has been fully performed where the
-                  legally required consent and acknowledgement have been given.
-                </p>
-
-                <div className="overflow-hidden rounded-2xl border border-slate-200">
-                  <div className="grid grid-cols-[1.2fr_0.8fr] bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-800">
-                    <span>Notice before appointment</span>
-                    <span>Standard refund</span>
+                    <div className="inline-flex rounded-full border border-slate-200/80 bg-white/80 px-3 py-1 text-xs font-medium tracking-[0.18em] text-slate-500 backdrop-blur-sm dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                      0{index + 1}
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-[1.2fr_0.8fr] border-t border-slate-200 px-4 py-3 text-sm">
-                    <span>At least 48 hours</span>
-                    <span>100%</span>
+                  <h3 className="mt-6 text-[22px] font-semibold tracking-tight text-slate-900 dark:text-white">
+                    {card.title}
+                  </h3>
+
+                  <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+                    {card.description}
+                  </p>
+
+                  <div className="mt-6 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
+                    <span className="inline-block h-2 w-2 rounded-full bg-slate-400/70 dark:bg-white/60" />
+                    Coordinated locally
                   </div>
 
-                  <div className="grid grid-cols-[1.2fr_0.8fr] border-t border-slate-200 px-4 py-3 text-sm">
-                    <span>Between 24 and 48 hours</span>
-                    <span>50%</span>
+                  <Link
+                    href={card.href}
+                    className="mt-5 inline-flex text-sm font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4 transition hover:decoration-slate-900 dark:text-white dark:decoration-white/30 dark:hover:decoration-white"
+                  >
+                    View service details
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-10 max-w-4xl text-center">
+            <p className="text-sm uppercase tracking-[0.18em] text-slate-400">
+              Explore more
+            </p>
+
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/villa-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Villa Cleaning in Antalya
+              </Link>
+
+              <Link
+                href="/airbnb-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Airbnb Cleaning in Antalya
+              </Link>
+              <Link
+                href="/deep-cleaning-antalya"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Deep Cleaning in Antalya
+              </Link>
+              <Link
+                href="/cleaning-service-konyaalti"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Cleaning in Konyaaltı
+              </Link>
+              <Link
+                href="/cleaning-service-muratpasa"
+                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
+              >
+                Cleaning in Muratpaşa
+              </Link>
+            </div>
+          </div>
+        </motion.section>
+
+        <section id="gallery" className="relative py-24 md:py-32">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(15,23,42,0.035),transparent_34%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_34%)]" />
+
+          <div className="relative mx-auto max-w-7xl px-6 md:px-8">
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.12 }}
+              variants={staggerWrap}
+              className="mx-auto max-w-3xl text-center"
+            >
+              <motion.div
+                variants={fadeUp}
+                className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400"
+              >
+                Premium experience
+              </motion.div>
+
+              <motion.h2
+                variants={fadeUp}
+                className="text-3xl font-semibold tracking-tight md:text-5xl"
+              >
+                Designed for properties that need to feel exceptional
+              </motion.h2>
+
+              <motion.p
+                variants={fadeUp}
+                className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300"
+              >
+                From luxury villas to guest-ready holiday homes, every detail is
+                shaped around presentation, comfort, and a more refined standard
+                of care.
+              </motion.p>
+            </motion.div>
+
+            <div className="mt-16 space-y-10 md:mt-20">
+              {lifestylePanels.map((panel, index) => (
+                <motion.article
+                  key={panel.title}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.16 }}
+                  variants={softReveal}
+                  className={`group grid items-center gap-8 overflow-hidden rounded-[36px] border border-slate-200/90 bg-white p-4 shadow-[0_20px_70px_rgba(15,23,42,0.06)] transition hover:shadow-[0_28px_90px_rgba(15,23,42,0.10)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-5 ${
+                    index % 2 === 0
+                      ? "md:grid-cols-[1.15fr_0.85fr]"
+                      : "md:grid-cols-[0.85fr_1.15fr]"
+                  }`}
+                >
+                  <div className={`${index % 2 === 1 ? "md:order-2" : ""}`}>
+                    <div className="relative h-[320px] overflow-hidden rounded-[28px] bg-slate-100 md:h-[440px] dark:bg-white/5">
+                      <Image
+                        src={panel.image}
+                        alt={panel.alt}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 55vw"
+                        className="object-cover transition duration-700 group-hover:scale-[1.03]"
+                      />
+
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/28 via-black/6 to-transparent" />
+
+                      <div className="absolute inset-x-0 bottom-0 p-5 md:p-6">
+                        <div className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.22em] text-white/90 backdrop-blur">
+                          {panel.eyebrow}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-[1.2fr_0.8fr] border-t border-slate-200 px-4 py-3 text-sm">
-                    <span>Less than 24 hours</span>
-                    <span>Normally non-refundable</span>
+                  <div
+                    className={`px-2 py-4 md:px-6 ${
+                      index % 2 === 1 ? "md:order-1" : ""
+                    }`}
+                  >
+                    <div className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                      {panel.eyebrow}
+                    </div>
+
+                    <h3 className="mt-4 text-2xl font-semibold tracking-tight md:text-4xl">
+                      {panel.title}
+                    </h3>
+
+                    <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                      {panel.text}
+                    </p>
+
+                    <div className="mt-8 flex flex-wrap gap-3">
+                      {[
+                        "Luxury presentation",
+                        "Guest-ready finish",
+                        "Quiet reliability",
+                      ].map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </motion.article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <motion.section
+          id="why-us"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={staggerWrap}
+          className="relative overflow-hidden bg-[#f6f3ee] py-24 dark:bg-[#0f172a]"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.45),transparent_35%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_35%)]" />
+          <div className="relative mx-auto max-w-7xl px-6 md:px-8">
+            <motion.div
+              variants={fadeUp}
+              className="mx-auto max-w-3xl text-center"
+            >
+              <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                Why use an international coordination service?
+              </div>
+              <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
+                One request. Suitable local providers. One clear quote.
+              </h2>
+              <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                CleanNestPro manages the customer relationship from quote to
+                service follow-up. We remove the work of contacting and
+                comparing multiple providers, show you the suitable options
+                currently available, and appoint an independent local service
+                partner only after you choose what works for you.
+              </p>
+            </motion.div>
+
+            <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-3">
+              {quoteReasons.map((item) => (
+                <motion.div
+                  key={item.title}
+                  variants={softReveal}
+                  whileHover={{ y: -6 }}
+                  className="rounded-[32px] border border-slate-200 bg-white/80 p-8 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5"
+                >
+                  <h3 className="text-xl font-semibold">{item.title}</h3>
+                  <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+                    {item.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.section>
+
+        <motion.section
+          id="how-it-works"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.15 }}
+          variants={staggerWrap}
+          className="mx-auto px-6 py-24 md:px-8"
+        >
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+              Process
+            </div>
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
+              How it works
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+              Describe the property once. We handle the provider search,
+              availability checks, flexible date options, quote coordination,
+              and written booking confirmation.
+            </p>
+          </motion.div>
+
+          <div className="mx-auto mt-10 max-w-4xl rounded-[30px] border border-emerald-200 bg-emerald-50/80 p-6 text-left shadow-sm dark:border-emerald-500/20 dark:bg-emerald-500/10">
+            <div className="flex items-start gap-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-100 text-xl dark:bg-emerald-500/15">
+                ✓
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                  One managed service, with clear local delivery
+                </h3>
+                <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">
+                  CleanNestPro manages your availability request, quote, Stripe
+                  payment, multilingual support, written booking details, and
+                  service follow-up. An appointed independent local partner
+                  performs the on-site cleaning. You continue to contact us if
+                  anything needs to be clarified or resolved.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-auto mt-14 grid max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-4">
+            {processSteps.map((item) => (
+              <motion.div
+                key={item.step}
+                variants={softReveal}
+                className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-white/5"
+              >
+                <div className="absolute right-0 top-0 h-28 w-28 rounded-full bg-slate-100 blur-3xl dark:bg-white/5" />
+                <div className="relative z-10">
+                  <div className="text-sm font-semibold tracking-[0.18em] text-slate-400">
+                    {item.step}
+                  </div>
+                  <h3 className="mt-4 text-xl font-semibold">{item.title}</h3>
+                  <p className="mt-4 leading-7 text-slate-600 dark:text-slate-300">
+                    {item.text}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.section>
+
+        <motion.section
+          id="quote-form"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.1 }}
+          variants={staggerWrap}
+          className="w-full px-6 py-24 md:px-10 lg:px-16"
+        >
+          <div className="mx-auto w-full max-w-[1440px]">
+            <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] xl:gap-14">
+              <motion.div
+                variants={fadeUp}
+                className="max-w-2xl lg:sticky lg:top-8"
+              >
+                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                  One coordinated quote
+                </div>
+
+                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
+                  Tell us once.
+                  <br />
+                  We handle the search.
+                </h2>
+
+                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
+                  Share your preferred date, flexibility, and property details
+                  once. We contact suitable independent local providers and
+                  return by email with an available option, written scope, and
+                  one clear quote.
+                </p>
+
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
+                  Your selected date is a preference, not a confirmed
+                  appointment. If it is unavailable, we may suggest suitable
+                  alternatives. You are free to accept or decline any option.
+                </div>
+
+                <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
+                  <h3 className="text-lg font-semibold">
+                    What CleanNestPro handles
+                  </h3>
+                  <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                    <li>• Finding and approaching suitable local providers</li>
+                    <li>
+                      • Checking current availability and coordinating the scope
+                    </li>
+                    <li>
+                      • Offering alternative dates when your first choice is
+                      unavailable
+                    </li>
+                    <li>
+                      • Bringing the available timing and pricing into one clear
+                      quote
+                    </li>
+                    <li>• No payment unless you choose an available option</li>
+                    <li>
+                      • Written booking confirmation and secure Stripe payment
+                    </li>
+                  </ul>
+                  <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
+                    On-site cleaning is performed by an independent local
+                    service partner appointed by CleanNestPro. Your quote,
+                    payment, support, and service follow-up remain with
+                    CleanNestPro.
+                  </p>
+                </div>
+              </motion.div>
+
+              <motion.form
+                variants={softReveal}
+                onSubmit={handleSubmit}
+                className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#11182a] dark:shadow-none"
+              >
+                <div className="border-b border-slate-200 bg-[#f7f5f0] px-6 py-6 dark:border-white/10 dark:bg-white/[0.035] md:px-9">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        Step {formStep + 1} of {quoteSteps.length}
+                      </p>
+                      <h3 className="mt-1 text-xl font-semibold tracking-tight">
+                        {quoteSteps[formStep]}
+                      </h3>
+                    </div>
+                    <div className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold dark:border-white/10 dark:bg-white/5">
+                      {estimate}
+                    </div>
+                  </div>
+                  <div className="mt-5 grid grid-cols-4 gap-2">
+                    {quoteSteps.map((step, index) => (
+                      <button
+                        key={step}
+                        type="button"
+                        onClick={() => index < formStep && setFormStep(index)}
+                        className="group text-left"
+                        aria-label={`Go to ${step}`}
+                      >
+                        <span
+                          className={`block h-1.5 rounded-full transition ${
+                            index <= formStep
+                              ? "bg-slate-950 dark:bg-white"
+                              : "bg-slate-200 dark:bg-white/10"
+                          }`}
+                        />
+                        <span className="mt-2 hidden text-[11px] font-medium text-slate-500 sm:block">
+                          {step}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                <p>
-                  The reduced or non-refundable amount reflects time reserved,
-                  provider commitments, preparation, and the reduced likelihood
-                  of filling the appointment at short notice. Any amount retained
-                  will remain subject to mandatory consumer law and will not
-                  exceed the reasonable net costs or losses arising directly from
-                  the cancellation. If we can reasonably avoid or recover those
-                  losses, we will take that into account.
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => updateField("website", e.target.value)}
+                  />
+                </div>
+
+                <div className="min-h-[520px] p-6 md:p-9">
+                  {formStep === 0 ? (
+                    <div className="space-y-7">
+                      <StepIntro
+                        eyebrow="Your space"
+                        title="What are we cleaning?"
+                        text="A few property details help us match the right local team and equipment."
+                      />
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field>
+                          <Label htmlFor="serviceType">Service type</Label>
+                          <Select
+                            id="serviceType"
+                            value={form.serviceType}
+                            onChange={(e) =>
+                              updateField(
+                                "serviceType",
+                                e.target.value as ServiceType,
+                              )
+                            }
+                          >
+                            <option>Regular Home Cleaning</option>
+                            <option>Deep Cleaning</option>
+                            <option>Airbnb Turnover Cleaning</option>
+                            <option>Move In / Move Out Cleaning</option>
+                            <option>After-party Cleanup</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertyType">Property type</Label>
+                          <Select
+                            id="propertyType"
+                            value={form.propertyType}
+                            onChange={(e) =>
+                              updateField(
+                                "propertyType",
+                                e.target.value as PropertyType,
+                              )
+                            }
+                          >
+                            <option>Studio</option>
+                            <option>1 Bedroom Apartment</option>
+                            <option>2 Bedroom Apartment</option>
+                            <option>3 Bedroom Apartment</option>
+                            <option>Villa / Large Home</option>
+                            <option>Holiday Home</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="bathrooms">Bathrooms</Label>
+                          <Select
+                            id="bathrooms"
+                            value={form.bathrooms}
+                            onChange={(e) =>
+                              updateField("bathrooms", e.target.value)
+                            }
+                          >
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4+</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertySize">Approximate size</Label>
+                          <Input
+                            id="propertySize"
+                            value={form.propertySize}
+                            onChange={(e) =>
+                              updateField("propertySize", e.target.value)
+                            }
+                            placeholder="e.g. 100 m²"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="furnished">Furnished?</Label>
+                          <Select
+                            id="furnished"
+                            value={form.furnished}
+                            onChange={(e) =>
+                              updateField("furnished", e.target.value)
+                            }
+                          >
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Partly</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertyCondition">
+                            Current condition
+                          </Label>
+                          <Select
+                            id="propertyCondition"
+                            value={form.propertyCondition}
+                            onChange={(e) =>
+                              updateField("propertyCondition", e.target.value)
+                            }
+                          >
+                            <option>Normally maintained</option>
+                            <option>Needs extra attention</option>
+                            <option>Heavily soiled</option>
+                            <option>Empty / recently renovated</option>
+                            <option>Not sure</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="location">Area in Antalya</Label>
+                          <Input
+                            id="location"
+                            value={form.location}
+                            onChange={(e) =>
+                              updateField("location", e.target.value)
+                            }
+                            placeholder="Muratpaşa / neighbourhood"
+                            autoComplete="address-level2"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="floorNumber">Floor</Label>
+                          <Input
+                            id="floorNumber"
+                            value={form.floorNumber}
+                            onChange={(e) =>
+                              updateField("floorNumber", e.target.value)
+                            }
+                            placeholder="e.g. 7th floor"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="elevator">Elevator available?</Label>
+                          <Select
+                            id="elevator"
+                            value={form.elevator}
+                            onChange={(e) =>
+                              updateField("elevator", e.target.value)
+                            }
+                          >
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Not applicable</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="fullAddress">
+                            Address or nearby landmark (optional)
+                          </Label>
+                          <Input
+                            id="fullAddress"
+                            value={form.fullAddress}
+                            onChange={(e) =>
+                              updateField("fullAddress", e.target.value)
+                            }
+                            placeholder="Street, building or a nearby landmark"
+                            autoComplete="street-address"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {formStep === 1 ? (
+                    <div className="space-y-7">
+                      <StepIntro
+                        eyebrow="Build the scope"
+                        title="Choose everything you need"
+                        text="Select as much as you like. Specialist details only appear when relevant."
+                      />
+                      <Field>
+                        <Label htmlFor="suppliesNeeded">
+                          Should the team bring all supplies and equipment?
+                        </Label>
+                        <Select
+                          id="suppliesNeeded"
+                          value={form.suppliesNeeded}
+                          onChange={(e) =>
+                            updateField("suppliesNeeded", e.target.value)
+                          }
+                        >
+                          <option>No</option>
+                          <option>Yes</option>
+                        </Select>
+                      </Field>
+                      <fieldset>
+                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+                          Additional services
+                        </legend>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          {extraTaskOptions.map((task) => {
+                            const active = form.extraTasks.includes(task);
+                            return (
+                              <button
+                                key={task}
+                                type="button"
+                                aria-pressed={active}
+                                onClick={() => toggleExtraTask(task)}
+                                className={`flex min-h-14 items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${active ? "border-slate-950 bg-slate-950 text-white shadow-sm dark:border-white dark:bg-white dark:text-slate-950" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-slate-400 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]"}`}
+                              >
+                                <span>{task}</span>
+                                <span
+                                  className={`ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${active ? "border-white/30 bg-white/15 dark:border-slate-900/20 dark:bg-slate-900/10" : "border-slate-300 dark:border-white/15"}`}
+                                >
+                                  {active ? "✓" : "+"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </fieldset>
+                      {form.extraTasks.includes(
+                        "Sofa & armchair deep cleaning",
+                      ) ? (
+                        <DetailPanel title="Sofa & armchair details">
+                          <Input
+                            value={form.sofaDetails}
+                            onChange={(e) =>
+                              updateField("sofaDetails", e.target.value)
+                            }
+                            placeholder="e.g. one 3-seat sofa, one 2-seat sofa and two armchairs"
+                          />
+                        </DetailPanel>
+                      ) : null}
+                      {form.extraTasks.includes("Curtain cleaning") ? (
+                        <DetailPanel title="Curtain details">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                              value={form.curtainCount}
+                              onChange={(e) =>
+                                updateField("curtainCount", e.target.value)
+                              }
+                              placeholder="Number of curtains / rooms"
+                            />
+                            <Input
+                              value={form.curtainType}
+                              onChange={(e) =>
+                                updateField("curtainType", e.target.value)
+                              }
+                              placeholder="Sheer, blackout, roller, unknown…"
+                            />
+                          </div>
+                        </DetailPanel>
+                      ) : null}
+                      {form.extraTasks.includes("Mattress deep cleaning") ? (
+                        <DetailPanel title="Mattress details">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                              value={form.mattressCount}
+                              onChange={(e) =>
+                                updateField("mattressCount", e.target.value)
+                              }
+                              placeholder="Number of mattresses"
+                            />
+                            <Input
+                              value={form.mattressSizes}
+                              onChange={(e) =>
+                                updateField("mattressSizes", e.target.value)
+                              }
+                              placeholder="Single, double, king…"
+                            />
+                          </div>
+                        </DetailPanel>
+                      ) : null}
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field>
+                          <Label htmlFor="pets">Any pets?</Label>
+                          <Select
+                            id="pets"
+                            value={form.pets}
+                            onChange={(e) =>
+                              updateField("pets", e.target.value)
+                            }
+                          >
+                            <option>No</option>
+                            <option>Yes</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="allergies">
+                            Allergies or product restrictions
+                          </Label>
+                          <Input
+                            id="allergies"
+                            value={form.allergies}
+                            onChange={(e) =>
+                              updateField("allergies", e.target.value)
+                            }
+                            placeholder="None, fragrance-free products…"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {formStep === 2 ? (
+                    <div className="space-y-7">
+                      <StepIntro
+                        eyebrow="Timing & access"
+                        title="What timing would work for you?"
+                        text="Choose your first preference and tell us how flexible you are. We will check what is available locally before offering a booking option."
+                      />
+                      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
+                        Your preferred date is not yet a confirmed appointment.
+                        If it is unavailable, we may email suitable alternatives
+                        for you to accept or decline.
+                      </div>
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field>
+                          <Label htmlFor="preferredDate">
+                            First-choice date
+                          </Label>
+                          <Input
+                            id="preferredDate"
+                            type="date"
+                            value={form.preferredDate}
+                            onChange={(e) =>
+                              updateField("preferredDate", e.target.value)
+                            }
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="preferredTime">
+                            Preferred arrival time
+                          </Label>
+                          <Input
+                            id="preferredTime"
+                            type="time"
+                            value={form.preferredTime}
+                            onChange={(e) =>
+                              updateField("preferredTime", e.target.value)
+                            }
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="dateFlexibility">
+                            How flexible are your dates?
+                          </Label>
+                          <Select
+                            id="dateFlexibility"
+                            value={form.dateFlexibility}
+                            onChange={(e) =>
+                              updateField("dateFlexibility", e.target.value)
+                            }
+                          >
+                            <option>This date only</option>
+                            <option>Flexible by 1 day</option>
+                            <option>Flexible by 3 days</option>
+                            <option>Flexible within the same week</option>
+                            <option>
+                              Please suggest the earliest available option
+                            </option>
+                            <option>I’m fully flexible</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="frequency">Cleaning frequency</Label>
+                          <Select
+                            id="frequency"
+                            value={form.frequency}
+                            onChange={(e) =>
+                              updateField(
+                                "frequency",
+                                e.target.value as FrequencyType,
+                              )
+                            }
+                          >
+                            <option>One-time</option>
+                            <option>Weekly</option>
+                            <option>Bi-weekly</option>
+                            <option>Monthly</option>
+                            <option>Not sure yet</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="parkingAvailable">
+                            Parking nearby?
+                          </Label>
+                          <Select
+                            id="parkingAvailable"
+                            value={form.parkingAvailable}
+                            onChange={(e) =>
+                              updateField("parkingAvailable", e.target.value)
+                            }
+                          >
+                            <option>Not sure</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Paid parking only</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="accessDetails">
+                            Access arrangement
+                          </Label>
+                          <Input
+                            id="accessDetails"
+                            value={form.accessDetails}
+                            onChange={(e) =>
+                              updateField("accessDetails", e.target.value)
+                            }
+                            placeholder="I will be home, key handover, reception…"
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {formStep === 3 ? (
+                    <div className="space-y-7">
+                      <StepIntro
+                        eyebrow="Almost done"
+                        title="Where should we send the available options?"
+                        text="We manually review your request, check suitable local provider availability, and email you before any booking or payment."
+                      />
+                      <div className="grid gap-5 md:grid-cols-2">
+                        <Field>
+                          <Label htmlFor="fullName">Full name</Label>
+                          <Input
+                            id="fullName"
+                            value={form.fullName}
+                            onChange={(e) =>
+                              updateField("fullName", e.target.value)
+                            }
+                            placeholder="Your full name"
+                            required
+                            autoComplete="name"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={form.email}
+                            onChange={(e) =>
+                              updateField("email", e.target.value)
+                            }
+                            placeholder="you@example.com"
+                            required
+                            autoComplete="email"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="whatsapp">
+                            WhatsApp number (optional)
+                          </Label>
+                          <Input
+                            id="whatsapp"
+                            type="tel"
+                            value={form.whatsapp}
+                            onChange={(e) =>
+                              updateField("whatsapp", e.target.value)
+                            }
+                            placeholder="Include country code"
+                            autoComplete="tel"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="preferredLanguage">
+                            Preferred language
+                          </Label>
+                          <Select
+                            id="preferredLanguage"
+                            value={form.preferredLanguage}
+                            onChange={(e) =>
+                              updateField(
+                                "preferredLanguage",
+                                e.target.value as LanguageType,
+                              )
+                            }
+                          >
+                            <option>English</option>
+                            <option>Russian</option>
+                            <option>Turkish</option>
+                          </Select>
+                        </Field>
+                        <Field className="md:col-span-2">
+                          <Label htmlFor="specialNotes">
+                            Anything else we should know?
+                          </Label>
+                          <Textarea
+                            id="specialNotes"
+                            value={form.specialNotes}
+                            onChange={(e) =>
+                              updateField("specialNotes", e.target.value)
+                            }
+                            placeholder="Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately."
+                          />
+                        </Field>
+                      </div>
+                      <DetailPanel title="Property photos (optional)">
+                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                          Photos improve quote accuracy. Please exclude people,
+                          documents, screens and family photographs.
+                        </p>
+                        <input
+                          ref={photoInputRef}
+                          id="propertyPhotos"
+                          name="propertyPhotos"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                          onChange={handlePhotoSelection}
+                          disabled={
+                            sending ||
+                            processingPhotos ||
+                            propertyPhotos.length >= MAX_PROPERTY_PHOTOS
+                          }
+                          className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900"
+                        />
+                        {photoPreviews.length ? (
+                          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {photoPreviews.map((preview, index) => (
+                              <div
+                                key={`${preview.file.name}-${index}`}
+                                className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10"
+                              >
+                                <Image
+                                  src={preview.url}
+                                  alt={`Selected property photo ${index + 1}`}
+                                  width={320}
+                                  height={224}
+                                  unoptimized
+                                  className="h-24 w-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removePropertyPhoto(index)}
+                                  className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                      </DetailPanel>
+                      <div className="grid gap-4 rounded-[28px] border border-slate-200 bg-[#f7f5f0] p-5 dark:border-white/10 dark:bg-white/[0.035] sm:grid-cols-[1fr_auto] sm:items-center">
+                        <div>
+                          <p className="text-sm font-semibold">
+                            Indicative all-in range
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                            Final timing and price follow a manual scope and
+                            local availability review.
+                          </p>
+                        </div>
+                        <div className="text-3xl font-semibold tracking-tight">
+                          {estimate}
+                        </div>
+                      </div>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">
+                        🔒 No payment is requested now. We first check local
+                        availability. If you choose an available date and accept
+                        the final quote, we send a secure Stripe payment link
+                        and confirm the booking in writing.
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.035]">
+                        <label
+                          htmlFor="termsAccepted"
+                          className="flex cursor-pointer items-start gap-3"
+                        >
+                          <input
+                            id="termsAccepted"
+                            name="termsAccepted"
+                            type="checkbox"
+                            required
+                            checked={form.termsAccepted}
+                            onChange={(e) =>
+                              updateField("termsAccepted", e.target.checked)
+                            }
+                            className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 accent-slate-950"
+                          />
+                          <span className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+                            I understand that this is an availability and quote
+                            request, not a confirmed booking. I agree to the{" "}
+                            <Link
+                              href="/terms"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
+                            >
+                              Terms of Service
+                            </Link>{" "}
+                            and acknowledge the{" "}
+                            <Link
+                              href="/privacy-policy"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
+                            >
+                              Privacy Policy
+                            </Link>
+                            .
+                          </span>
+                        </label>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                <div className="border-t border-slate-200 bg-slate-50/70 px-6 py-5 dark:border-white/10 dark:bg-white/[0.025] md:px-9">
+                  <div className="flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={goToPreviousStep}
+                      disabled={formStep === 0}
+                      className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium transition hover:bg-white disabled:invisible dark:border-white/15 dark:hover:bg-white/5"
+                    >
+                      Back
+                    </button>
+                    {formStep < quoteSteps.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={goToNextStep}
+                        className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-950"
+                      >
+                        Continue <span aria-hidden="true">→</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={sending || processingPhotos}
+                        className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-950"
+                      >
+                        {processingPhotos
+                          ? "Preparing photos…"
+                          : sending
+                            ? "Sending…"
+                            : "Check local availability"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {submitted ? (
+                  <div className="m-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                      Your availability and quote request has been sent.
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
+                      Thank you. We’ll review the scope, check suitable local
+                      provider availability, and email you with an available
+                      option or suitable alternatives. Nothing is booked and no
+                      payment is due yet.
+                    </p>
+                  </div>
+                ) : null}
+
+                <p className="mx-6 mb-6 mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                  Are you a cleaner in Antalya?{" "}
+                  <Link
+                    href="/apply"
+                    className="underline hover:text-black dark:hover:text-white"
+                  >
+                    Apply to work with us
+                  </Link>
                 </p>
-
-                <p>
-                  Reasonable date or time changes may be accommodated subject to
-                  availability. A requested change is not effective until
-                  confirmed by CleanNestPro. Repeated or late changes may be
-                  treated as a cancellation.
-                </p>
-
-                <p>
-                  If an appointed service partner becomes unavailable and
-                  CleanNestPro cannot arrange a suitable replacement, or if we
-                  otherwise cannot provide the agreed service on the confirmed
-                  date, you may choose an agreed rescheduled appointment or a
-                  full refund of the amount paid for the undelivered service.
-                </p>
-
-                <p>
-                  Approved refunds are returned to the original payment method
-                  where possible. The time required for the refunded amount to
-                  appear is determined by the payment provider, card network,
-                  and your bank.
-                </p>
-
-                <p>
-                  These cancellation terms do not limit any mandatory statutory
-                  cancellation or refund rights that apply to you.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                7. Customer responsibilities
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  You agree to provide accurate, complete, and up-to-date
-                  information when requesting a quote or booking.
-                </p>
-
-                <p>You must disclose relevant information including:</p>
-
-                <ul className="list-disc space-y-2 pl-6">
-                  <li>the true size and condition of the property;</li>
-                  <li>access, parking, security, and building restrictions;</li>
-                  <li>pets, pests, hazardous materials, or health risks;</li>
-                  <li>
-                    fragile, valuable, damaged, or unusually delicate items;
-                  </li>
-                  <li>
-                    recent construction, renovation, heavy soiling, mould,
-                    bodily fluids, or specialist cleaning requirements; and
-                  </li>
-                  <li>
-                    any tasks that were not included in the original request.
-                  </li>
-                </ul>
-
-                <p>
-                  You are responsible for securing money, jewellery, documents,
-                  medicines, keys, electronics, and other valuable or sensitive
-                  items before the service begins.
-                </p>
-
-                <p>
-                  Failure to provide accurate information may affect the price,
-                  duration, service quality, safety, or availability and may
-                  result in an adjusted quote, reduced scope, postponement, or
-                  cancellation.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                8. Property access and service conditions
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  You must ensure that safe and timely access to the property is
-                  available at the confirmed appointment time.
-                </p>
-
-                <p>
-                  Unless otherwise agreed, the property should have working
-                  electricity, running water, appropriate lighting, and a
-                  reasonably safe working environment.
-                </p>
-
-                <p>
-                  If access cannot be obtained, the customer is absent when
-                  attendance is required, keys are unavailable, or entry
-                  instructions are inaccurate, the booking may be treated as a
-                  late cancellation and may be non-refundable.
-                </p>
-
-                <p>
-                  The attending service partner may refuse or pause unsafe or
-                  unlawful work and must notify CleanNestPro. We may then reduce,
-                  cancel, or reschedule work where conditions are abusive,
-                  materially different from those disclosed, or require specialist
-                  equipment or qualifications that were not agreed in advance.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                9. Service standards and limitations
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro will manage the service with reasonable care and
-                  skill and will require appointed service partners to carry out
-                  the on-site work with reasonable care and skill, subject to the
-                  agreed scope, available time, property condition, and access.
-                </p>
-
-                <p>
-                  Cleaning improves the condition and presentation of a
-                  property, but no guarantee is made that every stain, mark,
-                  odour, discolouration, scale deposit, mould trace, permanent
-                  damage, or pre-existing defect can be removed.
-                </p>
-
-                <p>
-                  Unless specifically included in writing, the service does not
-                  include specialist biohazard cleaning, pest treatment,
-                  exterior high-level window cleaning, hazardous waste removal,
-                  restoration work, repair work, or tasks requiring regulated
-                  specialist qualifications.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                10. Complaints, damage, and re-clean requests
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Any service concern, alleged damage, missing item, or request
-                  for corrective cleaning should be reported to CleanNestPro as
-                  soon as reasonably possible and preferably within 24 hours of
-                  the service.
-                </p>
-
-                <p>
-                  You should provide clear details and, where relevant,
-                  photographs or other supporting evidence. You must allow a
-                  reasonable opportunity to review the issue and, where
-                  appropriate, arrange corrective work before engaging another
-                  provider or incurring additional costs.
-                </p>
-
-                <p>
-                  Reporting within 24 hours helps us investigate while the
-                  circumstances are recent. It does not remove any legal right
-                  that cannot lawfully be limited by a contractual reporting
-                  period.
-                </p>
-
-                <p>
-                  CleanNestPro may offer a re-clean, partial refund, full refund,
-                  or another reasonable remedy depending on the circumstances,
-                  agreed scope, and applicable law.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                11. Payment disputes and chargebacks
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  If you believe a payment is incorrect or a refund is due,
-                  please contact CleanNestPro first so that we have a reasonable
-                  opportunity to investigate and resolve the matter.
-                </p>
-
-                <p>
-                  You must not knowingly submit a false, misleading, or
-                  fraudulent payment dispute or chargeback. We may provide the
-                  payment provider or card issuer with relevant evidence,
-                  including the accepted quote, these terms, booking
-                  confirmation, communications, attendance records, service
-                  evidence, cancellation information, and refund records.
-                </p>
-
-                <p>
-                  Nothing in this section prevents you from exercising a lawful
-                  right to dispute a genuinely unauthorised or incorrectly
-                  processed payment.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                12. Liability and legal rights
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Nothing in these terms excludes or limits liability for death
-                  or personal injury caused by negligence, fraud, fraudulent
-                  misrepresentation, or any other liability that cannot lawfully
-                  be excluded or limited.
-                </p>
-
-                <p>
-                  Nothing in these terms affects mandatory consumer rights,
-                  including any right for services to be performed with
-                  reasonable care and skill.
-                </p>
-
-                <p>
-                  CleanNestPro is responsible for loss or damage that is a
-                  reasonably foreseeable result of our breach of these terms or
-                  our failure to use reasonable care and skill. We do not exclude
-                  responsibility merely because on-site performance was assigned
-                  to an independent service partner acting on our behalf.
-                </p>
-
-                <p>
-                  CleanNestPro is not responsible for pre-existing damage,
-                  ordinary wear and tear, inherent defects, manufacturer
-                  defects, colour fading, unstable fittings, or damage resulting
-                  from inaccurate instructions or undisclosed risks, except to
-                  the extent that our breach or negligence, or that of a service
-                  partner performing the booking on our behalf, caused or
-                  materially worsened the loss.
-                </p>
-
-                <p>
-                  If you use the service as a consumer, we are not responsible
-                  for business losses such as loss of profit, revenue, business,
-                  opportunity, or business interruption. Any other limitation of
-                  liability applies only where it is lawful, fair, transparent,
-                  and consistent with your mandatory consumer rights.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                13. Delays and events outside reasonable control
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro and the service provider are not responsible for
-                  delay or failure caused by events outside reasonable control,
-                  including severe weather, road closures, transport disruption,
-                  illness, accidents, utility failure, government action,
-                  building access restrictions, civil disturbance, or emergency
-                  conditions.
-                </p>
-
-                <p>
-                  Where such an event affects a confirmed booking, we will
-                  communicate as soon as reasonably possible and seek to
-                  reschedule the service or provide an appropriate refund for
-                  any service that cannot be delivered.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                14. Service availability
-              </h2>
-
-              <p className="mt-4 leading-8 text-slate-600">
-                Availability is not guaranteed and may vary based on location,
-                timing, operational capacity, provider availability, property
-                condition, and the requested scope. CleanNestPro may decline a
-                request before confirmation without obligation to provide a
-                reason, except where prohibited by law.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                15. Website and automated assistant
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  Website content, estimated prices, and responses from any
-                  automated assistant are provided for general information and
-                  preliminary guidance.
-                </p>
-
-                <p>
-                  Automated responses do not constitute a final quote, confirmed
-                  booking, professional advice, or binding commitment.
-                  CleanNestPro may correct errors or clarify information before
-                  a booking is confirmed.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                16. Privacy
-              </h2>
-
-              <p className="mt-4 leading-8 text-slate-600">
-                Personal information is handled in accordance with the
-                CleanNestPro Privacy Policy. By requesting or booking a service,
-                you acknowledge that relevant information may be shared with
-                selected providers and payment processors where necessary to
-                arrange and deliver the service.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                17. Governing law and disputes
-              </h2>
-
-              <div className="mt-4 space-y-4 leading-8 text-slate-600">
-                <p>
-                  These terms and any non-contractual obligations arising from
-                  them are governed by the laws of England and Wales, subject to
-                  any mandatory consumer protection laws that apply in the
-                  country where you live or where the service is performed.
-                </p>
-
-                <p>
-                  The courts of England and Wales will have jurisdiction, but
-                  this does not remove any right a consumer may have to bring a
-                  claim in another court where mandatory law permits.
-                </p>
-
-                <p>
-                  Before starting formal proceedings, both parties should first
-                  attempt to resolve the matter through reasonable written
-                  communication.
-                </p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                18. Company information
-              </h2>
-
-              <div className="mt-4 space-y-3 leading-8 text-slate-600">
-                <p>
-                  CleanNestPro operates under Generation Beta Digital Ltd, a
-                  company registered in the United Kingdom.
-                </p>
-
-                <p>
-                  Registered office: 3rd Floor, 86–90 Paul Street, London EC2A
-                  4NE, United Kingdom
-                </p>
-
-                <p>Company Number: 16274319</p>
-                <p>ICO Registration: ZB883806</p>
-                <p>Customer support: support@cleannestpro.com</p>
-              </div>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">
-                19. Changes to these terms
-              </h2>
-
-              <p className="mt-4 leading-8 text-slate-600">
-                We may update these terms to reflect changes in the service,
-                payment process, provider arrangements, or legal requirements.
-                The updated version will be posted on this page with a revised
-                date. Changes will not retrospectively reduce rights already
-                attached to a confirmed booking unless required by law or agreed
-                with you.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-2xl font-semibold">20. Contact</h2>
-
-              <p className="mt-4 leading-8 text-slate-600">
-                For questions, cancellation requests, complaints, or refund
-                enquiries relating to these terms, please contact CleanNestPro
-                using the website, your booking correspondence, or
-                support@cleannestpro.com.
-              </p>
-            </section>
+              </motion.form>
+            </div>
           </div>
-        </div>
-      </section>
-    </main>
+        </motion.section>
+
+        <motion.section
+          id="faq"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.14 }}
+          variants={staggerWrap}
+          className="mx-auto max-w-6xl px-6 py-24 md:px-8"
+        >
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
+            <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+              FAQ
+            </div>
+            <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
+              Frequently asked questions
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
+              Added in a search-friendly structure for both users and SEO.
+            </p>
+          </motion.div>
+
+          <div className="mx-auto mt-14 space-y-4">
+            {faqs.map((item) => (
+              <motion.details
+                key={item.q}
+                variants={softReveal}
+                className="group rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm open:shadow-md dark:border-white/10 dark:bg-white/5"
+              >
+                <summary className="cursor-pointer list-none text-lg font-semibold marker:hidden">
+                  <div className="flex items-center justify-between gap-4">
+                    <span>{item.q}</span>
+                    <span className="text-slate-400 transition group-open:rotate-45">
+                      +
+                    </span>
+                  </div>
+                </summary>
+                <p className="mt-4 max-w-4xl leading-7 text-slate-600 dark:text-slate-300">
+                  {item.a}
+                </p>
+              </motion.details>
+            ))}
+          </div>
+        </motion.section>
+
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.16 }}
+          variants={fadeUp}
+          className="mx-auto max-w-5xl px-6 pb-24 text-center md:px-8"
+        >
+          <div className="rounded-[36px] border border-slate-200 bg-white px-8 py-12 shadow-[0_18px_60px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/5 dark:shadow-none">
+            <h2 className="text-2xl font-semibold tracking-tight md:text-4xl">
+              Local cleaning, without the work of searching locally
+            </h2>
+
+            <p className="mx-auto mt-5 max-w-3xl leading-8 text-slate-600 dark:text-slate-300">
+              CleanNestPro is a UK-based cleaning coordination service for
+              international clients in Antalya. Tell us your preferred timing
+              and requirements once; we check suitable independent local
+              options, present what is available clearly, and manage the quote,
+              secure payment, multilingual communication, written booking, and
+              follow-up.
+            </p>
+          </div>
+        </motion.section>
+
+        <ChatAssistant />
+        <Footer />
+      </main>
+    </>
+  );
+}
+
+function Field({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <div className={className}>{children}</div>;
+}
+
+function StepIntro({
+  eyebrow,
+  title,
+  text,
+}: {
+  eyebrow: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+        {eyebrow}
+      </p>
+      <h4 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
+        {title}
+      </h4>
+      <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500 dark:text-slate-400">
+        {text}
+      </p>
+    </div>
+  );
+}
+
+function DetailPanel({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-[24px] border border-slate-200 bg-slate-50/70 p-5 dark:border-white/10 dark:bg-white/[0.035]">
+      <p className="mb-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+        {title}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+function Label({
+  children,
+  htmlFor,
+}: {
+  children: React.ReactNode;
+  htmlFor: string;
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
+    >
+      {children}
+    </label>
+  );
+}
+
+function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/25 dark:focus:ring-white/10 dark:[color-scheme:dark]"
+    />
+  );
+}
+
+function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      {...props}
+      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-500 focus:ring-2 focus:ring-slate-200 [color-scheme:light] dark:border-white/15 dark:bg-slate-900 dark:text-white dark:focus:border-white/25 dark:focus:ring-white/10 dark:[color-scheme:dark]"
+    >
+      {props.children}
+    </select>
+  );
+}
+
+function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      {...props}
+      rows={5}
+      className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-500 focus:ring-2 focus:ring-slate-200 dark:border-white/15 dark:bg-white/5 dark:text-white dark:placeholder:text-slate-400 dark:focus:border-white/25 dark:focus:ring-white/10"
+    />
   );
 }

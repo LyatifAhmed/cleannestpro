@@ -8,6 +8,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const MAX_PROPERTY_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 700 * 1024;
 const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
+const CURRENT_TERMS_VERSION = "2026-07-24";
+const CURRENT_PRIVACY_VERSION = "2026-07-24";
 
 type QuotePayload = {
   quoteReference?: string;
@@ -22,6 +24,7 @@ type QuotePayload = {
   frequency: string;
   preferredDate: string;
   preferredTime: string;
+  dateFlexibility?: string;
   furnished: string;
   pets: string;
   suppliesNeeded: string;
@@ -29,6 +32,12 @@ type QuotePayload = {
   accessDetails: string;
   specialNotes: string;
   estimatedRange: string;
+  termsAccepted?: boolean;
+  termsVersion?: string;
+  termsAcceptedAt?: string;
+  privacyAcknowledged?: boolean;
+  privacyVersion?: string;
+  legalRecordedAt?: string;
 };
 
 type EmailAttachment = {
@@ -56,6 +65,19 @@ function row(label: string, value: string) {
       </td>
     </tr>
   `;
+}
+
+function formatRecordedTime(value?: string) {
+  if (!value) return "Not provided";
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-GB", {
+    dateStyle: "full",
+    timeStyle: "long",
+    timeZone: "Europe/London",
+  }).format(date);
 }
 
 function createQuoteReference() {
@@ -118,7 +140,11 @@ async function parseRequest(req: NextRequest) {
     }
 
     const bytes = Buffer.from(await file.arrayBuffer());
-    const isJpeg = bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+    const isJpeg =
+      bytes.length >= 3 &&
+      bytes[0] === 0xff &&
+      bytes[1] === 0xd8 &&
+      bytes[2] === 0xff;
 
     if (!isJpeg) {
       throw new Error("INVALID_PHOTO");
@@ -159,6 +185,7 @@ function buildAdminHtml(data: QuotePayload, photoCount: number) {
           ${row("Cleaning frequency", data.frequency)}
           ${row("Preferred date", data.preferredDate || "Not provided")}
           ${row("Preferred time", data.preferredTime || "Not provided")}
+          ${row("Date flexibility", data.dateFlexibility || "Not provided")}
           ${row("Is the property furnished?", data.furnished)}
           ${row("Any pets?", data.pets)}
           ${row("Need cleaning supplies brought?", data.suppliesNeeded)}
@@ -169,6 +196,26 @@ function buildAdminHtml(data: QuotePayload, photoCount: number) {
           ${row("Estimated range shown on site", data.estimatedRange)}
         </tbody>
       </table>
+
+      <div style="margin-top:24px;padding:18px;border-radius:16px;background:#f8fafc;border:1px solid #cbd5e1;">
+        <h3 style="margin:0 0 12px 0;font-size:17px;color:#0f172a;">
+          Legal acknowledgement
+        </h3>
+        <table style="border-collapse:collapse;width:100%;font-size:14px;background:#ffffff;">
+          <tbody>
+            ${row("Terms accepted", data.termsAccepted ? "Yes" : "No")}
+            ${row("Terms version", data.termsVersion || "Not provided")}
+            ${row("Customer acceptance time", formatRecordedTime(data.termsAcceptedAt))}
+            ${row("Privacy Policy acknowledged", data.privacyAcknowledged ? "Yes" : "No")}
+            ${row("Privacy Policy version", data.privacyVersion || "Not provided")}
+            ${row("Server recorded at", formatRecordedTime(data.legalRecordedAt))}
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0 0;font-size:12px;line-height:1.6;color:#64748b;">
+          The server accepted this request only after receiving the required
+          Terms of Service acceptance and Privacy Policy acknowledgement.
+        </p>
+      </div>
     </div>
   `;
 }
@@ -197,7 +244,7 @@ function buildCustomerHtml(data: QuotePayload) {
 
         <p style="margin:0 0 16px 0;color:#475569;">
           Your reference is <strong style="color:#0f172a;">${escapeHtml(
-            data.quoteReference || "Not provided"
+            data.quoteReference || "Not provided",
           )}</strong>.
         </p>
 
@@ -207,9 +254,26 @@ function buildCustomerHtml(data: QuotePayload) {
         </p>
 
         <p style="margin:0 0 16px 0;color:#475569;">
-          This is not a final confirmed price yet. We’ll review the
-          property details, timing, and any extras before responding.
+          This is an availability and quote request, not a confirmed booking or
+          final price. We’ll review the property details, local provider
+          availability, timing, flexibility, and any extras before responding.
         </p>
+
+        <div style="margin:24px 0;padding:16px 18px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;">
+          <p style="margin:0 0 8px 0;font-size:14px;font-weight:600;color:#0f172a;">
+            Your legal acknowledgement
+          </p>
+          <p style="margin:0;font-size:14px;line-height:1.7;color:#475569;">
+            You accepted the CleanNestPro
+            <a href="https://cleannestpro.com/terms" style="color:#0f172a;text-decoration:underline;">Terms of Service</a>
+            (version ${escapeHtml(data.termsVersion || CURRENT_TERMS_VERSION)})
+            and acknowledged the
+            <a href="https://cleannestpro.com/privacy-policy" style="color:#0f172a;text-decoration:underline;">Privacy Policy</a>
+            (version ${escapeHtml(data.privacyVersion || CURRENT_PRIVACY_VERSION)}).
+            This was recorded by our server at
+            ${escapeHtml(formatRecordedTime(data.legalRecordedAt))}.
+          </p>
+        </div>
 
         <div style="margin:24px 0;padding:16px 18px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;">
           <p style="margin:0;font-size:14px;color:#475569;">
@@ -232,7 +296,7 @@ export async function POST(req: NextRequest) {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
         { error: "RESEND_API_KEY is not configured." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -242,14 +306,33 @@ export async function POST(req: NextRequest) {
     const location = data.location?.trim();
 
     if (!fullName || !customerEmail || !location) {
-      return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields." },
+        { status: 400 },
+      );
+    }
+
+    if (
+      data.termsAccepted !== true ||
+      data.privacyAcknowledged !== true ||
+      data.termsVersion !== CURRENT_TERMS_VERSION ||
+      data.privacyVersion !== CURRENT_PRIVACY_VERSION
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Please accept the current Terms of Service and acknowledge the Privacy Policy.",
+        },
+        { status: 400 },
+      );
     }
 
     const adminEmail = process.env.QUOTE_TO_EMAIL || "quotes@cleannestpro.com";
     const fromEmail =
       process.env.QUOTE_FROM_EMAIL ||
       "CleanNestPro Support <support@cleannestpro.com>";
-    const supportEmail = process.env.QUOTE_REPLY_EMAIL || "support@cleannestpro.com";
+    const supportEmail =
+      process.env.QUOTE_REPLY_EMAIL || "support@cleannestpro.com";
 
     const payload: QuotePayload = {
       ...data,
@@ -258,6 +341,11 @@ export async function POST(req: NextRequest) {
       email: customerEmail,
       location,
       extraTasks: Array.isArray(data.extraTasks) ? data.extraTasks : [],
+      termsAccepted: true,
+      termsVersion: CURRENT_TERMS_VERSION,
+      privacyAcknowledged: true,
+      privacyVersion: CURRENT_PRIVACY_VERSION,
+      legalRecordedAt: new Date().toISOString(),
     };
 
     const adminResult = await resend.emails.send({
@@ -270,10 +358,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (adminResult.error) {
-      console.error("Failed to send admin quote notification:", adminResult.error);
+      console.error(
+        "Failed to send admin quote notification:",
+        adminResult.error,
+      );
       return NextResponse.json(
         { error: "Failed to send quote notification." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -286,10 +377,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (customerResult.error) {
-      console.error("Failed to send customer confirmation:", customerResult.error);
+      console.error(
+        "Failed to send customer confirmation:",
+        customerResult.error,
+      );
       return NextResponse.json(
         { error: "Quote received, but confirmation email failed." },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -317,7 +411,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { error: "Failed to send quote request." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -141,47 +141,47 @@ const extraTaskOptions = [
 ];
 
 const trustBadges = [
-  "Independent local cleaning providers",
+  "Independent local provider coordination",
   "English, Turkish & Russian support",
-  "One clear quote by email",
+  "Flexible date options by email",
   "Secure booking with Stripe",
 ];
 
 const quoteReasons = [
   {
     title: "One request, not endless calls",
-    text: "Tell us what you need once. We approach suitable local providers, check availability, and coordinate the details on your behalf.",
+    text: "Tell us your preferred date, flexibility, and cleaning needs once. We approach suitable local providers and coordinate the available options on your behalf.",
   },
   {
-    title: "One clear final quote",
-    text: "We bring the property details, requested extras, timing, and provider pricing together into one clear quote for you to review.",
+    title: "Choose what works for you",
+    text: "We bring the available timing, written scope, requested extras, and provider pricing together clearly. You are free to accept or decline any option.",
   },
   {
     title: "Local delivery, managed by us",
-    text: "An independent local service partner performs the on-site work, while CleanNestPro manages your quote, payment, multilingual support, booking, and service follow-up.",
+    text: "An independent local service partner performs the on-site work, while CleanNestPro remains your international point of contact for the quote, payment, booking, and service follow-up.",
   },
 ];
 
 const processSteps = [
   {
     step: "01",
-    title: "Tell us about the property",
-    text: "Share the essentials so we can understand the size, timing, and type of cleaning required.",
+    title: "Tell us what works for you",
+    text: "Share your preferred date, how flexible you are, and the property details. Your preferred date is a request, not yet a confirmed appointment.",
   },
   {
     step: "02",
-    title: "We coordinate local providers",
-    text: "We review the scope and approach suitable independent providers to check availability and pricing on your behalf.",
+    title: "We check suitable local options",
+    text: "We review the scope and approach suitable independent providers to check current availability and pricing on your behalf.",
   },
   {
     step: "03",
-    title: "Receive one clear quote",
-    text: "We return with one consolidated quote and written scope, so you do not need to compare multiple cleaners yourself.",
+    title: "Choose your preferred option",
+    text: "We email an available date or suitable alternatives with a written scope and clear final quote. You are never required to accept an alternative.",
   },
   {
     step: "04",
-    title: "Your local provider is confirmed",
-    text: "If you accept, pay CleanNestPro securely through Stripe. We appoint the local service partner and manage the agreed appointment details.",
+    title: "Confirm securely",
+    text: "Once an option is available, accept it and pay CleanNestPro securely through Stripe. We then confirm the agreed appointment in writing.",
   },
 ];
 
@@ -212,7 +212,7 @@ const lifestylePanels = [
 const faqs = [
   {
     q: "How does the CleanNestPro service work?",
-    a: "CleanNestPro provides a managed cleaning service for international clients. You receive the quote, booking support, multilingual communication, and payment process from us. We appoint an independent local service partner to perform the on-site cleaning under the agreed scope.",
+    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. You tell us your preferred timing, flexibility, and requirements once. We approach suitable independent local providers and email you an available option, written scope, and clear final quote. If you accept and pay, we confirm the appointment and remain your point of contact.",
   },
   {
     q: "Who carries out the cleaning and who do I contact?",
@@ -220,7 +220,7 @@ const faqs = [
   },
   {
     q: "Which areas in Antalya do you currently cover?",
-    a: "We currently focus on selected areas in Antalya. You can send your location in the quote form and we will confirm availability by email.",
+    a: "We currently focus on selected areas in Antalya. Send your location in the quote form and we will check current local provider availability before offering a booking option.",
   },
   {
     q: "Do you offer cleaning for Airbnb and holiday homes?",
@@ -236,19 +236,23 @@ const faqs = [
   },
   {
     q: "How is pricing confirmed?",
-    a: "The range shown on the page is indicative and includes the quoted service costs. Final pricing is confirmed after we review your property details, timing, requested extras, and current local provider availability.",
+    a: "The range shown on the page is indicative. Final pricing is confirmed only after we review your property details, requested extras, preferred timing, flexibility, and current local provider availability.",
   },
   {
     q: "How do I request a quote?",
-    a: "Simply complete the quote form with the property type, preferred timing, and any notes that would help us understand the request. We then reply by email with the next step.",
+    a: "Complete the quote form with the property type, preferred date, date flexibility, and any useful notes. This is an availability and quote request, not a confirmed booking. We then email you with an available option or suitable alternatives.",
   },
   {
     q: "How do I pay and confirm my booking?",
-    a: "After you accept the final quote, we send you a secure Stripe payment link by email. Your booking is confirmed once payment is completed.",
+    a: "We first coordinate an available local provider and email you the proposed date, written scope, and final price. If you choose that option, we send a secure Stripe payment link. Your booking is confirmed only after you accept the available option, complete payment, and receive our written booking confirmation.",
+  },
+  {
+    q: "Is my preferred date guaranteed?",
+    a: "Your selected date is your first preference, not a guaranteed appointment. Availability depends on suitable independent local providers. If your first choice is unavailable, we may offer alternative dates or times. You are free to accept or decline them, and there is nothing to pay unless you choose an available option.",
   },
   {
     q: "What happens if CleanNestPro cannot provide the booked service?",
-    a: "If the confirmed booking cannot go ahead because the selected provider becomes unavailable and we cannot coordinate a suitable replacement, you will receive a full refund of the amount paid for that booking.",
+    a: "If a confirmed provider later becomes unavailable, we will make reasonable efforts to coordinate a suitable replacement or offer alternative dates. If we cannot do so, or the alternatives do not work for you, we will issue a full refund of the amount paid for the affected booking.",
   },
   {
     q: "What is the cancellation policy?",
@@ -273,7 +277,7 @@ const createInitialState = (): FormState => ({
   frequency: "One-time",
   preferredDate: "",
   preferredTime: "",
-  dateFlexibility: "Exact date preferred",
+  dateFlexibility: "Flexible by 3 days",
   furnished: "Yes",
   pets: "No",
   suppliesNeeded: "No",
@@ -339,11 +343,7 @@ const staggerWrap: Variants = {
 const MAX_PROPERTY_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 700 * 1024;
 const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
-const ALLOWED_PHOTO_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
+const ALLOWED_PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function compressPropertyPhoto(file: File): Promise<File> {
   if (!ALLOWED_PHOTO_TYPES.has(file.type)) {
@@ -356,12 +356,16 @@ async function compressPropertyPhoto(file: File): Promise<File> {
     const image = await new Promise<HTMLImageElement>((resolve, reject) => {
       const element = document.createElement("img");
       element.onload = () => resolve(element);
-      element.onerror = () => reject(new Error(`${file.name}: the image could not be read.`));
+      element.onerror = () =>
+        reject(new Error(`${file.name}: the image could not be read.`));
       element.src = sourceUrl;
     });
 
     const maxDimension = 1600;
-    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    const scale = Math.min(
+      1,
+      maxDimension / Math.max(image.width, image.height),
+    );
     const width = Math.max(1, Math.round(image.width * scale));
     const height = Math.max(1, Math.round(image.height * scale));
     const canvas = document.createElement("canvas");
@@ -369,7 +373,8 @@ async function compressPropertyPhoto(file: File): Promise<File> {
     canvas.height = height;
 
     const context = canvas.getContext("2d");
-    if (!context) throw new Error(`${file.name}: the image could not be processed.`);
+    if (!context)
+      throw new Error(`${file.name}: the image could not be processed.`);
 
     context.drawImage(image, 0, 0, width, height);
 
@@ -378,7 +383,7 @@ async function compressPropertyPhoto(file: File): Promise<File> {
 
     while (quality >= 0.48) {
       blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob(resolve, "image/jpeg", quality)
+        canvas.toBlob(resolve, "image/jpeg", quality),
       );
       if (blob && blob.size <= MAX_PHOTO_BYTES) break;
       quality -= 0.08;
@@ -411,7 +416,8 @@ function estimateCurtainCleaning(data: FormState): [number, number] {
   // booking. Keep the online range gentle; unusual/heavy systems are reviewed.
   let typeMultiplier = 1;
   if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.35;
-  else if (/sheer|tulle|voile|standard|normal/.test(type)) typeMultiplier = 0.75;
+  else if (/sheer|tulle|voile|standard|normal/.test(type))
+    typeMultiplier = 0.75;
 
   return [count * 3 * typeMultiplier, count * 6 * typeMultiplier];
 }
@@ -422,14 +428,18 @@ function estimateMattressCleaning(data: FormState): [number, number] {
 
   // When both types are entered (for example "one single, one double"), use
   // one of each and price any remaining mattresses at the unknown-size rate.
-  if (/single|twin|85|90/.test(sizes) && /double|king|queen|160|180|200/.test(sizes)) {
+  if (
+    /single|twin|85|90/.test(sizes) &&
+    /double|king|queen|160|180|200/.test(sizes)
+  ) {
     const remaining = Math.max(0, count - 2);
     return [28 + 34 + remaining * 31, 34 + 42 + remaining * 39];
   }
 
   if (/king|queen|180|200/.test(sizes)) return [count * 36, count * 44];
   if (/double|140|150|160/.test(sizes)) return [count * 34, count * 42];
-  if (/single|twin|80|85|90|100|120/.test(sizes)) return [count * 28, count * 34];
+  if (/single|twin|80|85|90|100|120/.test(sizes))
+    return [count * 28, count * 34];
 
   return [count * 31, count * 39];
 }
@@ -439,7 +449,9 @@ function estimateSofaCleaning(data: FormState): [number, number] {
 
   // Calibrated from the first completed supplier quote: a normal salon set
   // costs about 3,000 TL locally. The customer range includes coordination.
-  if (/l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)) {
+  if (
+    /l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)
+  ) {
     return [82, 105];
   }
 
@@ -529,7 +541,9 @@ function estimateQuote(data: FormState) {
     "Inside oven",
     "Inside kitchen cupboards & drawers (empty, clean & replace contents)",
   ]);
-  const bundleCount = data.extraTasks.filter((task) => bundleTasks.has(task)).length;
+  const bundleCount = data.extraTasks.filter((task) =>
+    bundleTasks.has(task),
+  ).length;
 
   if (bundleCount > 0) {
     const deepStyleService =
@@ -585,13 +599,20 @@ function estimateQuote(data: FormState) {
     "Villa / Large Home": 220,
     "Holiday Home": 140,
   };
-  if (Number.isFinite(sizeM2) && sizeM2 > typicalSize[data.propertyType] * 1.15) {
-    const oversizeRatio = Math.min(0.18, (sizeM2 / typicalSize[data.propertyType] - 1) * 0.3);
+  if (
+    Number.isFinite(sizeM2) &&
+    sizeM2 > typicalSize[data.propertyType] * 1.15
+  ) {
+    const oversizeRatio = Math.min(
+      0.18,
+      (sizeM2 / typicalSize[data.propertyType] - 1) * 0.3,
+    );
     min *= 1 + oversizeRatio * 0.7;
     max *= 1 + oversizeRatio;
   }
 
-  const bathroomCount = data.bathrooms === "4+" ? 4 : Number.parseInt(data.bathrooms, 10);
+  const bathroomCount =
+    data.bathrooms === "4+" ? 4 : Number.parseInt(data.bathrooms, 10);
   if (Number.isFinite(bathroomCount) && bathroomCount > 1) {
     min += (bathroomCount - 1) * 7;
     max += (bathroomCount - 1) * 10;
@@ -682,7 +703,7 @@ function getCoordinationServiceJsonLd() {
     },
     availableLanguage: ["English", "Turkish", "Russian"],
     description:
-      "A UK-based managed cleaning service for international clients in Antalya. CleanNestPro handles quoting, payment, multilingual support, booking and service follow-up, while appointed independent local partners perform the on-site work.",
+      "A UK-based cleaning coordination service for international clients in Antalya. Share your preferred timing once; CleanNestPro checks suitable local options and manages the quote, secure payment, multilingual support, written booking and follow-up.",
   };
 }
 
@@ -703,12 +724,14 @@ export default function Home() {
 
   const estimate = useMemo(() => estimateQuote(form), [form]);
   const photoPreviews = useMemo(
-    () => propertyPhotos.map((file) => ({ file, url: URL.createObjectURL(file) })),
-    [propertyPhotos]
+    () =>
+      propertyPhotos.map((file) => ({ file, url: URL.createObjectURL(file) })),
+    [propertyPhotos],
   );
 
   useEffect(() => {
-    return () => photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
+    return () =>
+      photoPreviews.forEach((preview) => URL.revokeObjectURL(preview.url));
   }, [photoPreviews]);
 
   useEffect(() => {
@@ -773,19 +796,27 @@ export default function Home() {
       const totalBytes = nextPhotos.reduce((sum, file) => sum + file.size, 0);
 
       if (totalBytes > MAX_TOTAL_PHOTO_BYTES) {
-        throw new Error("The selected photos are too large in total. Please remove one or more photos.");
+        throw new Error(
+          "The selected photos are too large in total. Please remove one or more photos.",
+        );
       }
 
       setPropertyPhotos(nextPhotos);
     } catch (error) {
-      alert(error instanceof Error ? error.message : "The photos could not be processed.");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "The photos could not be processed.",
+      );
     } finally {
       setProcessingPhotos(false);
     }
   }
 
   function removePropertyPhoto(index: number) {
-    setPropertyPhotos((current) => current.filter((_, photoIndex) => photoIndex !== index));
+    setPropertyPhotos((current) =>
+      current.filter((_, photoIndex) => photoIndex !== index),
+    );
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -799,7 +830,9 @@ export default function Home() {
         return;
       }
 
-      const secondsOnForm = Math.floor((Date.now() - form.formStartedAt) / 1000);
+      const secondsOnForm = Math.floor(
+        (Date.now() - form.formStartedAt) / 1000,
+      );
 
       if (secondsOnForm < 4) {
         setSending(false);
@@ -814,7 +847,9 @@ export default function Home() {
 
       const requestBody = new FormData();
       requestBody.append("payload", JSON.stringify(payload));
-      propertyPhotos.forEach((photo) => requestBody.append("propertyPhotos", photo));
+      propertyPhotos.forEach((photo) =>
+        requestBody.append("propertyPhotos", photo),
+      );
 
       const res = await fetch("/api/quote", {
         method: "POST",
@@ -936,31 +971,32 @@ export default function Home() {
                 initial="hidden"
                 animate="show"
                 variants={staggerWrap}
-                className="w-full pt-20 text-center md:pt-28"
+                className="w-full pt-4 text-center md:pt-8"
               >
                 <motion.div
                   variants={fadeUp}
                   className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
                 >
-                  Managed cleaning for international clients in Antalya
+                  UK-based cleaning coordination for international clients in
+                  Antalya
                 </motion.div>
 
                 <motion.h1
                   variants={fadeUp}
                   className="mx-auto mt-8 max-w-7xl text-[56px] font-light leading-[0.95] tracking-[-0.04em] text-white sm:text-[72px] md:text-[96px] lg:text-[128px]"
                 >
-                  Home cleaning in Antalya,
+                  Local cleaning in Antalya,
                   <br />
-                  without the endless search
+                  without the local hassle
                 </motion.h1>
 
                 <motion.p
                   variants={fadeUp}
                   className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/85 md:text-2xl md:leading-10"
                 >
-                  Tell us what you need once. We approach suitable independent
-                  local providers, coordinate the details, and return with one
-                  clear quote—so you do not have to contact multiple cleaners.
+                  Share your preferred date and requirements once. We coordinate
+                  suitable independent local options, present what is available
+                  clearly, and remain your English-speaking point of contact.
                 </motion.p>
 
                 <motion.div
@@ -979,13 +1015,13 @@ export default function Home() {
 
                 <motion.div
                   variants={fadeUp}
-                  className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
+                  className="mt-10 hidden items-center justify-center gap-3 sm:flex"
                 >
                   <a
                     href="#quote-form"
                     className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90"
                   >
-                    Get a detailed quote
+                    Check local availability
                   </a>
 
                   <button
@@ -997,6 +1033,15 @@ export default function Home() {
                     Ask the assistant
                   </button>
                 </motion.div>
+
+                <motion.p
+                  variants={fadeUp}
+                  className="mx-auto mt-5 max-w-3xl text-sm leading-6 text-white/70"
+                >
+                  Preferred dates are subject to local availability. If your
+                  first choice is unavailable, we may offer alternatives before
+                  you book. You only pay after choosing an available option.
+                </motion.p>
               </motion.div>
             </div>
           </div>
@@ -1010,7 +1055,10 @@ export default function Home() {
           variants={staggerWrap}
           className="mx-auto max-w-7xl px-6 py-24 md:px-8"
         >
-          <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
             <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
               Services
             </div>
@@ -1232,18 +1280,22 @@ export default function Home() {
         >
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.45),transparent_35%)] dark:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.04),transparent_35%)]" />
           <div className="relative mx-auto max-w-7xl px-6 md:px-8">
-            <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+            <motion.div
+              variants={fadeUp}
+              className="mx-auto max-w-3xl text-center"
+            >
               <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                Why use a managed cleaning service?
+                Why use an international coordination service?
               </div>
               <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
                 One request. Suitable local providers. One clear quote.
               </h2>
               <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
                 CleanNestPro manages the customer relationship from quote to
-                service follow-up. We remove the work of contacting and comparing
-                multiple providers, then appoint a suitable independent local
-                service partner to carry out the on-site cleaning.
+                service follow-up. We remove the work of contacting and
+                comparing multiple providers, show you the suitable options
+                currently available, and appoint an independent local service
+                partner only after you choose what works for you.
               </p>
             </motion.div>
 
@@ -1273,7 +1325,10 @@ export default function Home() {
           variants={staggerWrap}
           className="mx-auto px-6 py-24 md:px-8"
         >
-          <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
             <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
               Process
             </div>
@@ -1282,7 +1337,8 @@ export default function Home() {
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
               Describe the property once. We handle the provider search,
-              availability checks, quote coordination, and written booking details.
+              availability checks, flexible date options, quote coordination,
+              and written booking confirmation.
             </p>
           </motion.div>
 
@@ -1296,10 +1352,11 @@ export default function Home() {
                   One managed service, with clear local delivery
                 </h3>
                 <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">
-                  Your quote, Stripe payment, multilingual support, booking, and
-                  service follow-up are managed by CleanNestPro. An appointed
-                  independent local partner performs the on-site cleaning. You
-                  continue to contact us if anything needs to be clarified or resolved.
+                  CleanNestPro manages your availability request, quote, Stripe
+                  payment, multilingual support, written booking details, and
+                  service follow-up. An appointed independent local partner
+                  performs the on-site cleaning. You continue to contact us if
+                  anything needs to be clarified or resolved.
                 </p>
               </div>
             </div>
@@ -1337,7 +1394,10 @@ export default function Home() {
         >
           <div className="mx-auto w-full max-w-[1440px]">
             <div className="grid items-start gap-10 lg:grid-cols-[0.72fr_1.28fr] xl:gap-14">
-              <motion.div variants={fadeUp} className="max-w-2xl lg:sticky lg:top-8">
+              <motion.div
+                variants={fadeUp}
+                className="max-w-2xl lg:sticky lg:top-8"
+              >
                 <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
                   One coordinated quote
                 </div>
@@ -1349,24 +1409,45 @@ export default function Home() {
                 </h2>
 
                 <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
-                  Share the property details once. We contact suitable independent
-                  local providers on your behalf and return by email with one clear
-                  quote and scope for you to review.
+                  Share your preferred date, flexibility, and property details
+                  once. We contact suitable independent local providers and
+                  return by email with an available option, written scope, and
+                  one clear quote.
                 </p>
 
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
+                  Your selected date is a preference, not a confirmed
+                  appointment. If it is unavailable, we may suggest suitable
+                  alternatives. You are free to accept or decline any option.
+                </div>
+
                 <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
-                  <h3 className="text-lg font-semibold">What CleanNestPro handles</h3>
+                  <h3 className="text-lg font-semibold">
+                    What CleanNestPro handles
+                  </h3>
                   <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
                     <li>• Finding and approaching suitable local providers</li>
-                    <li>• Checking availability and coordinating the scope</li>
-                    <li>• Bringing the pricing together into one clear quote</li>
-                    <li>• No payment before you receive and accept the final quote</li>
-                    <li>• Written booking coordination and secure Stripe payment</li>
+                    <li>
+                      • Checking current availability and coordinating the scope
+                    </li>
+                    <li>
+                      • Offering alternative dates when your first choice is
+                      unavailable
+                    </li>
+                    <li>
+                      • Bringing the available timing and pricing into one clear
+                      quote
+                    </li>
+                    <li>• No payment unless you choose an available option</li>
+                    <li>
+                      • Written booking confirmation and secure Stripe payment
+                    </li>
                   </ul>
                   <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                    On-site cleaning is performed by an independent local service
-                    partner appointed by CleanNestPro. Your quote, payment, support,
-                    and service follow-up remain with CleanNestPro.
+                    On-site cleaning is performed by an independent local
+                    service partner appointed by CleanNestPro. Your quote,
+                    payment, support, and service follow-up remain with
+                    CleanNestPro.
                   </p>
                 </div>
               </motion.div>
@@ -1416,101 +1497,624 @@ export default function Home() {
 
                 <div className="hidden" aria-hidden="true">
                   <label htmlFor="website">Website</label>
-                  <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => updateField("website", e.target.value)} />
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => updateField("website", e.target.value)}
+                  />
                 </div>
 
                 <div className="min-h-[520px] p-6 md:p-9">
                   {formStep === 0 ? (
                     <div className="space-y-7">
-                      <StepIntro eyebrow="Your space" title="What are we cleaning?" text="A few property details help us match the right local team and equipment." />
+                      <StepIntro
+                        eyebrow="Your space"
+                        title="What are we cleaning?"
+                        text="A few property details help us match the right local team and equipment."
+                      />
                       <div className="grid gap-5 md:grid-cols-2">
-                        <Field><Label htmlFor="serviceType">Service type</Label><Select id="serviceType" value={form.serviceType} onChange={(e) => updateField("serviceType", e.target.value as ServiceType)}><option>Regular Home Cleaning</option><option>Deep Cleaning</option><option>Airbnb Turnover Cleaning</option><option>Move In / Move Out Cleaning</option><option>After-party Cleanup</option></Select></Field>
-                        <Field><Label htmlFor="propertyType">Property type</Label><Select id="propertyType" value={form.propertyType} onChange={(e) => updateField("propertyType", e.target.value as PropertyType)}><option>Studio</option><option>1 Bedroom Apartment</option><option>2 Bedroom Apartment</option><option>3 Bedroom Apartment</option><option>Villa / Large Home</option><option>Holiday Home</option></Select></Field>
-                        <Field><Label htmlFor="bathrooms">Bathrooms</Label><Select id="bathrooms" value={form.bathrooms} onChange={(e) => updateField("bathrooms", e.target.value)}><option>1</option><option>2</option><option>3</option><option>4+</option></Select></Field>
-                        <Field><Label htmlFor="propertySize">Approximate size</Label><Input id="propertySize" value={form.propertySize} onChange={(e) => updateField("propertySize", e.target.value)} placeholder="e.g. 100 m²" /></Field>
-                        <Field><Label htmlFor="furnished">Furnished?</Label><Select id="furnished" value={form.furnished} onChange={(e) => updateField("furnished", e.target.value)}><option>Yes</option><option>No</option><option>Partly</option></Select></Field>
-                        <Field><Label htmlFor="propertyCondition">Current condition</Label><Select id="propertyCondition" value={form.propertyCondition} onChange={(e) => updateField("propertyCondition", e.target.value)}><option>Normally maintained</option><option>Needs extra attention</option><option>Heavily soiled</option><option>Empty / recently renovated</option><option>Not sure</option></Select></Field>
-                        <Field><Label htmlFor="location">Area in Antalya</Label><Input id="location" value={form.location} onChange={(e) => updateField("location", e.target.value)} placeholder="Muratpaşa / neighbourhood" autoComplete="address-level2" /></Field>
-                        <Field><Label htmlFor="floorNumber">Floor</Label><Input id="floorNumber" value={form.floorNumber} onChange={(e) => updateField("floorNumber", e.target.value)} placeholder="e.g. 7th floor" /></Field>
-                        <Field><Label htmlFor="elevator">Elevator available?</Label><Select id="elevator" value={form.elevator} onChange={(e) => updateField("elevator", e.target.value)}><option>Yes</option><option>No</option><option>Not applicable</option></Select></Field>
-                        <Field><Label htmlFor="fullAddress">Address or nearby landmark (optional)</Label><Input id="fullAddress" value={form.fullAddress} onChange={(e) => updateField("fullAddress", e.target.value)} placeholder="Street, building or a nearby landmark" autoComplete="street-address" /></Field>
+                        <Field>
+                          <Label htmlFor="serviceType">Service type</Label>
+                          <Select
+                            id="serviceType"
+                            value={form.serviceType}
+                            onChange={(e) =>
+                              updateField(
+                                "serviceType",
+                                e.target.value as ServiceType,
+                              )
+                            }
+                          >
+                            <option>Regular Home Cleaning</option>
+                            <option>Deep Cleaning</option>
+                            <option>Airbnb Turnover Cleaning</option>
+                            <option>Move In / Move Out Cleaning</option>
+                            <option>After-party Cleanup</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertyType">Property type</Label>
+                          <Select
+                            id="propertyType"
+                            value={form.propertyType}
+                            onChange={(e) =>
+                              updateField(
+                                "propertyType",
+                                e.target.value as PropertyType,
+                              )
+                            }
+                          >
+                            <option>Studio</option>
+                            <option>1 Bedroom Apartment</option>
+                            <option>2 Bedroom Apartment</option>
+                            <option>3 Bedroom Apartment</option>
+                            <option>Villa / Large Home</option>
+                            <option>Holiday Home</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="bathrooms">Bathrooms</Label>
+                          <Select
+                            id="bathrooms"
+                            value={form.bathrooms}
+                            onChange={(e) =>
+                              updateField("bathrooms", e.target.value)
+                            }
+                          >
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4+</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertySize">Approximate size</Label>
+                          <Input
+                            id="propertySize"
+                            value={form.propertySize}
+                            onChange={(e) =>
+                              updateField("propertySize", e.target.value)
+                            }
+                            placeholder="e.g. 100 m²"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="furnished">Furnished?</Label>
+                          <Select
+                            id="furnished"
+                            value={form.furnished}
+                            onChange={(e) =>
+                              updateField("furnished", e.target.value)
+                            }
+                          >
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Partly</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="propertyCondition">
+                            Current condition
+                          </Label>
+                          <Select
+                            id="propertyCondition"
+                            value={form.propertyCondition}
+                            onChange={(e) =>
+                              updateField("propertyCondition", e.target.value)
+                            }
+                          >
+                            <option>Normally maintained</option>
+                            <option>Needs extra attention</option>
+                            <option>Heavily soiled</option>
+                            <option>Empty / recently renovated</option>
+                            <option>Not sure</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="location">Area in Antalya</Label>
+                          <Input
+                            id="location"
+                            value={form.location}
+                            onChange={(e) =>
+                              updateField("location", e.target.value)
+                            }
+                            placeholder="Muratpaşa / neighbourhood"
+                            autoComplete="address-level2"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="floorNumber">Floor</Label>
+                          <Input
+                            id="floorNumber"
+                            value={form.floorNumber}
+                            onChange={(e) =>
+                              updateField("floorNumber", e.target.value)
+                            }
+                            placeholder="e.g. 7th floor"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="elevator">Elevator available?</Label>
+                          <Select
+                            id="elevator"
+                            value={form.elevator}
+                            onChange={(e) =>
+                              updateField("elevator", e.target.value)
+                            }
+                          >
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Not applicable</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="fullAddress">
+                            Address or nearby landmark (optional)
+                          </Label>
+                          <Input
+                            id="fullAddress"
+                            value={form.fullAddress}
+                            onChange={(e) =>
+                              updateField("fullAddress", e.target.value)
+                            }
+                            placeholder="Street, building or a nearby landmark"
+                            autoComplete="street-address"
+                          />
+                        </Field>
                       </div>
                     </div>
                   ) : null}
 
                   {formStep === 1 ? (
                     <div className="space-y-7">
-                      <StepIntro eyebrow="Build the scope" title="Choose everything you need" text="Select as much as you like. Specialist details only appear when relevant." />
-                      <Field><Label htmlFor="suppliesNeeded">Should the team bring all supplies and equipment?</Label><Select id="suppliesNeeded" value={form.suppliesNeeded} onChange={(e) => updateField("suppliesNeeded", e.target.value)}><option>No</option><option>Yes</option></Select></Field>
+                      <StepIntro
+                        eyebrow="Build the scope"
+                        title="Choose everything you need"
+                        text="Select as much as you like. Specialist details only appear when relevant."
+                      />
+                      <Field>
+                        <Label htmlFor="suppliesNeeded">
+                          Should the team bring all supplies and equipment?
+                        </Label>
+                        <Select
+                          id="suppliesNeeded"
+                          value={form.suppliesNeeded}
+                          onChange={(e) =>
+                            updateField("suppliesNeeded", e.target.value)
+                          }
+                        >
+                          <option>No</option>
+                          <option>Yes</option>
+                        </Select>
+                      </Field>
                       <fieldset>
-                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">Additional services</legend>
+                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+                          Additional services
+                        </legend>
                         <div className="grid gap-3 sm:grid-cols-2">
                           {extraTaskOptions.map((task) => {
                             const active = form.extraTasks.includes(task);
                             return (
-                              <button key={task} type="button" aria-pressed={active} onClick={() => toggleExtraTask(task)} className={`flex min-h-14 items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${active ? "border-slate-950 bg-slate-950 text-white shadow-sm dark:border-white dark:bg-white dark:text-slate-950" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-slate-400 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]"}`}>
-                                <span>{task}</span><span className={`ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${active ? "border-white/30 bg-white/15 dark:border-slate-900/20 dark:bg-slate-900/10" : "border-slate-300 dark:border-white/15"}`}>{active ? "✓" : "+"}</span>
+                              <button
+                                key={task}
+                                type="button"
+                                aria-pressed={active}
+                                onClick={() => toggleExtraTask(task)}
+                                className={`flex min-h-14 items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${active ? "border-slate-950 bg-slate-950 text-white shadow-sm dark:border-white dark:bg-white dark:text-slate-950" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-slate-400 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]"}`}
+                              >
+                                <span>{task}</span>
+                                <span
+                                  className={`ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${active ? "border-white/30 bg-white/15 dark:border-slate-900/20 dark:bg-slate-900/10" : "border-slate-300 dark:border-white/15"}`}
+                                >
+                                  {active ? "✓" : "+"}
+                                </span>
                               </button>
                             );
                           })}
                         </div>
                       </fieldset>
-                      {form.extraTasks.includes("Sofa & armchair deep cleaning") ? <DetailPanel title="Sofa & armchair details"><Input value={form.sofaDetails} onChange={(e) => updateField("sofaDetails", e.target.value)} placeholder="e.g. one 3-seat sofa, one 2-seat sofa and two armchairs" /></DetailPanel> : null}
-                      {form.extraTasks.includes("Curtain cleaning") ? <DetailPanel title="Curtain details"><div className="grid gap-4 sm:grid-cols-2"><Input value={form.curtainCount} onChange={(e) => updateField("curtainCount", e.target.value)} placeholder="Number of curtains / rooms" /><Input value={form.curtainType} onChange={(e) => updateField("curtainType", e.target.value)} placeholder="Sheer, blackout, roller, unknown…" /></div></DetailPanel> : null}
-                      {form.extraTasks.includes("Mattress deep cleaning") ? <DetailPanel title="Mattress details"><div className="grid gap-4 sm:grid-cols-2"><Input value={form.mattressCount} onChange={(e) => updateField("mattressCount", e.target.value)} placeholder="Number of mattresses" /><Input value={form.mattressSizes} onChange={(e) => updateField("mattressSizes", e.target.value)} placeholder="Single, double, king…" /></div></DetailPanel> : null}
+                      {form.extraTasks.includes(
+                        "Sofa & armchair deep cleaning",
+                      ) ? (
+                        <DetailPanel title="Sofa & armchair details">
+                          <Input
+                            value={form.sofaDetails}
+                            onChange={(e) =>
+                              updateField("sofaDetails", e.target.value)
+                            }
+                            placeholder="e.g. one 3-seat sofa, one 2-seat sofa and two armchairs"
+                          />
+                        </DetailPanel>
+                      ) : null}
+                      {form.extraTasks.includes("Curtain cleaning") ? (
+                        <DetailPanel title="Curtain details">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                              value={form.curtainCount}
+                              onChange={(e) =>
+                                updateField("curtainCount", e.target.value)
+                              }
+                              placeholder="Number of curtains / rooms"
+                            />
+                            <Input
+                              value={form.curtainType}
+                              onChange={(e) =>
+                                updateField("curtainType", e.target.value)
+                              }
+                              placeholder="Sheer, blackout, roller, unknown…"
+                            />
+                          </div>
+                        </DetailPanel>
+                      ) : null}
+                      {form.extraTasks.includes("Mattress deep cleaning") ? (
+                        <DetailPanel title="Mattress details">
+                          <div className="grid gap-4 sm:grid-cols-2">
+                            <Input
+                              value={form.mattressCount}
+                              onChange={(e) =>
+                                updateField("mattressCount", e.target.value)
+                              }
+                              placeholder="Number of mattresses"
+                            />
+                            <Input
+                              value={form.mattressSizes}
+                              onChange={(e) =>
+                                updateField("mattressSizes", e.target.value)
+                              }
+                              placeholder="Single, double, king…"
+                            />
+                          </div>
+                        </DetailPanel>
+                      ) : null}
                       <div className="grid gap-5 md:grid-cols-2">
-                        <Field><Label htmlFor="pets">Any pets?</Label><Select id="pets" value={form.pets} onChange={(e) => updateField("pets", e.target.value)}><option>No</option><option>Yes</option></Select></Field>
-                        <Field><Label htmlFor="allergies">Allergies or product restrictions</Label><Input id="allergies" value={form.allergies} onChange={(e) => updateField("allergies", e.target.value)} placeholder="None, fragrance-free products…" /></Field>
+                        <Field>
+                          <Label htmlFor="pets">Any pets?</Label>
+                          <Select
+                            id="pets"
+                            value={form.pets}
+                            onChange={(e) =>
+                              updateField("pets", e.target.value)
+                            }
+                          >
+                            <option>No</option>
+                            <option>Yes</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="allergies">
+                            Allergies or product restrictions
+                          </Label>
+                          <Input
+                            id="allergies"
+                            value={form.allergies}
+                            onChange={(e) =>
+                              updateField("allergies", e.target.value)
+                            }
+                            placeholder="None, fragrance-free products…"
+                          />
+                        </Field>
                       </div>
                     </div>
                   ) : null}
 
                   {formStep === 2 ? (
                     <div className="space-y-7">
-                      <StepIntro eyebrow="Timing & access" title="When should the team arrive?" text="Tell us what is fixed and where you have flexibility." />
+                      <StepIntro
+                        eyebrow="Timing & access"
+                        title="What timing would work for you?"
+                        text="Choose your first preference and tell us how flexible you are. We will check what is available locally before offering a booking option."
+                      />
+                      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
+                        Your preferred date is not yet a confirmed appointment.
+                        If it is unavailable, we may email suitable alternatives
+                        for you to accept or decline.
+                      </div>
                       <div className="grid gap-5 md:grid-cols-2">
-                        <Field><Label htmlFor="preferredDate">Preferred date</Label><Input id="preferredDate" type="date" value={form.preferredDate} onChange={(e) => updateField("preferredDate", e.target.value)} /></Field>
-                        <Field><Label htmlFor="preferredTime">Preferred time</Label><Input id="preferredTime" type="time" value={form.preferredTime} onChange={(e) => updateField("preferredTime", e.target.value)} /></Field>
-                        <Field><Label htmlFor="dateFlexibility">Date flexibility</Label><Select id="dateFlexibility" value={form.dateFlexibility} onChange={(e) => updateField("dateFlexibility", e.target.value)}><option>Exact date preferred</option><option>Flexible by 1 day</option><option>Flexible within the same week</option><option>Please suggest the earliest option</option></Select></Field>
-                        <Field><Label htmlFor="frequency">Cleaning frequency</Label><Select id="frequency" value={form.frequency} onChange={(e) => updateField("frequency", e.target.value as FrequencyType)}><option>One-time</option><option>Weekly</option><option>Bi-weekly</option><option>Monthly</option><option>Not sure yet</option></Select></Field>
-                        <Field><Label htmlFor="parkingAvailable">Parking nearby?</Label><Select id="parkingAvailable" value={form.parkingAvailable} onChange={(e) => updateField("parkingAvailable", e.target.value)}><option>Not sure</option><option>Yes</option><option>No</option><option>Paid parking only</option></Select></Field>
-                        <Field><Label htmlFor="accessDetails">Access arrangement</Label><Input id="accessDetails" value={form.accessDetails} onChange={(e) => updateField("accessDetails", e.target.value)} placeholder="I will be home, key handover, reception…" /></Field>
+                        <Field>
+                          <Label htmlFor="preferredDate">
+                            First-choice date
+                          </Label>
+                          <Input
+                            id="preferredDate"
+                            type="date"
+                            value={form.preferredDate}
+                            onChange={(e) =>
+                              updateField("preferredDate", e.target.value)
+                            }
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="preferredTime">
+                            Preferred arrival time
+                          </Label>
+                          <Input
+                            id="preferredTime"
+                            type="time"
+                            value={form.preferredTime}
+                            onChange={(e) =>
+                              updateField("preferredTime", e.target.value)
+                            }
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="dateFlexibility">
+                            How flexible are your dates?
+                          </Label>
+                          <Select
+                            id="dateFlexibility"
+                            value={form.dateFlexibility}
+                            onChange={(e) =>
+                              updateField("dateFlexibility", e.target.value)
+                            }
+                          >
+                            <option>This date only</option>
+                            <option>Flexible by 1 day</option>
+                            <option>Flexible by 3 days</option>
+                            <option>Flexible within the same week</option>
+                            <option>
+                              Please suggest the earliest available option
+                            </option>
+                            <option>I’m fully flexible</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="frequency">Cleaning frequency</Label>
+                          <Select
+                            id="frequency"
+                            value={form.frequency}
+                            onChange={(e) =>
+                              updateField(
+                                "frequency",
+                                e.target.value as FrequencyType,
+                              )
+                            }
+                          >
+                            <option>One-time</option>
+                            <option>Weekly</option>
+                            <option>Bi-weekly</option>
+                            <option>Monthly</option>
+                            <option>Not sure yet</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="parkingAvailable">
+                            Parking nearby?
+                          </Label>
+                          <Select
+                            id="parkingAvailable"
+                            value={form.parkingAvailable}
+                            onChange={(e) =>
+                              updateField("parkingAvailable", e.target.value)
+                            }
+                          >
+                            <option>Not sure</option>
+                            <option>Yes</option>
+                            <option>No</option>
+                            <option>Paid parking only</option>
+                          </Select>
+                        </Field>
+                        <Field>
+                          <Label htmlFor="accessDetails">
+                            Access arrangement
+                          </Label>
+                          <Input
+                            id="accessDetails"
+                            value={form.accessDetails}
+                            onChange={(e) =>
+                              updateField("accessDetails", e.target.value)
+                            }
+                            placeholder="I will be home, key handover, reception…"
+                          />
+                        </Field>
                       </div>
                     </div>
                   ) : null}
 
                   {formStep === 3 ? (
                     <div className="space-y-7">
-                      <StepIntro eyebrow="Almost done" title="Where should we send your quote?" text="We review every request before confirming the final scope and price." />
+                      <StepIntro
+                        eyebrow="Almost done"
+                        title="Where should we send the available options?"
+                        text="We manually review your request, check suitable local provider availability, and email you before any booking or payment."
+                      />
                       <div className="grid gap-5 md:grid-cols-2">
-                        <Field><Label htmlFor="fullName">Full name</Label><Input id="fullName" value={form.fullName} onChange={(e) => updateField("fullName", e.target.value)} placeholder="Your full name" required autoComplete="name" /></Field>
-                        <Field><Label htmlFor="email">Email</Label><Input id="email" type="email" value={form.email} onChange={(e) => updateField("email", e.target.value)} placeholder="you@example.com" required autoComplete="email" /></Field>
-                        <Field><Label htmlFor="whatsapp">WhatsApp number (optional)</Label><Input id="whatsapp" type="tel" value={form.whatsapp} onChange={(e) => updateField("whatsapp", e.target.value)} placeholder="Include country code" autoComplete="tel" /></Field>
-                        <Field><Label htmlFor="preferredLanguage">Preferred language</Label><Select id="preferredLanguage" value={form.preferredLanguage} onChange={(e) => updateField("preferredLanguage", e.target.value as LanguageType)}><option>English</option><option>Russian</option><option>Turkish</option></Select></Field>
-                        <Field className="md:col-span-2"><Label htmlFor="specialNotes">Anything else we should know?</Label><Textarea id="specialNotes" value={form.specialNotes} onChange={(e) => updateField("specialNotes", e.target.value)} placeholder="Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately." /></Field>
+                        <Field>
+                          <Label htmlFor="fullName">Full name</Label>
+                          <Input
+                            id="fullName"
+                            value={form.fullName}
+                            onChange={(e) =>
+                              updateField("fullName", e.target.value)
+                            }
+                            placeholder="Your full name"
+                            required
+                            autoComplete="name"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="email">Email</Label>
+                          <Input
+                            id="email"
+                            type="email"
+                            value={form.email}
+                            onChange={(e) =>
+                              updateField("email", e.target.value)
+                            }
+                            placeholder="you@example.com"
+                            required
+                            autoComplete="email"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="whatsapp">
+                            WhatsApp number (optional)
+                          </Label>
+                          <Input
+                            id="whatsapp"
+                            type="tel"
+                            value={form.whatsapp}
+                            onChange={(e) =>
+                              updateField("whatsapp", e.target.value)
+                            }
+                            placeholder="Include country code"
+                            autoComplete="tel"
+                          />
+                        </Field>
+                        <Field>
+                          <Label htmlFor="preferredLanguage">
+                            Preferred language
+                          </Label>
+                          <Select
+                            id="preferredLanguage"
+                            value={form.preferredLanguage}
+                            onChange={(e) =>
+                              updateField(
+                                "preferredLanguage",
+                                e.target.value as LanguageType,
+                              )
+                            }
+                          >
+                            <option>English</option>
+                            <option>Russian</option>
+                            <option>Turkish</option>
+                          </Select>
+                        </Field>
+                        <Field className="md:col-span-2">
+                          <Label htmlFor="specialNotes">
+                            Anything else we should know?
+                          </Label>
+                          <Textarea
+                            id="specialNotes"
+                            value={form.specialNotes}
+                            onChange={(e) =>
+                              updateField("specialNotes", e.target.value)
+                            }
+                            placeholder="Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately."
+                          />
+                        </Field>
                       </div>
                       <DetailPanel title="Property photos (optional)">
-                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">Photos improve quote accuracy. Please exclude people, documents, screens and family photographs.</p>
-                        <input ref={photoInputRef} id="propertyPhotos" name="propertyPhotos" type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handlePhotoSelection} disabled={sending || processingPhotos || propertyPhotos.length >= MAX_PROPERTY_PHOTOS} className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900" />
-                        {photoPreviews.length ? <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">{photoPreviews.map((preview, index) => <div key={`${preview.file.name}-${index}`} className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10"><Image src={preview.url} alt={`Selected property photo ${index + 1}`} width={320} height={224} unoptimized className="h-24 w-full object-cover" /><button type="button" onClick={() => removePropertyPhoto(index)} className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white">Remove</button></div>)}</div> : null}
+                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                          Photos improve quote accuracy. Please exclude people,
+                          documents, screens and family photographs.
+                        </p>
+                        <input
+                          ref={photoInputRef}
+                          id="propertyPhotos"
+                          name="propertyPhotos"
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          multiple
+                          onChange={handlePhotoSelection}
+                          disabled={
+                            sending ||
+                            processingPhotos ||
+                            propertyPhotos.length >= MAX_PROPERTY_PHOTOS
+                          }
+                          className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-950 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white disabled:opacity-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:file:bg-white dark:file:text-slate-900"
+                        />
+                        {photoPreviews.length ? (
+                          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            {photoPreviews.map((preview, index) => (
+                              <div
+                                key={`${preview.file.name}-${index}`}
+                                className="relative overflow-hidden rounded-2xl border border-slate-200 dark:border-white/10"
+                              >
+                                <Image
+                                  src={preview.url}
+                                  alt={`Selected property photo ${index + 1}`}
+                                  width={320}
+                                  height={224}
+                                  unoptimized
+                                  className="h-24 w-full object-cover"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removePropertyPhoto(index)}
+                                  className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
                       </DetailPanel>
                       <div className="grid gap-4 rounded-[28px] border border-slate-200 bg-[#f7f5f0] p-5 dark:border-white/10 dark:bg-white/[0.035] sm:grid-cols-[1fr_auto] sm:items-center">
-                        <div><p className="text-sm font-semibold">Indicative all-in range</p><p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">Final price follows a manual scope and availability review.</p></div>
-                        <div className="text-3xl font-semibold tracking-tight">{estimate}</div>
+                        <div>
+                          <p className="text-sm font-semibold">
+                            Indicative all-in range
+                          </p>
+                          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                            Final timing and price follow a manual scope and
+                            local availability review.
+                          </p>
+                        </div>
+                        <div className="text-3xl font-semibold tracking-tight">
+                          {estimate}
+                        </div>
                       </div>
-                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">🔒 No payment is requested now. If you accept the final quote, we send a secure Stripe payment link.</div>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">
+                        🔒 No payment is requested now. We first check local
+                        availability. If you choose an available date and accept
+                        the final quote, we send a secure Stripe payment link
+                        and confirm the booking in writing.
+                      </div>
                     </div>
                   ) : null}
                 </div>
 
                 <div className="border-t border-slate-200 bg-slate-50/70 px-6 py-5 dark:border-white/10 dark:bg-white/[0.025] md:px-9">
                   <div className="flex items-center justify-between gap-3">
-                    <button type="button" onClick={goToPreviousStep} disabled={formStep === 0} className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium transition hover:bg-white disabled:invisible dark:border-white/15 dark:hover:bg-white/5">Back</button>
-                    {formStep < quoteSteps.length - 1 ? <button type="button" onClick={goToNextStep} className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-950">Continue <span aria-hidden="true">→</span></button> : <button type="submit" disabled={sending || processingPhotos} className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-950">{processingPhotos ? "Preparing photos…" : sending ? "Sending…" : "Request my quote"}</button>}
+                    <button
+                      type="button"
+                      onClick={goToPreviousStep}
+                      disabled={formStep === 0}
+                      className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium transition hover:bg-white disabled:invisible dark:border-white/15 dark:hover:bg-white/5"
+                    >
+                      Back
+                    </button>
+                    {formStep < quoteSteps.length - 1 ? (
+                      <button
+                        type="button"
+                        onClick={goToNextStep}
+                        className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-950"
+                      >
+                        Continue <span aria-hidden="true">→</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        disabled={sending || processingPhotos}
+                        className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-950"
+                      >
+                        {processingPhotos
+                          ? "Preparing photos…"
+                          : sending
+                            ? "Sending…"
+                            : "Check local availability"}
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {submitted ? <div className="m-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10"><p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Your quote request has been sent.</p><p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">Thank you. We’ll review the scope and email your final quote.</p></div> : null}
+                {submitted ? (
+                  <div className="m-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                      Your availability and quote request has been sent.
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
+                      Thank you. We’ll review the scope, check suitable local
+                      provider availability, and email you with an available
+                      option or suitable alternatives. Nothing is booked and no
+                      payment is due yet.
+                    </p>
+                  </div>
+                ) : null}
 
                 <p className="mx-6 mb-6 mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
                   Are you a cleaner in Antalya?{" "}
@@ -1534,7 +2138,10 @@ export default function Home() {
           variants={staggerWrap}
           className="mx-auto max-w-6xl px-6 py-24 md:px-8"
         >
-          <motion.div variants={fadeUp} className="mx-auto max-w-3xl text-center">
+          <motion.div
+            variants={fadeUp}
+            className="mx-auto max-w-3xl text-center"
+          >
             <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
               FAQ
             </div>
@@ -1582,10 +2189,12 @@ export default function Home() {
             </h2>
 
             <p className="mx-auto mt-5 max-w-3xl leading-8 text-slate-600 dark:text-slate-300">
-              CleanNestPro is a UK-based managed cleaning service for international
-              clients in Antalya. You describe the property once; we source and
-              appoint a suitable independent local partner, then manage the quote,
-              Stripe payment, multilingual communication, booking, and follow-up.
+              CleanNestPro is a UK-based cleaning coordination service for
+              international clients in Antalya. Tell us your preferred timing
+              and requirements once; we check suitable independent local
+              options, present what is available clearly, and manage the quote,
+              secure payment, multilingual communication, written booking, and
+              follow-up.
             </p>
           </div>
         </motion.section>
