@@ -45,8 +45,8 @@ type FrequencyType =
 
 type LanguageType = "Turkish" | "English" | "Russian";
 
-const TERMS_VERSION = "2026-07-24";
-const PRIVACY_VERSION = "2026-07-24";
+const TERMS_VERSION = "2026-07-28";
+const PRIVACY_VERSION = "2026-07-28";
 
 type FormState = {
   fullName: string;
@@ -145,16 +145,15 @@ const extraTaskOptions = [
 ];
 
 const trustBadges = [
-  "Independent local provider coordination",
   "English, Turkish & Russian support",
-  "Flexible date options by email",
-  "Secure booking with Stripe",
+  "Independent local provider coordination",
+  "Secure Stripe payment",
 ];
 
 const quoteReasons = [
   {
     title: "One request, not endless calls",
-    text: "Tell us your preferred date, flexibility, and cleaning needs once. We approach suitable local providers and coordinate the available options on your behalf.",
+    text: "Tell us your preferred date, flexibility, and cleaning needs once. We make reasonable efforts to approach suitable local providers and bring the options we can source together for you.",
   },
   {
     title: "Choose what works for you",
@@ -175,7 +174,7 @@ const processSteps = [
   {
     step: "02",
     title: "We check suitable local options",
-    text: "We review the scope and approach suitable independent providers to check current availability and pricing on your behalf.",
+    text: "We review the scope and make reasonable efforts to check availability and pricing with suitable independent providers.",
   },
   {
     step: "03",
@@ -193,7 +192,7 @@ const lifestylePanels = [
   {
     eyebrow: "Luxury villas",
     title: "Presented beautifully, maintained quietly",
-    text: "From private villas to guest-ready homes, the experience is designed to feel discreet, polished, and dependable.",
+    text: "From private villas to guest-ready homes, the experience is designed to feel discreet, polished, and carefully coordinated.",
     image: "/luxury-villa-cleaning.jpg",
     alt: "Luxury villa in Antalya prepared for premium home cleaning service",
   },
@@ -216,7 +215,7 @@ const lifestylePanels = [
 const faqs = [
   {
     q: "How does the CleanNestPro service work?",
-    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. You tell us your preferred timing, flexibility, and requirements once. We approach suitable independent local providers and email you an available option, written scope, and clear final quote. If you accept and pay, we confirm the appointment and remain your point of contact.",
+    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. You tell us your preferred timing, flexibility, and requirements once. We make reasonable efforts to approach suitable independent local providers and email you any suitable option we can source, together with a written scope and clear final quote. If you accept and pay, we confirm the agreed appointment in writing and remain your point of contact.",
   },
   {
     q: "Who carries out the cleaning and who do I contact?",
@@ -224,7 +223,7 @@ const faqs = [
   },
   {
     q: "Which areas in Antalya do you currently cover?",
-    a: "We currently focus on selected areas in Antalya. Send your location in the quote form and we will check current local provider availability before offering a booking option.",
+    a: "We currently focus on selected areas in Antalya. Send your location in the quote form and we will make reasonable efforts to check suitable local provider availability before offering any booking option.",
   },
   {
     q: "Do you offer cleaning for Airbnb and holiday homes?",
@@ -244,15 +243,15 @@ const faqs = [
   },
   {
     q: "How do I request a quote?",
-    a: "Complete the quote form with the property type, preferred date, date flexibility, and any useful notes. This is an availability and quote request, not a confirmed booking. We then email you with an available option or suitable alternatives.",
+    a: "Complete the quote form with the property type, preferred date, date flexibility, and any useful notes. This is an availability and quote request, not a confirmed booking. We then review the request and email you with any suitable option or alternatives we are able to source.",
   },
   {
     q: "How do I pay and confirm my booking?",
-    a: "We first coordinate an available local provider and email you the proposed date, written scope, and final price. If you choose that option, we send a secure Stripe payment link. Your booking is confirmed only after you accept the available option, complete payment, and receive our written booking confirmation.",
+    a: "We first make reasonable efforts to source a suitable local provider and email you the proposed date, written scope, and final price. If you choose that option, we send a secure Stripe payment link. Your booking is confirmed only after you accept the option, complete payment, and receive our written booking confirmation.",
   },
   {
     q: "Is my preferred date guaranteed?",
-    a: "Your selected date is your first preference, not a guaranteed appointment. Availability depends on suitable independent local providers. If your first choice is unavailable, we may offer alternative dates or times. You are free to accept or decline them, and there is nothing to pay unless you choose an available option.",
+    a: "Your selected date is your first preference, not a guaranteed appointment. Availability depends on independent local providers. We will make reasonable efforts to find a suitable option and may suggest alternative dates or times. You are free to accept or decline them, and there is nothing to pay unless you choose an option.",
   },
   {
     q: "What happens if CleanNestPro cannot provide the booked service?",
@@ -335,15 +334,35 @@ const staggerWrap: Variants = {
 };
 
 // ─────────────────────────────────────────────────────────────
-// Antalya piyasa araştırmasına ve ilk tamamlanan tedarikçi tekliflerine
-// dayalı müşteri fiyat aralığı (Temmuz 2026).
+// Indicative pricing calibration — July 2026
 //
-// Bu yalnızca yönlendirici bir aralıktır. Nihai fiyat, yerel sağlayıcının
-// KDV dahil maliyeti kesinleştikten sonra şu hedefle kontrol edilir:
-//   finalQuoteEur = supplierCostTry / currentEurTryRate / 0.72
-// 0.72; ödeme/kur maliyetleri, operasyon payı ve yaklaşık %18-20 hedef
-// marj için güvenli bir geri-kazanım katsayısıdır.
+// First completed local supplier reference (Hasan Bey):
+//   • Deep cleaning: 7,000 TRY + VAT
+//   • Sofa / upholstery cleaning: 3,000 TRY + VAT
+//   • Mattress cleaning: 3,000 TRY + VAT
+//   • Curtain removal, washing and rehanging: included in that deep-clean scope
+//   • Combined supplier invoice: approximately 16,000 TRY including VAT
+//
+// These figures are supplier-cost references, not customer promises. The live
+// customer quote still depends on property size, condition, exact quantities,
+// access, date and current provider availability. REFERENCE_EUR_TRY_RATE is a
+// maintainable operational reference rather than a live FX feed.
+//
+// CUSTOMER_RECOVERY_FACTOR leaves room for Stripe/FX costs, coordination and a
+// target contribution margin. Final prices are always reviewed manually.
 // ─────────────────────────────────────────────────────────────
+
+const REFERENCE_EUR_TRY_RATE = 45;
+const TURKISH_VAT_MULTIPLIER = 1.2;
+const CUSTOMER_RECOVERY_FACTOR = 0.76;
+
+function managedPriceFromSupplierTry(supplierPriceTryExVat: number) {
+  return (
+    (supplierPriceTryExVat * TURKISH_VAT_MULTIPLIER) /
+    REFERENCE_EUR_TRY_RATE /
+    CUSTOMER_RECOVERY_FACTOR
+  );
+}
 
 const MAX_PROPERTY_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 700 * 1024;
@@ -417,56 +436,45 @@ function estimateCurtainCleaning(data: FormState): [number, number] {
   const count = parsePositiveCount(data.curtainCount);
   const type = data.curtainType.toLowerCase();
 
-  // Curtains are often priced favourably when they are added to a larger
-  // booking. Keep the online range gentle; unusual/heavy systems are reviewed.
-  let typeMultiplier = 1;
-  if (/blackout|roller|roman|heavy|lined/.test(type)) typeMultiplier = 1.35;
-  else if (/sheer|tulle|voile|standard|normal/.test(type))
-    typeMultiplier = 0.75;
+  // The first completed supplier job included curtain removal, washing and
+  // rehanging inside the deep-cleaning package. Standalone curtain pricing has
+  // not yet been isolated, so this remains deliberately broad and is reviewed.
+  const baseMin = count <= 2 ? 55 : 70 + (count - 2) * 12;
+  const baseMax = count <= 2 ? 90 : 105 + (count - 2) * 18;
+  const heavyMultiplier = /blackout|roller|roman|heavy|lined/.test(type)
+    ? 1.25
+    : 1;
 
-  return [count * 3 * typeMultiplier, count * 6 * typeMultiplier];
+  return [baseMin * heavyMultiplier, baseMax * heavyMultiplier];
 }
 
 function estimateMattressCleaning(data: FormState): [number, number] {
   const count = parsePositiveCount(data.mattressCount);
   const sizes = data.mattressSizes.toLowerCase();
+  const supplierReference = managedPriceFromSupplierTry(3000);
 
-  // When both types are entered (for example "one single, one double"), use
-  // one of each and price any remaining mattresses at the unknown-size rate.
-  if (
-    /single|twin|85|90/.test(sizes) &&
-    /double|king|queen|160|180|200/.test(sizes)
-  ) {
-    const remaining = Math.max(0, count - 2);
-    return [28 + 34 + remaining * 31, 34 + 42 + remaining * 39];
-  }
+  let sizeMultiplier = 1;
+  if (/king|queen|180|200/.test(sizes)) sizeMultiplier = 1.12;
+  else if (/single|twin|80|85|90|100|120/.test(sizes)) sizeMultiplier = 0.9;
 
-  if (/king|queen|180|200/.test(sizes)) return [count * 36, count * 44];
-  if (/double|140|150|160/.test(sizes)) return [count * 34, count * 42];
-  if (/single|twin|80|85|90|100|120/.test(sizes))
-    return [count * 28, count * 34];
-
-  return [count * 31, count * 39];
+  const unit = supplierReference * sizeMultiplier;
+  return [count * unit * 0.92, count * unit * 1.08];
 }
 
 function estimateSofaCleaning(data: FormState): [number, number] {
   const details = data.sofaDetails.toLowerCase();
+  const supplierReference = managedPriceFromSupplierTry(3000);
 
-  // Calibrated from the first completed supplier quote: a normal salon set
-  // costs about 3,000 TL locally. The customer range includes coordination.
   if (
     /l[- ]?shape|sectional|corner|large|7[- ]?seat|8[- ]?seat/.test(details)
   ) {
-    return [82, 105];
+    return [supplierReference * 1.15, supplierReference * 1.4];
   }
 
-  return [65, 78];
+  return [supplierReference * 0.92, supplierReference * 1.08];
 }
 
 function estimateQuote(data: FormState) {
-  // Müşteriye gösterilen yönetilen hizmet aralığı (€).
-  // Yerel sağlayıcının kendi KDV'si tedarikçi maliyetinin içindedir;
-  // CleanNestPro müşteriye ayrıca Türk KDV'si tahsil ediyor gibi gösterilmez.
   let baseMin = 0;
   let baseMax = 0;
 
@@ -497,48 +505,38 @@ function estimateQuote(data: FormState) {
       break;
   }
 
-  // 2) Hizmet tipine göre ÇARPAN (sabit ek yerine oransal artış —
-  //    çünkü örn. derin temizlik piyasada standart fiyatın
-  //    %50-70 üzerinde fiyatlanıyor, sabit € eklemek gerçekçi değil)
-  let serviceMultiplierMin = 1;
-  let serviceMultiplierMax = 1;
+  let min = baseMin;
+  let max = baseMax;
 
-  switch (data.serviceType) {
-    case "Regular Home Cleaning":
-      serviceMultiplierMin = 1;
-      serviceMultiplierMax = 1;
-      break;
-    case "Deep Cleaning":
-      serviceMultiplierMin = 1.42;
-      serviceMultiplierMax = 1.55;
-      break;
-    case "Airbnb Turnover Cleaning":
-      // Genelde standart temizliğe yakın, çarşaf değişimi vb. ile hafif üstünde
-      serviceMultiplierMin = 1.05;
-      serviceMultiplierMax = 1.25;
-      break;
-    case "Move In / Move Out Cleaning":
-      serviceMultiplierMin = 1.35;
-      serviceMultiplierMax = 1.55;
-      break;
-    case "After-party Cleanup":
-      serviceMultiplierMin = 1.15;
-      serviceMultiplierMax = 1.4;
-      break;
+  if (data.serviceType === "Deep Cleaning") {
+    const deepReference = managedPriceFromSupplierTry(7000);
+    const scaleByProperty: Record<PropertyType, number> = {
+      Studio: 0.65,
+      "1 Bedroom Apartment": 0.78,
+      "2 Bedroom Apartment": 1,
+      "3 Bedroom Apartment": 1.15,
+      "Villa / Large Home": 1.45,
+      "Holiday Home": 1.1,
+    };
+    const reference = deepReference * scaleByProperty[data.propertyType];
+    min = Math.max(min * 1.35, reference * 0.9);
+    max = Math.max(max * 1.5, reference * 1.1);
+  } else if (data.serviceType === "Airbnb Turnover Cleaning") {
+    min *= 1.05;
+    max *= 1.2;
+  } else if (data.serviceType === "Move In / Move Out Cleaning") {
+    min *= 1.35;
+    max *= 1.55;
+  } else if (data.serviceType === "After-party Cleanup") {
+    min *= 1.15;
+    max *= 1.4;
   }
 
-  let min = baseMin * serviceMultiplierMin;
-  let max = baseMax * serviceMultiplierMax;
-
-  // Supplies are usually a small part of a full booking and should not make
-  // the displayed total feel punitive.
   if (data.suppliesNeeded === "Yes") {
     min += 5;
     max += 8;
   }
 
-  // Common deep-cleaning extras are bundled. Adding five related tasks should
-  // not look like five separate call-outs when one team can do them together.
   const bundleTasks = new Set([
     "Interior windows",
     "Balcony / terrace",
@@ -581,7 +579,6 @@ function estimateQuote(data: FormState) {
     max += extraMax;
   }
 
-  // Property condition materially changes team time and product usage.
   if (data.propertyCondition === "Needs extra attention") {
     min *= 1.06;
     max *= 1.1;
@@ -593,8 +590,6 @@ function estimateQuote(data: FormState) {
     max *= 1.15;
   }
 
-  // Use the information already collected without letting a small difference
-  // in size create a frightening jump. Only clearly larger homes are adjusted.
   const sizeM2 = Number.parseInt(data.propertySize.match(/\d+/)?.[0] ?? "", 10);
   const typicalSize: Record<PropertyType, number> = {
     Studio: 40,
@@ -623,8 +618,6 @@ function estimateQuote(data: FormState) {
     max += (bathroomCount - 1) * 10;
   }
 
-  // 5) Düzenli hizmet indirimi — piyasada abonelik/düzenli temizlikler
-  //    tek seferliklere göre ortalama %15-20 daha uygun
   if (data.frequency === "Weekly" || data.frequency === "Bi-weekly") {
     min *= 0.83;
     max *= 0.86;
@@ -633,9 +626,6 @@ function estimateQuote(data: FormState) {
     max *= 0.95;
   }
 
-  // Specialist machine-cleaning services are priced after frequency and
-  // property-condition adjustments. A weekly home-cleaning discount must not
-  // accidentally discount one-off curtain, mattress or upholstery work.
   if (data.extraTasks.includes("Sofa & armchair deep cleaning")) {
     const [sofaMin, sofaMax] = estimateSofaCleaning(data);
     min += sofaMin;
@@ -643,9 +633,12 @@ function estimateQuote(data: FormState) {
   }
 
   if (data.extraTasks.includes("Curtain cleaning")) {
-    const [curtainMin, curtainMax] = estimateCurtainCleaning(data);
-    min += curtainMin;
-    max += curtainMax;
+    const includedInDeepScope = data.serviceType === "Deep Cleaning";
+    if (!includedInDeepScope) {
+      const [curtainMin, curtainMax] = estimateCurtainCleaning(data);
+      min += curtainMin;
+      max += curtainMax;
+    }
   }
 
   if (data.extraTasks.includes("Mattress deep cleaning")) {
@@ -654,21 +647,12 @@ function estimateQuote(data: FormState) {
     max += mattressMax;
   }
 
-  // Base prices already contain a modest managed-service allowance. Do not
-  // add another blanket percentage here: it compounded every extra and made
-  // larger, otherwise sensible requests look disproportionately expensive.
-
   min = Math.max(35, min);
   max = Math.max(min + 15, max);
 
-  // Keep the indicative range useful rather than alarming. The raw supplier
-  // uncertainty is narrowed around the midpoint; manual review still confirms
-  // the final figure before any payment is requested.
   const midpoint = (min + max) / 2;
   const displayMin = Math.max(min, midpoint * 0.9);
   const displayMax = Math.min(max, midpoint * 1.1);
-
-  // Daha okunabilir fiyat noktaları için en yakın €5'e yuvarla.
   const roundedMin = Math.round(displayMin / 5) * 5;
   const roundedMax = Math.max(roundedMin + 10, Math.round(displayMax / 5) * 5);
 
@@ -909,7 +893,7 @@ export default function Home() {
       <main className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
         <section
           ref={heroRef}
-          className="relative h-screen w-full overflow-hidden text-white"
+          className="relative min-h-[100svh] w-full overflow-hidden text-white md:h-screen"
         >
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
@@ -928,11 +912,13 @@ export default function Home() {
 
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-black/10 to-transparent" />
 
-          <HeroLens containerRef={heroRef} />
+          <div className="hidden md:block">
+            <HeroLens containerRef={heroRef} />
+          </div>
 
-          <div className="relative z-30 flex h-full w-full flex-col pt-8">
+          <div className="relative z-30 flex min-h-[100svh] w-full flex-col px-4 pb-7 pt-4 sm:px-6 md:h-full md:min-h-0 md:px-0 md:pb-0 md:pt-8">
             <header
-              className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-4 py-3 shadow-sm backdrop-blur-md transition-all duration-300 md:px-6 ${
+              className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-3 py-2.5 shadow-sm backdrop-blur-md transition-all duration-300 sm:px-4 md:px-6 md:py-3 ${
                 showFloatingQuote
                   ? "pointer-events-none translate-y-[-20px] opacity-0"
                   : "translate-y-0 opacity-100"
@@ -947,7 +933,7 @@ export default function Home() {
                   className="h-9 w-9 object-contain"
                   priority
                 />
-                <span className="text-xl">CleanNestPro</span>
+                <span className="text-lg sm:text-xl">CleanNestPro</span>
               </div>
 
               <nav className="hidden items-center gap-6 text-sm text-white/80 md:flex">
@@ -977,30 +963,32 @@ export default function Home() {
                     .getElementById("quote-form")
                     ?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="rounded-full bg-white/92 px-4 py-2 text-sm font-medium text-slate-900 transition hover:bg-white"
+                className="rounded-full bg-white/92 px-3 py-2 text-xs font-medium text-slate-900 transition hover:bg-white sm:px-4 sm:text-sm"
               >
                 Request quote
               </button>
             </header>
 
-            <div className="flex w-full flex-1 items-center justify-center px-6">
+            <div className="flex w-full flex-1 items-center justify-center px-1 sm:px-6">
               <motion.div
                 initial="hidden"
                 animate="show"
                 variants={staggerWrap}
-                className="w-full pt-4 text-center md:pt-8"
+                className="w-full py-6 text-center sm:py-8 md:pt-8"
               >
                 <motion.div
                   variants={fadeUp}
                   className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
                 >
-                  UK-based cleaning coordination for international clients in
-                  Antalya
+                  <span className="sm:hidden">UK-based support in Antalya</span>
+                  <span className="hidden sm:inline">
+                    UK-based cleaning coordination for international clients in Antalya
+                  </span>
                 </motion.div>
 
                 <motion.h1
                   variants={fadeUp}
-                  className="mx-auto mt-8 max-w-7xl text-[56px] font-light leading-[0.95] tracking-[-0.04em] text-white sm:text-[72px] md:text-[96px] lg:text-[128px]"
+                  className="mx-auto mt-6 max-w-7xl text-[44px] font-light leading-[0.96] tracking-[-0.04em] text-white sm:mt-8 sm:text-[72px] md:text-[96px] lg:text-[128px]"
                 >
                   Local cleaning in Antalya,
                   <br />
@@ -1009,16 +997,19 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-8 max-w-3xl text-lg leading-8 text-white/85 md:text-2xl md:leading-10"
+                  className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/85 sm:mt-8 sm:text-lg sm:leading-8 md:text-2xl md:leading-10"
                 >
-                  Share your preferred date and requirements once. We coordinate
-                  suitable independent local options, present what is available
-                  clearly, and remain your English-speaking point of contact.
+                  <span className="sm:hidden">
+                    Send one request. We make reasonable efforts to find a suitable local option and remain your English-speaking contact.
+                  </span>
+                  <span className="hidden sm:inline">
+                    Share your preferred date and requirements once. We make reasonable efforts to source suitable independent local options, present what is available clearly, and remain your English-speaking point of contact.
+                  </span>
                 </motion.p>
 
                 <motion.div
                   variants={fadeUp}
-                  className="mx-auto mt-8 flex max-w-5xl flex-wrap items-center justify-center gap-3"
+                  className="mx-auto mt-7 hidden max-w-5xl flex-wrap items-center justify-center gap-3 sm:flex"
                 >
                   {trustBadges.map((badge) => (
                     <span
@@ -1032,11 +1023,11 @@ export default function Home() {
 
                 <motion.div
                   variants={fadeUp}
-                  className="mt-10 hidden items-center justify-center gap-3 sm:flex"
+                  className="mt-8 flex items-center justify-center gap-3 sm:mt-10"
                 >
                   <a
                     href="#quote-form"
-                    className="inline-flex min-w-[220px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90"
+                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90 sm:w-auto sm:min-w-[220px]"
                   >
                     Check local availability
                   </a>
@@ -1045,7 +1036,7 @@ export default function Home() {
                     onClick={() =>
                       window.dispatchEvent(new CustomEvent("open-clean-chat"))
                     }
-                    className="inline-flex min-w-[220px] items-center justify-center rounded-2xl border border-white/20 bg-black/16 px-6 py-4 text-base font-medium text-white transition hover:bg-black/24"
+                    className="hidden min-w-[220px] items-center justify-center rounded-2xl border border-white/20 bg-black/16 px-6 py-4 text-base font-medium text-white transition hover:bg-black/24 sm:inline-flex"
                   >
                     Ask the assistant
                   </button>
@@ -1053,11 +1044,9 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-5 max-w-3xl text-sm leading-6 text-white/70"
+                  className="mx-auto mt-4 max-w-xl rounded-2xl border border-white/15 bg-black/20 px-4 py-3 text-xs leading-5 text-white/80 backdrop-blur-sm sm:mt-5 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:leading-6 sm:text-white/70"
                 >
-                  Preferred dates are subject to local availability. If your
-                  first choice is unavailable, we may offer alternatives before
-                  you book. You only pay after choosing an available option.
+                  Your date is a preference, not a guarantee. We first check local availability, and you only pay after choosing an option.
                 </motion.p>
               </motion.div>
             </div>
@@ -1353,9 +1342,7 @@ export default function Home() {
               How it works
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              Describe the property once. We handle the provider search,
-              availability checks, flexible date options, quote coordination,
-              and written booking confirmation.
+              Describe the property once. We make reasonable efforts to source suitable providers, check availability, coordinate possible dates and prepare a written booking option.
             </p>
           </motion.div>
 
@@ -1427,9 +1414,7 @@ export default function Home() {
 
                 <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
                   Share your preferred date, flexibility, and property details
-                  once. We contact suitable independent local providers and
-                  return by email with an available option, written scope, and
-                  one clear quote.
+                  once. We make reasonable efforts to contact suitable independent local providers and return by email with any option we can source, a written scope, and one clear quote.
                 </p>
 
                 <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
@@ -1823,7 +1808,7 @@ export default function Home() {
                       <StepIntro
                         eyebrow="Timing & access"
                         title="What timing would work for you?"
-                        text="Choose your first preference and tell us how flexible you are. We will check what is available locally before offering a booking option."
+                        text="Choose your first preference and tell us how flexible you are. We will make reasonable efforts to check suitable local availability before offering any booking option."
                       />
                       <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
                         Your preferred date is not yet a confirmed appointment.
@@ -1936,7 +1921,7 @@ export default function Home() {
                       <StepIntro
                         eyebrow="Almost done"
                         title="Where should we send the available options?"
-                        text="We manually review your request, check suitable local provider availability, and email you before any booking or payment."
+                        text="We manually review your request, make reasonable efforts to check suitable local provider availability, and email you before any booking or payment."
                       />
                       <div className="grid gap-5 md:grid-cols-2">
                         <Field>
@@ -2166,8 +2151,7 @@ export default function Home() {
                     </p>
                     <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
                       Thank you. We’ll review the scope, check suitable local
-                      provider availability, and email you with an available
-                      option or suitable alternatives. Nothing is booked and no
+                      provider availability, and email you with any suitable option or alternatives we are able to source. Nothing is booked and no
                       payment is due yet.
                     </p>
                   </div>
