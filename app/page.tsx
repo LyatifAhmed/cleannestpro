@@ -145,68 +145,68 @@ const extraTaskOptions = [
 ];
 
 const trustBadges = [
-  "English, Turkish & Russian support",
-  "Independent local provider coordination",
+  "European-standard communication & coordination",
+  "A real point of contact before, during & after",
   "Secure Stripe payment",
 ];
 
 const quoteReasons = [
   {
-    title: "One request, not endless calls",
-    text: "Tell us your preferred date, flexibility, and cleaning needs once. We make reasonable efforts to approach suitable local providers and bring the options we can source together for you.",
+    title: "Clear expectations before anyone arrives",
+    text: "We turn your request into a written scope, confirm timing and extras, and explain what has — and has not — been agreed before the appointment.",
   },
   {
-    title: "Choose what works for you",
-    text: "We bring the available timing, written scope, requested extras, and provider pricing together clearly. You are free to accept or decline any option.",
+    title: "One accountable point of contact",
+    text: "The cleaning is delivered by an independent local provider, but you do not have to manage the relationship alone. CleanNestPro remains your contact from quote to follow-up.",
   },
   {
-    title: "Local delivery, managed by us",
-    text: "An independent local service partner performs the on-site work, while CleanNestPro remains your international point of contact for the quote, payment, booking, and service follow-up.",
+    title: "Professional recovery when details are missed",
+    text: "Cleaning is human work and small details can occasionally be overlooked. We listen, review feedback with the provider, and coordinate a fair next step instead of leaving you to resolve it alone.",
   },
 ];
 
 const processSteps = [
   {
     step: "01",
-    title: "Tell us what works for you",
-    text: "Share your preferred date, how flexible you are, and the property details. Your preferred date is a request, not yet a confirmed appointment.",
+    title: "Tell us what matters",
+    text: "Share the property, preferred timing, priorities, and any details you do not want overlooked. Your preferred date remains a request until confirmed.",
   },
   {
     step: "02",
-    title: "We check suitable local options",
-    text: "We review the scope and make reasonable efforts to check availability and pricing with suitable independent providers.",
+    title: "We coordinate the local delivery",
+    text: "We check suitable independent providers, align the scope, clarify extras, and bring the available option back to you in writing.",
   },
   {
     step: "03",
-    title: "Choose your preferred option",
-    text: "We email an available date or suitable alternatives with a written scope and clear final quote. You are never required to accept an alternative.",
+    title: "You approve with clarity",
+    text: "You see the proposed date, agreed scope, and final price before paying. There is no obligation to accept an option that does not work for you.",
   },
   {
     step: "04",
-    title: "Confirm securely",
-    text: "Once an option is available, accept it and pay CleanNestPro securely through Stripe. We then confirm the agreed appointment in writing.",
+    title: "We stay involved afterwards",
+    text: "After confirmation, we remain your point of contact. If something needs clarification or review, you come back to us — not into a chain of disconnected local calls.",
   },
 ];
 
 const lifestylePanels = [
   {
-    eyebrow: "Luxury villas",
-    title: "Presented beautifully, maintained quietly",
-    text: "From private villas to guest-ready homes, the experience is designed to feel discreet, polished, and carefully coordinated.",
+    eyebrow: "Before the visit",
+    title: "Clarity replaces guesswork",
+    text: "We organise the request, timing, access details, priorities, and agreed extras in writing so the appointment begins with a shared understanding.",
     image: "/luxury-villa-cleaning.jpg",
     alt: "Luxury villa in Antalya prepared for premium home cleaning service",
   },
   {
-    eyebrow: "Bathrooms & amenities",
-    title: "Attention to the details guests notice",
-    text: "Bathrooms, fresh towels, toiletries, and finishing touches all shape how a property feels from the very first moment.",
+    eyebrow: "During the visit",
+    title: "You are encouraged to speak up",
+    text: "When possible, point out priorities or anything you notice during the visit or at handover. Small details can be corrected most easily while the team is still on site.",
     image: "/bathroom-toiletries.jpg",
     alt: "Elegant bathroom toiletries and towels in a premium Antalya property",
   },
   {
-    eyebrow: "Guest-ready spaces",
-    title: "Cleaner visuals, calmer check-ins",
-    text: "Ideal for holiday homes and Airbnb properties that need to look bright, settled, and beautifully prepared before every arrival.",
+    eyebrow: "After the visit",
+    title: "Feedback is met with ownership",
+    text: "If the result raises a concern, we review it constructively with the local provider and coordinate a proportionate solution. Good service is also about what happens when something is not perfect.",
     image: "/guest-ready-bedroom.jpg",
     alt: "Guest-ready premium bedroom in a holiday home in Antalya",
   },
@@ -215,11 +215,19 @@ const lifestylePanels = [
 const faqs = [
   {
     q: "How does the CleanNestPro service work?",
-    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. You tell us your preferred timing, flexibility, and requirements once. We make reasonable efforts to approach suitable independent local providers and email you any suitable option we can source, together with a written scope and clear final quote. If you accept and pay, we confirm the agreed appointment in writing and remain your point of contact.",
+    a: "CleanNestPro is a UK-based cleaning coordination service for international clients in Antalya. Independent local providers perform the on-site work. We manage the customer experience around it: requirements, availability, written scope, quote, secure payment, multilingual communication, confirmation and follow-up.",
   },
   {
     q: "Who carries out the cleaning and who do I contact?",
-    a: "The on-site cleaning is performed by an independent local service partner appointed by CleanNestPro. Your booking and payment remain with CleanNestPro, and we remain your point of contact before, during, and after the appointment, including if a service issue needs to be resolved.",
+    a: "The on-site cleaning is performed by an independent local service partner. Your booking and payment remain with CleanNestPro, and we remain your point of contact before, during and after the appointment — including when feedback needs to be reviewed or a reasonable solution coordinated.",
+  },
+  {
+    q: "What do you mean by European-standard service?",
+    a: "We mean European-standard communication, coordination, transparency and customer care: clear written expectations, reliable updates, secure payment, one accountable point of contact and professional follow-up. The physical cleaning is delivered by independent local providers, so we do not present the phrase as a guarantee that every human task or permanent stain will have a flawless result.",
+  },
+  {
+    q: "What should I do if I notice a missed detail?",
+    a: "Please point it out during the visit or at handover whenever possible, because small details are easiest to correct while the team is still on site. If you notice something later, contact CleanNestPro promptly with a short explanation and, where useful, photos. We will review the feedback with the provider and coordinate a proportionate next step.",
   },
   {
     q: "Which areas in Antalya do you currently cover?",
@@ -692,7 +700,7 @@ function getCoordinationServiceJsonLd() {
     },
     availableLanguage: ["English", "Turkish", "Russian"],
     description:
-      "A UK-based cleaning coordination service for international clients in Antalya. Share your preferred timing once; CleanNestPro checks suitable local options and manages the quote, secure payment, multilingual support, written booking and follow-up.",
+      "A UK-based cleaning coordination service for international clients in Antalya, built around European-standard communication, clear written coordination, multilingual support, secure payment and accountable service follow-up through independent local providers.",
   };
 }
 
@@ -980,9 +988,9 @@ export default function Home() {
                   variants={fadeUp}
                   className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
                 >
-                  <span className="sm:hidden">UK-based support in Antalya</span>
+                  <span className="sm:hidden">European-standard coordination in Antalya</span>
                   <span className="hidden sm:inline">
-                    UK-based cleaning coordination for international clients in Antalya
+                    European-standard communication and coordination for cleaning in Antalya
                   </span>
                 </motion.div>
 
@@ -990,9 +998,9 @@ export default function Home() {
                   variants={fadeUp}
                   className="mx-auto mt-6 max-w-7xl text-[44px] font-light leading-[0.96] tracking-[-0.04em] text-white sm:mt-8 sm:text-[72px] md:text-[96px] lg:text-[128px]"
                 >
-                  Local cleaning in Antalya,
+                  Local cleaning.
                   <br />
-                  without the local hassle
+                  A better-managed experience.
                 </motion.h1>
 
                 <motion.p
@@ -1000,10 +1008,10 @@ export default function Home() {
                   className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/85 sm:mt-8 sm:text-lg sm:leading-8 md:text-2xl md:leading-10"
                 >
                   <span className="sm:hidden">
-                    Send one request. We make reasonable efforts to find a suitable local option and remain your English-speaking contact.
+                    Local professionals deliver the cleaning. We deliver the clarity, communication and follow-through around it.
                   </span>
                   <span className="hidden sm:inline">
-                    Share your preferred date and requirements once. We make reasonable efforts to source suitable independent local options, present what is available clearly, and remain your English-speaking point of contact.
+                    Independent local professionals perform the on-site work. CleanNestPro gives you European-standard communication, written coordination and one accountable point of contact before, during and after the visit.
                   </span>
                 </motion.p>
 
@@ -1046,12 +1054,46 @@ export default function Home() {
                   variants={fadeUp}
                   className="mx-auto mt-4 max-w-xl rounded-2xl border border-white/15 bg-black/20 px-4 py-3 text-xs leading-5 text-white/80 backdrop-blur-sm sm:mt-5 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:leading-6 sm:text-white/70"
                 >
-                  Your date is a preference, not a guarantee. We first check local availability, and you only pay after choosing an option.
+                  We do not promise human work will be flawless. We promise clear expectations, responsive support and professional follow-up when something needs attention.
                 </motion.p>
               </motion.div>
             </div>
           </div>
         </section>
+
+        <motion.section
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+          variants={fadeUp}
+          className="mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-20"
+        >
+          <div className="overflow-hidden rounded-[36px] border border-slate-200 bg-white px-7 py-10 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:px-12 md:py-14">
+            <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr] md:items-center">
+              <div>
+                <div className="text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
+                  Our service culture
+                </div>
+                <h2 className="mt-4 text-3xl font-semibold tracking-tight md:text-5xl">
+                  Perfection is an aspiration. Accountability is the promise.
+                </h2>
+              </div>
+              <div>
+                <p className="text-lg leading-8 text-slate-600 dark:text-slate-300">
+                  Cleaning is physical, detailed and human work. Even good teams can
+                  occasionally miss a small area, and some permanent stains may remain
+                  visible after professional treatment. What should never be missing is
+                  clear communication, ownership and a constructive response.
+                </p>
+                <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
+                  That is where CleanNestPro adds value: we set expectations, coordinate
+                  local delivery, encourage real-time feedback and stay involved when a
+                  concern needs to be understood or resolved.
+                </p>
+              </div>
+            </div>
+          </div>
+        </motion.section>
 
         <motion.section
           id="services"
@@ -1069,12 +1111,12 @@ export default function Home() {
               Services
             </div>
             <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-              Services tailored to your property
+              The right cleaning service, wrapped in better coordination
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              Choose the service your property needs. CleanNestPro coordinates
-              the request with suitable independent local providers and brings
-              the details together into one clear quote.
+              Choose the cleaning your property needs. We then manage the parts
+              that often create stress: scope, availability, written confirmation,
+              multilingual communication, secure payment and follow-up.
             </p>
           </motion.div>
 
@@ -1114,7 +1156,7 @@ export default function Home() {
 
                   <div className="mt-6 flex items-center gap-2 text-sm font-medium text-slate-500 dark:text-slate-300">
                     <span className="inline-block h-2 w-2 rounded-full bg-slate-400/70 dark:bg-white/60" />
-                    Coordinated locally
+                    Locally delivered, centrally supported
                   </div>
 
                   <Link
@@ -1184,23 +1226,23 @@ export default function Home() {
                 variants={fadeUp}
                 className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400"
               >
-                Premium experience
+                The CleanNestPro experience
               </motion.div>
 
               <motion.h2
                 variants={fadeUp}
                 className="text-3xl font-semibold tracking-tight md:text-5xl"
               >
-                Designed for properties that need to feel exceptional
+                Our standard is how the whole experience is managed
               </motion.h2>
 
               <motion.p
                 variants={fadeUp}
                 className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300"
               >
-                From luxury villas to guest-ready holiday homes, every detail is
-                shaped around presentation, comfort, and a more refined standard
-                of care.
+                “European-standard” at CleanNestPro refers to professional communication,
+                clear coordination, accountability and service recovery. The on-site
+                cleaning itself is carried out by independent local professionals.
               </motion.p>
             </motion.div>
 
@@ -1257,9 +1299,9 @@ export default function Home() {
 
                     <div className="mt-8 flex flex-wrap gap-3">
                       {[
-                        "Luxury presentation",
-                        "Guest-ready finish",
-                        "Quiet reliability",
+                        "Clear expectations",
+                        "Responsive support",
+                        "Accountable follow-up",
                       ].map((tag) => (
                         <span
                           key={tag}
@@ -1291,17 +1333,16 @@ export default function Home() {
               className="mx-auto max-w-3xl text-center"
             >
               <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                Why use an international coordination service?
+                What you are really buying
               </div>
               <h2 className="text-3xl font-semibold tracking-tight md:text-5xl">
-                One request. Suitable local providers. One clear quote.
+                Not only cleaning — a managed customer experience
               </h2>
               <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
-                CleanNestPro manages the customer relationship from quote to
-                service follow-up. We remove the work of contacting and
-                comparing multiple providers, show you the suitable options
-                currently available, and appoint an independent local service
-                partner only after you choose what works for you.
+                The local provider delivers the physical cleaning. CleanNestPro
+                designs and manages the experience around it: clear expectations,
+                written scope, multilingual communication, secure payment,
+                responsive support and a fair process if something needs attention.
               </p>
             </motion.div>
 
@@ -1342,7 +1383,7 @@ export default function Home() {
               How it works
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              Describe the property once. We make reasonable efforts to source suitable providers, check availability, coordinate possible dates and prepare a written booking option.
+              From the first request to the final follow-up, the process is designed so you always know what is happening, who to contact and what happens next.
             </p>
           </motion.div>
 
@@ -1353,14 +1394,14 @@ export default function Home() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                  One managed service, with clear local delivery
+                  European-standard coordination, locally delivered cleaning
                 </h3>
                 <p className="mt-2 leading-7 text-slate-600 dark:text-slate-300">
-                  CleanNestPro manages your availability request, quote, Stripe
-                  payment, multilingual support, written booking details, and
-                  service follow-up. An appointed independent local partner
-                  performs the on-site cleaning. You continue to contact us if
-                  anything needs to be clarified or resolved.
+                  Our European-standard promise is about communication,
+                  coordination and customer care — not a claim that every local
+                  provider or every human cleaning task will be flawless. An
+                  independent local partner performs the on-site work; CleanNestPro
+                  remains responsible for managing your experience and response.
                 </p>
               </div>
             </div>
@@ -1403,18 +1444,20 @@ export default function Home() {
                 className="max-w-2xl lg:sticky lg:top-8"
               >
                 <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                  One coordinated quote
+                  One managed experience
                 </div>
 
                 <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-                  Tell us once.
+                  Tell us what matters.
                   <br />
-                  We handle the search.
+                  We manage the experience.
                 </h2>
 
                 <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
-                  Share your preferred date, flexibility, and property details
-                  once. We make reasonable efforts to contact suitable independent local providers and return by email with any option we can source, a written scope, and one clear quote.
+                  Share your priorities, timing and property details once. We coordinate
+                  suitable independent local providers, put the proposed scope in
+                  writing and remain available if anything needs clarification before,
+                  during or after the service.
                 </p>
 
                 <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
@@ -1425,31 +1468,30 @@ export default function Home() {
 
                 <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
                   <h3 className="text-lg font-semibold">
-                    What CleanNestPro handles
+                    The experience CleanNestPro manages
                   </h3>
                   <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    <li>• Finding and approaching suitable local providers</li>
+                    <li>• Understanding your priorities and setting expectations</li>
                     <li>
-                      • Checking current availability and coordinating the scope
+                      • Finding suitable local providers and coordinating the scope
                     </li>
                     <li>
-                      • Offering alternative dates when your first choice is
-                      unavailable
+                      • Confirming timing, access details and requested extras in writing
                     </li>
                     <li>
-                      • Bringing the available timing and pricing into one clear
-                      quote
+                      • Keeping pricing, timing and responsibilities clear
                     </li>
-                    <li>• No payment unless you choose an available option</li>
+                    <li>• Multilingual communication and secure Stripe payment</li>
                     <li>
-                      • Written booking confirmation and secure Stripe payment
+                      • Service follow-up and constructive issue coordination
                     </li>
                   </ul>
                   <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                    On-site cleaning is performed by an independent local
-                    service partner appointed by CleanNestPro. Your quote,
-                    payment, support, and service follow-up remain with
-                    CleanNestPro.
+                    On-site cleaning is performed by an independent local service
+                    partner. CleanNestPro’s European-standard promise relates to
+                    communication, coordination, transparency and customer care.
+                    Cleaning outcomes can vary with property condition, access,
+                    time and the limits of stain or material treatment.
                   </p>
                 </div>
               </motion.div>
@@ -2190,7 +2232,7 @@ export default function Home() {
               Frequently asked questions
             </h2>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              Added in a search-friendly structure for both users and SEO.
+              Clear answers about local delivery, our coordination role and what you can expect if something needs attention.
             </p>
           </motion.div>
 
@@ -2226,16 +2268,15 @@ export default function Home() {
         >
           <div className="rounded-[36px] border border-slate-200 bg-white px-8 py-12 shadow-[0_18px_60px_rgba(15,23,42,0.05)] dark:border-white/10 dark:bg-white/5 dark:shadow-none">
             <h2 className="text-2xl font-semibold tracking-tight md:text-4xl">
-              Local cleaning, without the work of searching locally
+              Local cleaning, backed by accountable coordination
             </h2>
 
             <p className="mx-auto mt-5 max-w-3xl leading-8 text-slate-600 dark:text-slate-300">
-              CleanNestPro is a UK-based cleaning coordination service for
-              international clients in Antalya. Tell us your preferred timing
-              and requirements once; we check suitable independent local
-              options, present what is available clearly, and manage the quote,
-              secure payment, multilingual communication, written booking, and
-              follow-up.
+              CleanNestPro is a UK-based coordination service for international
+              clients in Antalya. Local independent professionals perform the
+              cleaning; we manage the customer experience around it with clear
+              communication, written coordination, secure payment and responsive
+              follow-up. Perfection is an aspiration. Accountability is the promise.
             </p>
           </div>
         </motion.section>

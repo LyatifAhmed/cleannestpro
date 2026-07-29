@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Service | CleanNestPro",
   description:
-    "Terms governing CleanNestPro cleaning coordination, availability requests, flexible date options, quotes, payments, bookings, and local service delivery in Antalya.",
+    "Terms governing CleanNestPro customer care, cleaning coordination, local service delivery, stain limitations, complaints, remedies, quotes, payments, and bookings in Antalya.",
 };
 
 export default function TermsPage() {
@@ -11,7 +11,7 @@ export default function TermsPage() {
     <main className="min-h-screen bg-[#fcfbf8] text-slate-900">
       <section className="mx-auto max-w-4xl px-6 py-16 md:px-8">
         <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm md:p-12">
-          <p className="text-sm text-slate-500">Last updated: 24 July 2026</p>
+          <p className="text-sm text-slate-500">Last updated: 29 July 2026</p>
 
           <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-5xl">
             Terms of Service
@@ -33,13 +33,14 @@ export default function TermsPage() {
 
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  CleanNestPro provides a UK-based cleaning coordination service
-                  for international customers in Antalya. We receive
-                  availability and quote requests, review requirements, approach
-                  suitable independent local providers, present available
-                  options, issue quotes, take payment, provide multilingual
-                  customer support, manage confirmed bookings, appoint local
-                  service partners, and handle service follow-up.
+                  CleanNestPro provides a UK-based, customer-experience-led
+                  cleaning coordination service for international customers in
+                  Antalya. We receive availability and quote requests, clarify
+                  requirements, approach suitable independent local providers,
+                  present available options, issue quotes, take payment, provide
+                  multilingual customer support, manage confirmed bookings,
+                  appoint local service partners, and coordinate service
+                  follow-up where something needs to be clarified or put right.
                 </p>
 
                 <p>
@@ -459,26 +460,66 @@ export default function TermsPage() {
 
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  CleanNestPro will manage the service with reasonable care and
-                  skill and will require appointed service partners to carry out
-                  the on-site work with reasonable care and skill, subject to
-                  the agreed scope, available time, property condition, and
-                  access.
+                  CleanNestPro will manage the customer journey with reasonable
+                  care and skill, including written coordination, multilingual
+                  communication, booking support, service follow-up, and the
+                  handling of concerns. We will also require appointed service
+                  partners to carry out the agreed on-site work with reasonable
+                  care and skill, subject to the written scope, available time,
+                  property condition, access, materials, equipment, and any
+                  limitations identified before or during the service.
                 </p>
 
                 <p>
-                  Cleaning improves the condition and presentation of a
-                  property, but no guarantee is made that every stain, mark,
-                  odour, discolouration, scale deposit, mould trace, permanent
-                  damage, or pre-existing defect can be removed.
+                  References on the website to a European-standard or
+                  internationally managed experience describe CleanNestPro&apos;s
+                  approach to communication, coordination, transparency,
+                  customer care, and problem resolution. They do not mean that
+                  every local property, surface, stain, or item can be restored
+                  to an as-new appearance, and they are not a guarantee of a
+                  flawless or identical visual result in every property.
+                </p>
+
+                <p>
+                  Cleaning is intended to improve hygiene, condition, and
+                  presentation. Results depend on factors outside reasonable
+                  control, including the age and composition of a stain, the
+                  material or fabric involved, prior treatment, colour fastness,
+                  wear, sun damage, moisture damage, embedded residue, mineral
+                  deposits, mould penetration, and permanent surface change.
+                  Accordingly, no guarantee is made that every stain, mark,
+                  odour, discolouration, scale deposit, mould trace, dye
+                  transfer, burn, abrasion, water mark, permanent damage, or
+                  pre-existing defect can be removed.
+                </p>
+
+                <p>
+                  In particular, mattress, sofa, carpet, curtain, and upholstery
+                  cleaning may materially improve hygiene and appearance without
+                  removing all visible staining. Extraction cleaning, steam
+                  treatment, washing, or another professional method may leave a
+                  historic or permanent mark visible even where the item has
+                  been properly cleaned. A remaining visible mark does not by
+                  itself establish that the agreed cleaning service was not
+                  performed with reasonable care and skill.
+                </p>
+
+                <p>
+                  We and the attending service partner may decline to continue
+                  treating a stain or surface where further treatment could
+                  reasonably cause fading, colour transfer, shrinkage, fabric
+                  distortion, delamination, scratching, corrosion, or other
+                  damage. Where practical, the customer will be informed of a
+                  material limitation identified during the appointment.
                 </p>
 
                 <p>
                   Unless specifically included in writing, the service does not
-                  include specialist biohazard cleaning, pest treatment,
+                  include guaranteed stain removal, restoration to an as-new
+                  condition, specialist biohazard cleaning, pest treatment,
                   exterior high-level window cleaning, hazardous waste removal,
-                  restoration work, repair work, or tasks requiring regulated
-                  specialist qualifications.
+                  mould remediation, restoration work, repair work, or tasks
+                  requiring regulated specialist qualifications.
                 </p>
               </div>
             </section>
@@ -492,15 +533,20 @@ export default function TermsPage() {
                 <p>
                   Any service concern, alleged damage, missing item, or request
                   for corrective cleaning should be reported to CleanNestPro as
-                  soon as reasonably possible and preferably within 24 hours of
-                  the service.
+                  soon as reasonably possible and preferably during the
+                  appointment, at the service handover, or within 24 hours after
+                  completion. Prompt reporting gives the attending team a fair
+                  opportunity to inspect and, where appropriate, correct a
+                  missed area while the circumstances are still clear.
                 </p>
 
                 <p>
                   You should provide clear details and, where relevant,
-                  photographs or other supporting evidence. You must allow a
-                  reasonable opportunity to review the issue and, where
-                  appropriate, arrange corrective work before engaging another
+                  photographs or other supporting evidence. For stain-related
+                  concerns, please identify the item, material, location, and
+                  visible result complained of. You must allow a reasonable
+                  opportunity to review the issue and, where appropriate,
+                  arrange proportionate corrective work before engaging another
                   provider or incurring additional costs.
                 </p>
 
@@ -512,9 +558,13 @@ export default function TermsPage() {
                 </p>
 
                 <p>
-                  CleanNestPro may offer a re-clean, partial refund, full
-                  refund, or another reasonable remedy depending on the
-                  circumstances, agreed scope, and applicable law.
+                  CleanNestPro may offer a targeted touch-up, re-clean, partial
+                  refund, full refund, explanation of a technical or permanent
+                  limitation, or another reasonable and proportionate remedy
+                  depending on the circumstances, agreed scope, available
+                  evidence, and applicable law. A touch-up or re-clean is not an
+                  admission that the entire service was defective and may be
+                  limited to the specific area reasonably requiring attention.
                 </p>
               </div>
             </section>
