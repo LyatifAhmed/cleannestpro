@@ -8,8 +8,9 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 const MAX_PROPERTY_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 700 * 1024;
 const MAX_TOTAL_PHOTO_BYTES = 3.5 * 1024 * 1024;
-const CURRENT_TERMS_VERSION = "2026-07-24";
-const CURRENT_PRIVACY_VERSION = "2026-07-24";
+// Keep these values identical to TERMS_VERSION and PRIVACY_VERSION in app/page.tsx.
+const CURRENT_TERMS_VERSION = "2026-07-28";
+const CURRENT_PRIVACY_VERSION = "2026-07-28";
 
 type QuotePayload = {
   quoteReference?: string;
@@ -21,6 +22,9 @@ type QuotePayload = {
   propertyType: string;
   bathrooms: string;
   propertySize: string;
+  propertyCondition?: string;
+  floorNumber?: string;
+  elevator?: string;
   frequency: string;
   preferredDate: string;
   preferredTime: string;
@@ -29,6 +33,16 @@ type QuotePayload = {
   pets: string;
   suppliesNeeded: string;
   extraTasks: string[];
+  sofaType?: string;
+  sofaSeats?: string;
+  armchairCount?: string;
+  curtainCount?: string;
+  curtainType?: string;
+  singleMattressCount?: string;
+  doubleMattressCount?: string;
+  kingMattressCount?: string;
+  allergies?: string;
+  parkingAvailable?: string;
   accessDetails: string;
   specialNotes: string;
   estimatedRange: string;
@@ -182,6 +196,9 @@ function buildAdminHtml(data: QuotePayload, photoCount: number) {
           ${row("Property type", data.propertyType)}
           ${row("Bathrooms", data.bathrooms)}
           ${row("Approx property size", data.propertySize || "Not provided")}
+          ${row("Property condition", data.propertyCondition || "Not provided")}
+          ${row("Floor", data.floorNumber || "Not provided")}
+          ${row("Elevator", data.elevator || "Not provided")}
           ${row("Cleaning frequency", data.frequency)}
           ${row("Preferred date", data.preferredDate || "Not provided")}
           ${row("Preferred time", data.preferredTime || "Not provided")}
@@ -190,6 +207,16 @@ function buildAdminHtml(data: QuotePayload, photoCount: number) {
           ${row("Any pets?", data.pets)}
           ${row("Need cleaning supplies brought?", data.suppliesNeeded)}
           ${row("Extra tasks", data.extraTasks?.length ? data.extraTasks.join(", ") : "None")}
+          ${row("Sofa type", data.sofaType || "Not selected")}
+          ${row("Approx sofa seats", data.sofaSeats || "Not selected")}
+          ${row("Armchairs", data.armchairCount || "0")}
+          ${row("Curtain count / rooms", data.curtainCount || "Not selected")}
+          ${row("Curtain type", data.curtainType || "Not selected")}
+          ${row("Single mattresses", data.singleMattressCount || "0")}
+          ${row("Double mattresses", data.doubleMattressCount || "0")}
+          ${row("King / queen mattresses", data.kingMattressCount || "0")}
+          ${row("Allergies / product restrictions", data.allergies || "None")}
+          ${row("Parking", data.parkingAvailable || "Not provided")}
           ${row("Access details", data.accessDetails || "Not provided")}
           ${row("Special notes", data.specialNotes || "None")}
           ${row("Property photos", photoCount ? `${photoCount} attached` : "None")}
