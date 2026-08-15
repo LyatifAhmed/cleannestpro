@@ -18,6 +18,10 @@ type CleanerApplyForm = {
   availability: string;
   hasSupplies: string;
   transport: string;
+  canInvoice: string;
+  acceptsFeedback: string;
+  performsFinalCheck: string;
+  qualityCommitment: boolean;
   teamSize: string;
   notes: string;
   website: string;
@@ -43,6 +47,10 @@ const createInitialState = (): CleanerApplyForm => ({
   availability: "",
   hasSupplies: "No",
   transport: "No",
+  canInvoice: "No",
+  acceptsFeedback: "Yes",
+  performsFinalCheck: "Yes",
+  qualityCommitment: false,
   teamSize: "",
   notes: "",
   website: "",
@@ -88,7 +96,7 @@ export default function ApplyPage() {
 
       if (secondsOnForm < 4) {
         setSending(false);
-        alert("Please take a little more time to complete the form.");
+        alert("Lütfen formu dikkatlice doldurmak için biraz daha zaman ayırın.");
         return;
       }
 
@@ -102,14 +110,14 @@ export default function ApplyPage() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error || "Failed to send application.");
+        throw new Error(data?.error || "Başvuru gönderilemedi.");
       }
 
       setSubmitted(true);
       setForm(createInitialState());
     } catch (error) {
       console.error(error);
-      alert("Something went wrong while sending the application.");
+      alert("Başvuru gönderilirken bir sorun oluştu. Lütfen tekrar deneyin.");
     } finally {
       setSending(false);
     }
@@ -124,26 +132,27 @@ export default function ApplyPage() {
         <div className="relative mx-auto max-w-6xl px-6 py-16 md:px-8 md:py-24">
           <div className="max-w-4xl">
             <div className="inline-flex rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-sm text-slate-600 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-              Work with CleanNestPro
+              CleanNestPro hizmet ağına katılın
             </div>
 
             <h1 className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl">
-              Join our selected service network in Antalya
+              Antalya’daki seçkin hizmet ağımıza katılın
             </h1>
 
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-600 dark:text-slate-300">
-              We work with a limited number of carefully selected local cleaners
-              and cleaning firms in Antalya. If you value presentation,
-              punctuality, and professional communication, we would be happy to
-              hear from you.
+              Antalya’da özenle seçilmiş, sınırlı sayıda profesyonel temizlik
+              ekibi ve bireysel hizmet sağlayıcıyla çalışıyoruz. İşinizi zamanında
+              ve eksiksiz teslim ediyor, müşterilerle saygılı iletişim kuruyor ve
+              geri bildirimi hizmetin doğal bir parçası olarak görüyorsanız
+              başvurunuzu bekliyoruz.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
               {[
-                "English, Turkish & Russian support",
-                "Individual and company applications welcome",
-                "Better organised communication",
-                "Premium client-facing standard",
+                "Türkçe, İngilizce ve Rusça müşteri desteği",
+                "Bireysel ve kurumsal başvuru",
+                "Planlı ve açık iletişim",
+                "Avrupa standartlarında hizmet anlayışı",
               ].map((item) => (
                 <span
                   key={item}
@@ -161,35 +170,39 @@ export default function ApplyPage() {
         <div className="grid gap-10 md:grid-cols-[0.95fr_1.05fr]">
           <div>
             <div className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm dark:border-white/10 dark:bg-white/5">
-              <h2 className="text-2xl font-semibold">Who we work with</h2>
+              <h2 className="text-2xl font-semibold">Kimlerle çalışıyoruz?</h2>
 
               <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                <li>• Reliable individual cleaners with strong attention to detail</li>
-                <li>• Local cleaning firms with a professional standard</li>
-                <li>• Teams experienced with apartments, villas, and guest-ready homes</li>
-                <li>• Service partners who communicate clearly and show up on time</li>
-                <li>• People comfortable serving international clients</li>
+                <li>• Ayrıntılara önem veren, güvenilir bireysel temizlik görevlileri</li>
+                <li>• Fatura kesebilen profesyonel temizlik şirketleri ve ekipleri</li>
+                <li>• Daire, villa, tatil evi ve misafir girişine hazırlık deneyimi olanlar</li>
+                <li>• Randevu saatine uyan ve gecikme durumunda önceden haber verenler</li>
+                <li>• Uluslararası müşterilerle saygılı ve profesyonel iletişim kurabilenler</li>
               </ul>
             </div>
 
             <div className="mt-6 rounded-[30px] border border-slate-200 bg-[#f6f3ee] p-7 dark:border-white/10 dark:bg-white/5">
-              <h3 className="text-lg font-semibold">Why partners apply</h3>
+              <h3 className="text-lg font-semibold">Sizden beklediğimiz hizmet standardı</h3>
 
               <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                <li>• Access to a more premium client profile</li>
-                <li>• Better structured communication before confirmation</li>
-                <li>• Clearer briefing and service expectations</li>
-                <li>• Opportunity to work with English, Turkish, and Russian-speaking clients</li>
+                <li>• İşe başlamadan önce verilen görev listesini dikkatle kontrol etmeniz</li>
+                <li>• Temizlik bitmeden müşteriye özellikle kontrol edilmesini istediği bir yer olup olmadığını sormanız</li>
+                <li>• Müşterinin makul geri bildirimlerini savunmaya geçmeden dinleyip gerekli düzeltmeyi yapmanız</li>
+                <li>• Teslimden önce kendi son kalite kontrolünüzü gerçekleştirmeniz</li>
+                <li>• Fiyat, kapsam, gecikme veya ek masraf konusunda sürpriz yaratmamanız</li>
+                <li>• Talep edildiğinde yapılan işe uygun fatura düzenleyebilmeniz</li>
               </ul>
             </div>
 
             <div className="mt-6 rounded-[30px] border border-slate-200 bg-white p-7 dark:border-white/10 dark:bg-white/5">
-              <h3 className="text-lg font-semibold">How applications are reviewed</h3>
+              <h3 className="text-lg font-semibold">Başvurular nasıl değerlendiriliyor?</h3>
               <p className="mt-4 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                We review applications carefully and may decide not to move
-                forward with every enquiry. CleanNestPro is intentionally
-                selective about who joins the network, because client trust and
-                delivery quality matter more than scale.
+                Her başvuruyu deneyim, iletişim, hizmet bölgesi, ekip yapısı ve
+                kalite yaklaşımı açısından inceliyoruz. Her başvuruyla ilerleme
+                garantisi vermiyoruz. Uygun bulunan iş ortaklarıyla önce detayları
+                görüşebilir, gerektiğinde deneme hizmeti veya referans isteyebiliriz.
+                Bizim için ağın büyüklüğünden çok müşteri güveni ve tutarlı hizmet
+                kalitesi önemlidir.
               </p>
             </div>
           </div>
@@ -199,7 +212,7 @@ export default function ApplyPage() {
             className="rounded-[34px] border border-slate-200 bg-white p-7 shadow-[0_18px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/5 dark:shadow-none md:p-9"
           >
             <div className="hidden" aria-hidden="true">
-              <label htmlFor="website">Website</label>
+              <label htmlFor="website">Web sitesi</label>
               <input
                 id="website"
                 name="website"
@@ -227,7 +240,7 @@ export default function ApplyPage() {
                           : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                       }`}
                     >
-                      {type}
+                      {type === "Individual Cleaner" ? "Bireysel başvuru" : "Şirket / ekip başvurusu"}
                     </button>
                   );
                 }
@@ -235,39 +248,39 @@ export default function ApplyPage() {
             </div>
 
             <h2 className="mt-6 text-2xl font-semibold">
-              {isCompany ? "Apply as a company" : "Apply as an individual"}
+              {isCompany ? "Şirket veya ekip olarak başvurun" : "Bireysel olarak başvurun"}
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
-              Submit your details below and we’ll review your application by
-              email. Clear communication in English, Turkish, and Russian is a
-              strong advantage.
+              Aşağıdaki bilgileri mümkün olduğunca açık ve eksiksiz paylaşın.
+              Başvurunuzu e-posta yoluyla değerlendireceğiz. Türkçenin yanında
+              İngilizce veya Rusça iletişim kurabilmek önemli bir avantajdır.
             </p>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               <Field>
-                <Label>{isCompany ? "Main contact name" : "Full name"}</Label>
+                <Label>{isCompany ? "Yetkili kişinin adı soyadı" : "Adınız soyadınız"}</Label>
                 <Input
                   value={form.fullName}
                   onChange={(e) => updateField("fullName", e.target.value)}
-                  placeholder={isCompany ? "Main contact person" : "Your full name"}
+                  placeholder={isCompany ? "İletişim kurulacak yetkili" : "Adınız ve soyadınız"}
                   required
                 />
               </Field>
 
               {isCompany ? (
                 <Field>
-                  <Label>Company name</Label>
+                  <Label>Şirket / ekip adı</Label>
                   <Input
                     value={form.companyName}
                     onChange={(e) => updateField("companyName", e.target.value)}
-                    placeholder="Your company name"
+                    placeholder="Ticari adınız veya ekip adınız"
                     required
                   />
                 </Field>
               ) : (
                 <Field>
-                  <Label>Phone</Label>
+                  <Label>Telefon</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => updateField("phone", e.target.value)}
@@ -279,7 +292,7 @@ export default function ApplyPage() {
 
               {!isCompany ? null : (
                 <Field>
-                  <Label>Phone</Label>
+                  <Label>Telefon</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => updateField("phone", e.target.value)}
@@ -301,63 +314,63 @@ export default function ApplyPage() {
               </Field>
 
               <Field>
-                <Label>Area in Antalya</Label>
+                <Label>Antalya’da hizmet verdiğiniz bölgeler</Label>
                 <Input
                   value={form.location}
                   onChange={(e) => updateField("location", e.target.value)}
-                  placeholder="Where are you based?"
+                  placeholder="Örn. Muratpaşa, Konyaaltı, Lara, Kemer"
                   required
                 />
               </Field>
 
               {isCompany ? (
                 <Field>
-                  <Label>Approx team size</Label>
+                  <Label>Yaklaşık ekip büyüklüğü</Label>
                   <Input
                     value={form.teamSize}
                     onChange={(e) => updateField("teamSize", e.target.value)}
-                    placeholder="e.g. 3 cleaners"
+                    placeholder="Örn. 3 temizlik görevlisi"
                   />
                 </Field>
               ) : (
                 <Field>
-                  <Label>Availability</Label>
+                  <Label>Çalışma günleri ve saatleri</Label>
                   <Input
                     value={form.availability}
                     onChange={(e) => updateField("availability", e.target.value)}
-                    placeholder="Weekdays, weekends, mornings..."
+                    placeholder="Hafta içi, hafta sonu, sabah, akşam..."
                   />
                 </Field>
               )}
 
               {isCompany ? (
                 <Field>
-                  <Label>Availability</Label>
+                  <Label>Çalışma günleri ve saatleri</Label>
                   <Input
                     value={form.availability}
                     onChange={(e) => updateField("availability", e.target.value)}
-                    placeholder="Typical availability"
+                    placeholder="Genel müsaitlik durumunuz"
                   />
                 </Field>
               ) : null}
 
               <Field className="md:col-span-2">
                 <Label>
-                  {isCompany ? "Company / team experience" : "Cleaning experience"}
+                  {isCompany ? "Şirket / ekip deneyimi" : "Temizlik deneyiminiz"}
                 </Label>
                 <Textarea
                   value={form.experience}
                   onChange={(e) => updateField("experience", e.target.value)}
                   placeholder={
                     isCompany
-                      ? "Tell us about your team, the kinds of homes you handle, service areas, and client experience."
-                      : "Tell us about your experience with apartments, villas, Airbnb cleaning, deep cleaning, etc."
+                      ? "Ekibinizi, kaç yıldır çalıştığınızı, hizmet verdiğiniz konut türlerini ve müşteri deneyiminizi anlatın."
+                      : "Daire, villa, Airbnb / tatil evi, detaylı temizlik gibi alanlardaki deneyiminizi anlatın."
                   }
                 />
               </Field>
 
               <Field className="md:col-span-2">
-                <Label>Languages you speak</Label>
+                <Label>Konuşabildiğiniz diller</Label>
                 <div className="flex flex-wrap gap-3">
                   {languageOptions.map((language) => {
                     const active = form.languages.includes(language);
@@ -372,7 +385,7 @@ export default function ApplyPage() {
                             : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50 dark:border-white/15 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
                         }`}
                       >
-                        {language}
+                        {{ English: "İngilizce", Russian: "Rusça", Turkish: "Türkçe", Other: "Diğer" }[language]}
                       </button>
                     );
                   })}
@@ -380,34 +393,71 @@ export default function ApplyPage() {
               </Field>
 
               <Field>
-                <Label>Can you bring supplies?</Label>
+                <Label>Temizlik malzemesi ve ekipman sağlayabilir misiniz?</Label>
                 <Select
                   value={form.hasSupplies}
                   onChange={(e) => updateField("hasSupplies", e.target.value)}
                 >
-                  <option>Yes</option>
-                  <option>No</option>
+                  <option value="Yes">Evet</option>
+                  <option value="No">Hayır</option>
                 </Select>
               </Field>
 
               <Field>
-                <Label>Do you have transport?</Label>
+                <Label>Ulaşım için kendi aracınız var mı?</Label>
                 <Select
                   value={form.transport}
                   onChange={(e) => updateField("transport", e.target.value)}
                 >
-                  <option>Yes</option>
-                  <option>No</option>
+                  <option value="Yes">Evet</option>
+                  <option value="No">Hayır</option>
+                </Select>
+              </Field>
+
+              <Field>
+                <Label>Verdiğiniz hizmet için fatura kesebilir misiniz?</Label>
+                <Select value={form.canInvoice} onChange={(e) => updateField("canInvoice", e.target.value)} required>
+                  <option value="Yes">Evet</option>
+                  <option value="No">Hayır</option>
+                </Select>
+              </Field>
+
+              <Field>
+                <Label>Müşteri geri bildirimini kabul edip gerekli düzeltmeyi yapar mısınız?</Label>
+                <Select value={form.acceptsFeedback} onChange={(e) => updateField("acceptsFeedback", e.target.value)} required>
+                  <option value="Yes">Evet</option>
+                  <option value="No">Hayır</option>
                 </Select>
               </Field>
 
               <Field className="md:col-span-2">
-                <Label>Anything else we should know?</Label>
+                <Label>İşten ayrılmadan önce müşteriye “Özellikle kontrol etmemizi istediğiniz başka bir yer var mı?” diye sorup son kontrol yapar mısınız?</Label>
+                <Select value={form.performsFinalCheck} onChange={(e) => updateField("performsFinalCheck", e.target.value)} required>
+                  <option value="Yes">Evet, bunu standart teslim sürecimizin parçası yapabiliriz</option>
+                  <option value="No">Hayır</option>
+                </Select>
+              </Field>
+
+              <Field className="md:col-span-2">
+                <Label>Başvurunuzla ilgili eklemek istediğiniz başka bir bilgi var mı?</Label>
                 <Textarea
                   value={form.notes}
                   onChange={(e) => updateField("notes", e.target.value)}
-                  placeholder="You can mention availability, preferred areas, experience, company profile, or anything useful for your application."
+                  placeholder="Referanslarınızı, sosyal medya veya web sitenizi, tercih ettiğiniz bölgeleri ya da hizmet yaklaşımınızı paylaşabilirsiniz."
                 />
+              </Field>
+
+              <Field className="md:col-span-2">
+                <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 bg-[#f6f3ee] p-4 text-sm leading-6 text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
+                  <input
+                    type="checkbox"
+                    className="mt-1 h-4 w-4"
+                    checked={form.qualityCommitment}
+                    onChange={(e) => updateField("qualityCommitment", e.target.checked)}
+                    required
+                  />
+                  <span>CleanNestPro müşterilerine zamanında, saygılı ve özenli hizmet sunmamız beklendiğini; makul geri bildirimlerde gerekli düzeltmeleri yapmamız ve müşteriden ayrılmadan önce son kontrol istememiz gerektiğini anlıyorum.</span>
+                </label>
               </Field>
             </div>
 
@@ -417,17 +467,17 @@ export default function ApplyPage() {
                 disabled={sending}
                 className="inline-flex w-full items-center justify-center rounded-2xl bg-slate-950 px-6 py-4 text-base font-medium text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-900"
               >
-                {sending ? "Sending..." : "Submit application by email"}
+                {sending ? "Gönderiliyor..." : "Başvuruyu gönder"}
               </button>
             </div>
 
             {submitted ? (
               <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
                 <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                  Your application has been sent.
+                  Başvurunuz gönderildi.
                 </p>
                 <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
-                  Thank you. We’ll review it carefully and get back to you by email if there is a fit.
+                  Teşekkür ederiz. Başvurunuzu dikkatle inceleyeceğiz. İş birliği için uygunluk olması hâlinde sizinle e-posta veya telefon yoluyla iletişime geçeceğiz.
                 </p>
               </div>
             ) : null}
