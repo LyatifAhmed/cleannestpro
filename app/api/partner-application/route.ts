@@ -15,6 +15,10 @@ type PartnerApplicationPayload = {
   availability: string;
   hasSupplies: string;
   transport: string;
+  canInvoice: string;
+  acceptsFeedback: string;
+  performsFinalCheck: string;
+  qualityCommitment: boolean;
   teamSize: string;
   notes: string;
   website?: string;
@@ -40,6 +44,12 @@ function isEmailValid(email: string) {
 
 function isPhoneReasonable(phone: string) {
   return /^[+()\d\s-]{7,20}$/.test(phone);
+}
+
+function yesNo(value: string) {
+  if (value === "Yes") return "Evet";
+  if (value === "No") return "Hayır";
+  return "Belirtilmedi";
 }
 
 function containsUrl(text: string) {
@@ -88,7 +98,7 @@ function row(label: string, value: string) {
         ${escapeHtml(label)}
       </td>
       <td style="padding:10px 12px;border:1px solid #e2e8f0;">
-        ${escapeHtml(value || "Not provided")}
+        ${escapeHtml(value || "Belirtilmedi")}
       </td>
     </tr>
   `;
@@ -98,37 +108,55 @@ function buildAdminHtml(data: PartnerApplicationPayload) {
   return `
     <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0f172a;max-width:760px;margin:0 auto;">
       <h2 style="margin:0 0 16px 0;">
-        New Partner Application — CleanNestPro
+        Yeni İş Ortağı Başvurusu — CleanNestPro
       </h2>
 
       <p style="margin:0 0 24px 0;color:#475569;">
-        A new partner application has been submitted through the website.
-        Reply directly to this email to contact the applicant.
+        Web sitesi üzerinden yeni bir iş ortağı başvurusu gönderildi.
+        Başvuru sahibiyle iletişime geçmek için bu e-postayı doğrudan yanıtlayabilirsiniz.
       </p>
 
       <table style="border-collapse:collapse;width:100%;font-size:14px;">
         <tbody>
-          ${row("Application type", data.applicationType)}
-          ${row("Full name / Contact", data.fullName)}
-          ${row("Company name", data.companyName || "Not provided")}
-          ${row("Phone", data.phone)}
-          ${row("Email", data.email)}
-          ${row("Area in Antalya", data.location)}
-          ${row("Experience", data.experience || "Not provided")}
           ${row(
-            "Languages",
+            "Başvuru türü",
+            data.applicationType === "Cleaning Company"
+              ? "Şirket / ekip"
+              : "Bireysel temizlik görevlisi"
+          )}
+          ${row("Ad soyad / Yetkili kişi", data.fullName)}
+          ${row("Şirket / ekip adı", data.companyName || "Belirtilmedi")}
+          ${row("Telefon", data.phone)}
+          ${row("E-posta", data.email)}
+          ${row("Antalya'da hizmet verdiği bölgeler", data.location)}
+          ${row("Deneyim", data.experience || "Belirtilmedi")}
+          ${row(
+            "Konuşabildiği diller",
             data.languages?.length
-              ? data.languages.join(", ")
-              : "Not provided"
+              ? data.languages
+                  .map((language) =>
+                    ({
+                      English: "İngilizce",
+                      Russian: "Rusça",
+                      Turkish: "Türkçe",
+                      Other: "Diğer",
+                    }[language] || language)
+                  )
+                  .join(", ")
+              : "Belirtilmedi"
           )}
           ${row(
-            "Availability",
-            data.availability || "Not provided"
+            "Çalışma günleri ve saatleri",
+            data.availability || "Belirtilmedi"
           )}
-          ${row("Can bring supplies", data.hasSupplies)}
-          ${row("Has transport", data.transport)}
-          ${row("Team size", data.teamSize || "Not provided")}
-          ${row("Notes", data.notes || "None")}
+          ${row("Malzeme ve ekipman sağlayabilir", yesNo(data.hasSupplies))}
+          ${row("Kendi ulaşım aracı var", yesNo(data.transport))}
+          ${row("Fatura kesebilir", yesNo(data.canInvoice))}
+          ${row("Geri bildirimi kabul edip düzeltme yapar", yesNo(data.acceptsFeedback))}
+          ${row("Müşteriden ayrılmadan önce son kontrol yapar", yesNo(data.performsFinalCheck))}
+          ${row("Hizmet standardı taahhüdünü onayladı", data.qualityCommitment ? "Evet" : "Hayır")}
+          ${row("Ekip büyüklüğü", data.teamSize || "Belirtilmedi")}
+          ${row("Ek notlar", data.notes || "Yok")}
         </tbody>
       </table>
     </div>
@@ -144,38 +172,39 @@ function buildApplicantHtml(data: PartnerApplicationPayload) {
         </p>
 
         <h1 style="margin:0 0 18px 0;font-size:28px;line-height:1.2;">
-          Your application has been received
+          Başvurunuz bize ulaştı
         </h1>
 
         <p style="margin:0 0 16px 0;color:#475569;">
-          Hi ${escapeHtml(data.fullName)},
+          Merhaba ${escapeHtml(data.fullName)},
         </p>
 
         <p style="margin:0 0 16px 0;color:#475569;">
-          Thank you for your application to work with CleanNestPro.
+          CleanNestPro hizmet ağına katılmak için yaptığınız başvuru için teşekkür ederiz.
         </p>
 
         <p style="margin:0 0 16px 0;color:#475569;">
-          We review applications carefully and selectively. If there is
-          a suitable fit, we will contact you by email with the next step.
+          Başvuruları deneyim, hizmet bölgesi, iletişim ve kalite yaklaşımı
+          açısından dikkatle değerlendiriyoruz. Uygunluk olması hâlinde sonraki
+          adımları görüşmek için sizinle e-posta veya telefon yoluyla iletişime geçeceğiz.
         </p>
 
         <div style="margin:24px 0;padding:16px 18px;border-radius:16px;background:#f8fafc;border:1px solid #e2e8f0;">
           <p style="margin:0;font-size:14px;color:#475569;">
-            We value reliability, clear communication, and a considered
-            service standard, especially for international clients.
+            Özellikle uluslararası müşterilerimiz için güvenilirlik, açık iletişim,
+            dakiklik, geri bildirime açıklık ve özenli hizmet standardı bizim için önemlidir.
           </p>
         </div>
 
         <p style="margin:0 0 16px 0;color:#475569;">
-          You can reply directly to this email if you need to add
-          anything to your application.
+          Başvurunuza eklemek istediğiniz bir bilgi varsa bu e-postayı doğrudan
+          yanıtlayabilirsiniz.
         </p>
 
         <p style="margin:0;color:#475569;">
-          Warm regards,<br />
+          Saygılarımızla,<br />
           <strong style="color:#0f172a;">
-            CleanNestPro Support
+            CleanNestPro Destek Ekibi
           </strong><br />
           <span style="font-size:14px;color:#64748b;">
             support@cleannestpro.com
@@ -190,7 +219,7 @@ export async function POST(req: NextRequest) {
   try {
     if (!process.env.RESEND_API_KEY) {
       return NextResponse.json(
-        { error: "RESEND_API_KEY is not configured." },
+        { error: "E-posta hizmeti yapılandırılmamış." },
         { status: 500 }
       );
     }
@@ -211,6 +240,10 @@ export async function POST(req: NextRequest) {
       availability: clean(raw.availability),
       hasSupplies: clean(raw.hasSupplies),
       transport: clean(raw.transport),
+      canInvoice: clean(raw.canInvoice),
+      acceptsFeedback: clean(raw.acceptsFeedback),
+      performsFinalCheck: clean(raw.performsFinalCheck),
+      qualityCommitment: raw.qualityCommitment === true,
       teamSize: clean(raw.teamSize),
       notes: clean(raw.notes),
       website: clean(raw.website),
@@ -242,7 +275,7 @@ export async function POST(req: NextRequest) {
       Date.now() - data.formStartedAt < 4000
     ) {
       return NextResponse.json(
-        { error: "Form submitted too quickly." },
+        { error: "Form çok hızlı gönderildi. Lütfen bilgilerinizi kontrol edin." },
         { status: 400 }
       );
     }
@@ -252,7 +285,7 @@ export async function POST(req: NextRequest) {
       data.applicationType !== "Cleaning Company"
     ) {
       return NextResponse.json(
-        { error: "Invalid application type." },
+        { error: "Geçersiz başvuru türü." },
         { status: 400 }
       );
     }
@@ -263,7 +296,7 @@ export async function POST(req: NextRequest) {
       data.fullName.length > 100
     ) {
       return NextResponse.json(
-        { error: "Please enter a valid name." },
+        { error: "Lütfen geçerli bir ad ve soyad girin." },
         { status: 400 }
       );
     }
@@ -273,21 +306,21 @@ export async function POST(req: NextRequest) {
       !data.companyName
     ) {
       return NextResponse.json(
-        { error: "Company name is required." },
+        { error: "Şirket veya ekip adı gereklidir." },
         { status: 400 }
       );
     }
 
     if (!data.phone || !isPhoneReasonable(data.phone)) {
       return NextResponse.json(
-        { error: "Please enter a valid phone number." },
+        { error: "Lütfen geçerli bir telefon numarası girin." },
         { status: 400 }
       );
     }
 
     if (!data.email || !isEmailValid(data.email)) {
       return NextResponse.json(
-        { error: "Please enter a valid email address." },
+        { error: "Lütfen geçerli bir e-posta adresi girin." },
         { status: 400 }
       );
     }
@@ -298,7 +331,7 @@ export async function POST(req: NextRequest) {
       data.location.length > 120
     ) {
       return NextResponse.json(
-        { error: "Please enter a valid location." },
+        { error: "Lütfen Antalya'da hizmet verdiğiniz bölgeleri belirtin." },
         { status: 400 }
       );
     }
@@ -317,7 +350,7 @@ export async function POST(req: NextRequest) {
       )
     ) {
       return NextResponse.json(
-        { error: "Links are not allowed in this form." },
+        { error: "Bu formdaki metin alanlarında bağlantı kullanılamaz." },
         { status: 400 }
       );
     }
@@ -334,7 +367,32 @@ export async function POST(req: NextRequest) {
 
     if (tooManyFieldsLookRandom(textFieldsToCheck)) {
       return NextResponse.json(
-        { error: "Submission looks invalid." },
+        { error: "Başvuru bilgileri geçersiz görünüyor." },
+        { status: 400 }
+      );
+    }
+
+    const yesNoFields = [
+      data.hasSupplies,
+      data.transport,
+      data.canInvoice,
+      data.acceptsFeedback,
+      data.performsFinalCheck,
+    ];
+
+    if (yesNoFields.some((value) => value !== "Yes" && value !== "No")) {
+      return NextResponse.json(
+        { error: "Lütfen tüm Evet/Hayır sorularını yanıtlayın." },
+        { status: 400 }
+      );
+    }
+
+    if (!data.qualityCommitment) {
+      return NextResponse.json(
+        {
+          error:
+            "Başvuruyu göndermek için hizmet standardı taahhüdünü onaylamalısınız.",
+        },
         { status: 400 }
       );
     }
@@ -343,7 +401,7 @@ export async function POST(req: NextRequest) {
       from: fromEmail,
       to: [supportEmail],
       replyTo: data.email,
-      subject: `New partner application from ${data.fullName}`,
+      subject: `Yeni iş ortağı başvurusu: ${data.fullName}`,
       html: buildAdminHtml(data),
     });
 
@@ -354,7 +412,7 @@ export async function POST(req: NextRequest) {
       );
 
       return NextResponse.json(
-        { error: "Failed to send partner application." },
+        { error: "Başvuru gönderilemedi. Lütfen tekrar deneyin." },
         { status: 502 }
       );
     }
@@ -363,8 +421,7 @@ export async function POST(req: NextRequest) {
       from: fromEmail,
       to: [data.email],
       replyTo: supportEmail,
-      subject:
-        "We’ve received your CleanNestPro application",
+      subject: "CleanNestPro başvurunuz bize ulaştı",
       html: buildApplicantHtml(data),
     });
 
@@ -377,7 +434,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Application received, but the confirmation email could not be sent.",
+            "Başvurunuz alındı ancak onay e-postası gönderilemedi.",
         },
         { status: 502 }
       );
@@ -395,7 +452,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(
-      { error: "Failed to send application." },
+      { error: "Başvuru gönderilemedi. Lütfen tekrar deneyin." },
       { status: 500 }
     );
   }
