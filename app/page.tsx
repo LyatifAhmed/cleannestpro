@@ -752,6 +752,19 @@ function getCoordinationServiceJsonLd() {
   };
 }
 
+function trackQuoteEvent(eventName: string) {
+  if (typeof window === "undefined") return;
+  const clarity = (
+    window as Window & {
+      clarity?: (...args: string[]) => void;
+    }
+  ).clarity;
+
+  if (typeof clarity === "function") {
+    clarity("event", eventName);
+  }
+}
+
 export default function Home() {
   const [form, setForm] = useState<FormState>(createInitialState());
   const [eurTryRate, setEurTryRate] = useState(FALLBACK_EUR_TRY_RATE);
@@ -763,6 +776,9 @@ export default function Home() {
   const [processingPhotos, setProcessingPhotos] = useState(false);
   const [propertyPhotos, setPropertyPhotos] = useState<File[]>([]);
 
+  const quoteSectionRef = useRef<HTMLElement | null>(null);
+  const quoteStartedRef = useRef(false);
+  const quoteViewedRef = useRef(false);
   const heroRef = useRef<HTMLElement | null>(null);
   const photoInputRef = useRef<HTMLInputElement | null>(null);
   const { scrollYProgress } = useScroll();
@@ -845,7 +861,30 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const section = quoteSectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting) && !quoteViewedRef.current) {
+          quoteViewedRef.current = true;
+          trackQuoteEvent("quote_form_viewed");
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
+    if (key !== "website" && !quoteStartedRef.current) {
+      quoteStartedRef.current = true;
+      trackQuoteEvent("quote_form_started");
+    }
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
@@ -970,6 +1009,7 @@ export default function Home() {
         throw new Error(data?.error || "Failed to send quote request.");
       }
 
+      trackQuoteEvent("quote_form_submitted");
       setSubmitted(true);
       window.localStorage.removeItem("cleannestpro-quote-draft");
       setForm(createInitialState());
@@ -1547,6 +1587,7 @@ export default function Home() {
         </motion.section>
 
         <motion.section
+          ref={quoteSectionRef}
           id="quote-form"
           initial="hidden"
           whileInView="show"
