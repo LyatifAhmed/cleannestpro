@@ -1102,7 +1102,7 @@ export default function Home() {
                   variants={fadeUp}
                   className="mx-auto mt-6 max-w-7xl text-[44px] font-light leading-[0.96] tracking-[-0.04em] text-white sm:mt-8 sm:text-[72px] md:text-[96px] lg:text-[128px]"
                 >
-                  Local cleaning.
+                  Home Cleaning in Antalya.
                   <br />A better-managed experience.
                 </motion.h1>
 
