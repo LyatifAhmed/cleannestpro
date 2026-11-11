@@ -3,7 +3,7 @@ import SeoServicePage, { type SeoPageConfig } from "@/components/seo/SeoServiceP
 
 const canonical = "https://www.cleannestpro.com/ru";
 export const metadata: Metadata = {
-  title: "Уборка в Анталье на русском языке | CleanNestPro",
+  title: "Клининг в Анталье — уборка квартир и домов | CleanNestPro",
   description: "Уборка квартир и домов в Анталье: Коньяалты, Хурма, Лиман и другие районы. Онлайн-запрос, понятный расчёт и поддержка на русском языке.",
   alternates: { canonical, languages: { en: "https://www.cleannestpro.com/", ru: canonical, "x-default": "https://www.cleannestpro.com/" } },
   openGraph: { title: "Уборка в Анталье | CleanNestPro", description: "Уборка квартир и домов с поддержкой на русском языке.", url: canonical, siteName: "CleanNestPro", locale: "ru_RU", type: "website", images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Уборка в Анталье" }] },
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const config: SeoPageConfig = {
   locale: "ru", canonical, breadcrumb: "Уборка в Анталье", eyebrow: "Поддержка на русском языке",
   title: "Уборка квартир и домов в Анталье",
-  intro: "Оставьте подробный онлайн-запрос на уборку квартиры, виллы или дома для отдыха. Мы уточним объём работ, район и удобную дату до подтверждения окончательной стоимости.",
+  intro: "Убираем квартиры, дома и виллы в Коньяалты, Хурме, Лимане, Сарысу, Муратпаше и Ларе. Чтобы получить расчёт на русском языке, заполните онлайн-форму: укажите район, площадь жилья и удобную дату. Согласуем итоговую цену до бронирования.",
   benefits: [
     { title: "Понятный онлайн-запрос", text: "Укажите площадь, количество комнат, состояние жилья и дополнительные задачи — без долгих телефонных разговоров." },
     { title: "Общение на русском", text: "Русскоязычные клиенты могут описать требования письменно и получить понятный ответ по электронной почте." },
