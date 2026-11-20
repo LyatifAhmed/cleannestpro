@@ -101,9 +101,18 @@ export default function AnalyticsConsent() {
     setChoice(next);
     setShowBanner(false);
     setSettingsOpen(false);
-    // Withdrawing consent removes tracking cookies on the next document load;
-    // existing third-party scripts cannot be safely unloaded in-place.
-    if (choice === "accepted" && next === "rejected") window.location.reload();
+    if (next === "rejected") {
+      // Make a best-effort deletion of first-party analytics cookies when
+      // consent is withdrawn. External scripts are stopped by reloading.
+      const cookies = document.cookie.split(";").map((part) => part.trim().split("=")[0]);
+      for (const name of cookies) {
+        if (!/^(_ga|_gid|_gat|_clck|_clsk)/.test(name)) continue;
+        for (const domain of ["", "domain=.cleannestpro.com; ", "domain=www.cleannestpro.com; "]) {
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; ${domain}SameSite=Lax`;
+        }
+      }
+      if (choice === "accepted") window.location.reload();
+    }
   }
 
   const copy = {
