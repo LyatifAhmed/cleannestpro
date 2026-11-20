@@ -8,7 +8,7 @@ export default function QuoteCTA({ title, text, locale = "en" }: { title: string
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">{title}</h2>
           <p className="mt-3 leading-7 text-slate-600">{text}</p>
         </div>
-        <Link href="/#quote-form" className="mt-6 inline-flex shrink-0 items-center justify-center rounded-2xl bg-slate-950 px-6 py-3.5 font-medium text-white transition hover:opacity-90 md:mt-0">{locale === "ru" ? "Запросить стоимость" : "Request your quote"}</Link>
+        <Link href={locale === "ru" ? "/?lang=ru#quote-form" : "/#quote-form"} className="mt-6 inline-flex shrink-0 items-center justify-center rounded-2xl bg-slate-950 px-6 py-3.5 font-medium text-white transition hover:opacity-90 md:mt-0">{locale === "ru" ? "Запросить стоимость" : "Request your quote"}</Link>
       </div>
     </section>
   );

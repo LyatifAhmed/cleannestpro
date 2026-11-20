@@ -14,6 +14,7 @@ import Link from "next/link";
 import Script from "next/script";
 import { motion, Variants, useScroll, useTransform } from "framer-motion";
 import Footer from "@/components/Footer";
+import { quoteTranslate, type QuoteLocale } from "@/lib/quote-i18n";
 import HeroLens from "@/components/HeroLens";
 
 const ChatAssistant = dynamic(() => import("@/components/ChatAssistant"), {
@@ -770,6 +771,8 @@ export default function Home() {
   const [eurTryRate, setEurTryRate] = useState(FALLBACK_EUR_TRY_RATE);
   const [draftReady, setDraftReady] = useState(false);
   const [formStep, setFormStep] = useState(0);
+  const [quoteLocale, setQuoteLocale] = useState<QuoteLocale>("en");
+  const t = (english: string) => quoteTranslate(quoteLocale, english);
   const [submitted, setSubmitted] = useState(false);
   const [showFloatingQuote, setShowFloatingQuote] = useState(false);
   const [sending, setSending] = useState(false);
@@ -816,6 +819,25 @@ export default function Home() {
         window.localStorage.removeItem("cleannestpro-quote-draft");
       }
     }
+    // Source-page language controls the quote experience, not the visitor's IP.
+    const search = new URLSearchParams(window.location.search);
+    const locale = search.get("lang");
+    const selectedLocale: QuoteLocale =
+      locale === "tr" || locale === "ru" ? locale : "en";
+    setQuoteLocale(selectedLocale);
+    const presetService = search.get("service");
+    const availableServices: ServiceType[] = [
+      "Regular Home Cleaning", "Deep Cleaning",
+      "Airbnb Turnover Cleaning", "Move In / Move Out Cleaning",
+      "After-party Cleanup",
+    ];
+    const property = search.get("property");
+    setForm((previous) => ({
+      ...previous,
+      preferredLanguage: selectedLocale === "tr" ? "Turkish" : selectedLocale === "ru" ? "Russian" : "English",
+      ...(availableServices.includes(presetService as ServiceType) ? { serviceType: presetService as ServiceType } : {}),
+      ...(property === "Villa / Large Home" ? { propertyType: "Villa / Large Home" as PropertyType } : {}),
+    }));
     setDraftReady(true);
   }, []);
 
@@ -904,7 +926,7 @@ export default function Home() {
 
   function goToNextStep() {
     if (formStep === 0 && !form.location.trim()) {
-      alert("Please add the area or neighbourhood in Antalya.");
+      alert(t("Area in Antalya") + (quoteLocale === "tr" ? " bilgisini girin." : quoteLocale === "ru" ? ": укажите район." : " is required."));
       return;
     }
 
@@ -1017,14 +1039,17 @@ export default function Home() {
       trackQuoteEvent("quote_form_submitted");
       setSubmitted(true);
       window.localStorage.removeItem("cleannestpro-quote-draft");
-      setForm(createInitialState());
+      setForm({
+        ...createInitialState(),
+        preferredLanguage: quoteLocale === "tr" ? "Turkish" : quoteLocale === "ru" ? "Russian" : "English",
+      });
       setFormStep(0);
       setPropertyPhotos([]);
       if (photoInputRef.current) photoInputRef.current.value = "";
     } catch (error) {
       trackQuoteEvent("quote_submission_failed");
       console.error(error);
-      alert("Something went wrong while sending your quote request.");
+      alert(quoteLocale === "tr" ? "Teklif talebi gönderilemedi. Lütfen tekrar deneyin." : quoteLocale === "ru" ? "Не удалось отправить запрос. Попробуйте ещё раз." : "Something went wrong while sending your quote request.");
     } finally {
       setSending(false);
     }
@@ -1607,83 +1632,75 @@ export default function Home() {
                 variants={fadeUp}
                 className="max-w-2xl lg:sticky lg:top-8"
               >
-                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                  One managed experience
-                </div>
+                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">{quoteLocale === "tr" ? "Tek merkezden yönetilen hizmet" : quoteLocale === "ru" ? "Единая координация" : "One managed experience"}</div>
 
-                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-                  Tell us what matters.
-                  <br />
-                  We manage the experience.
-                </h2>
+                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">{quoteLocale === "tr" ? "Önceliklerinizi anlatın." : quoteLocale === "ru" ? "Расскажите, что важно." : "Tell us what matters."}<br />{quoteLocale === "tr" ? "Gerisini biz koordine edelim." : quoteLocale === "ru" ? "Мы всё организуем." : "We manage the experience."}</h2>
 
-                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
-                  Share your priorities, timing and property details once. We
-                  coordinate suitable independent local providers, put the
-                  proposed scope in writing and remain available if anything
-                  needs clarification before, during or after the service.
-                </p>
+                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">{quoteLocale === "tr" ? "Önceliklerinizi, tarih ve mülk bilgilerinizi paylaşın. Uygun yerel ekipleri araştırır, iş kapsamını yazılı olarak netleştirir ve süreç boyunca iletişimi koordine ederiz." : quoteLocale === "ru" ? "Расскажите о недвижимости, сроках и пожеланиях. Мы подберём местных исполнителей, согласуем объём работ письменно и будем на связи." : "Share your priorities, timing and property details once. We coordinate suitable independent local providers, put the proposed scope in writing and remain available if anything needs clarification before, during or after the service."}</p>
 
-                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
-                  Your selected date is a preference, not a confirmed
-                  appointment. If it is unavailable, we may suggest suitable
-                  alternatives. You are free to accept or decline any option.
-                </div>
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">{quoteLocale === "tr" ? "Seçtiğiniz tarih henüz kesin rezervasyon değildir. Uygun değilse alternatifleri sunarız; kabul etmek zorunda değilsiniz." : quoteLocale === "ru" ? "Выбранная дата пока не подтверждена. Если она недоступна, предложим альтернативы без обязательств." : "Your selected date is a preference, not a confirmed appointment. If it is unavailable, we may suggest suitable alternatives. You are free to accept or decline any option."}</div>
 
                 <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
-                  <h3 className="text-lg font-semibold">
-                    The experience CleanNestPro manages
-                  </h3>
+                  <h3 className="text-lg font-semibold">{quoteLocale === "tr" ? "CleanNestPro neleri koordine eder?" : quoteLocale === "ru" ? "Что организует CleanNestPro" : "The experience CleanNestPro manages"}</h3>
                   <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    <li>
-                      • Understanding your priorities and setting expectations
-                    </li>
-                    <li>
-                      • Finding suitable local providers and coordinating the
-                      scope
-                    </li>
+                    <li>{quoteLocale === "tr" ? "• İhtiyaçların belirlenmesi ve beklentilerin netleştirilmesi" : quoteLocale === "ru" ? "• Изучение пожеланий и ожиданий" : "• Understanding your priorities and setting expectations"}</li>
+                    <li>{quoteLocale === "tr" ? "• Uygun yerel ekiplerin bulunması ve iş kapsamının belirlenmesi" : quoteLocale === "ru" ? "• Подбор местных исполнителей и согласование работ" : "• Finding suitable local providers and coordinating the scope"}</li>
                     <li>
                       • Confirming timing, access details and requested extras
                       in writing
                     </li>
-                    <li>
-                      • Keeping pricing, timing and responsibilities clear
-                    </li>
-                    <li>
-                      • Multilingual communication and secure Stripe payment
-                    </li>
-                    <li>
-                      • Service follow-up and constructive issue coordination
-                    </li>
+                    <li>{quoteLocale === "tr" ? "• Fiyat, tarih ve sorumlulukların açıklanması" : quoteLocale === "ru" ? "• Прозрачные цены, сроки и обязанности" : "• Keeping pricing, timing and responsibilities clear"}</li>
+                    <li>{quoteLocale === "tr" ? "• Çok dilli iletişim ve güvenli Stripe ödemesi" : quoteLocale === "ru" ? "• Поддержка на разных языках и безопасная оплата Stripe" : "• Multilingual communication and secure Stripe payment"}</li>
+                    <li>{quoteLocale === "tr" ? "• Hizmet sonrası takip ve sorunların çözüm koordinasyonu" : quoteLocale === "ru" ? "• Контроль после уборки и решение вопросов" : "• Service follow-up and constructive issue coordination"}</li>
                   </ul>
-                  <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                    On-site cleaning is performed by an independent local
-                    service partner. CleanNestPro’s European-standard promise
-                    relates to communication, coordination, transparency and
-                    customer care. Cleaning outcomes can vary with property
-                    condition, access, time and the limits of stain or material
-                    treatment.
-                  </p>
+                  <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">{quoteLocale === "tr" ? "Temizlik yerinde bağımsız yerel hizmet sağlayıcıları tarafından yapılır. CleanNestPro iletişim, koordinasyon, şeffaflık ve müşteri desteğinden sorumludur. Sonuçlar mülkün durumuna ve işin koşullarına göre değişebilir." : quoteLocale === "ru" ? "Уборку выполняют независимые местные партнёры. CleanNestPro отвечает за коммуникацию, координацию и поддержку. Результат зависит от состояния объекта и условий работы." : "On-site cleaning is performed by an independent local service partner. CleanNestPro’s European-standard promise relates to communication, coordination, transparency and customer care. Cleaning outcomes can vary with property condition, access, time and the limits of stain or material treatment."}</p>
                 </div>
               </motion.div>
 
               <motion.form
+                lang={quoteLocale}
                 variants={softReveal}
                 onSubmit={handleSubmit}
                 className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#11182a] dark:shadow-none"
               >
                 <div className="border-b border-slate-200 bg-[#f7f5f0] px-6 py-6 dark:border-white/10 dark:bg-white/[0.035] md:px-9">
+                  <div className="mb-4 flex items-center justify-end gap-2">
+                    <label htmlFor="quote-form-language" className="text-xs font-medium text-slate-500 dark:text-slate-300">
+                      {quoteLocale === "tr" ? "Form dili" : quoteLocale === "ru" ? "Язык формы" : "Form language"}
+                    </label>
+                    <select
+                      id="quote-form-language"
+                      value={quoteLocale}
+                      onChange={(event) => {
+                        const next = event.target.value as QuoteLocale;
+                        setQuoteLocale(next);
+                        setForm((previous) => ({
+                          ...previous,
+                          preferredLanguage: next === "tr" ? "Turkish" : next === "ru" ? "Russian" : "English",
+                        }));
+                        const currentUrl = new URL(window.location.href);
+                        if (next === "en") currentUrl.searchParams.delete("lang");
+                        else currentUrl.searchParams.set("lang", next);
+                        window.history.replaceState(null, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
+                      }}
+                      className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-white/15 dark:bg-slate-900 dark:text-white"
+                    >
+                      <option value="en">English</option>
+                      <option value="tr">Türkçe</option>
+                      <option value="ru">Русский</option>
+                    </select>
+                  </div>
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                        Step {formStep + 1} of {quoteSteps.length}
+                        {t("Step")} {formStep + 1} {t("of")} {quoteSteps.length}
                       </p>
                       <h3 className="mt-1 text-xl font-semibold tracking-tight">
-                        {quoteSteps[formStep]}
+                        {t(quoteSteps[formStep])}
                       </h3>
                     </div>
                     <div className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-semibold dark:border-white/10 dark:bg-white/5">
-                      {formStep === 0 ? "No payment now" : estimate}
+                      {formStep === 0 ? t("No payment now") : estimate}
                     </div>
                   </div>
                   <div className="mt-5 grid grid-cols-4 gap-2">
@@ -1693,7 +1710,7 @@ export default function Home() {
                         type="button"
                         onClick={() => index < formStep && setFormStep(index)}
                         className="group text-left"
-                        aria-label={`Go to ${step}`}
+                        aria-label={`${t("Step")}: ${t(step)}`}
                       >
                         <span
                           className={`block h-1.5 rounded-full transition ${
@@ -1703,7 +1720,7 @@ export default function Home() {
                           }`}
                         />
                         <span className="mt-2 hidden text-[11px] font-medium text-slate-500 sm:block">
-                          {step}
+                          {t(step)}
                         </span>
                       </button>
                     ))}
@@ -1727,13 +1744,13 @@ export default function Home() {
                   {formStep === 0 ? (
                     <div className="space-y-7">
                       <StepIntro
-                        eyebrow="Your space"
-                        title="What are we cleaning?"
-                        text="A few property details help us match the right local team and equipment."
+                        eyebrow={t("Your space")}
+                        title={t("What are we cleaning?")}
+                        text={t("A few property details help us match the right local team and equipment.")}
                       />
                       <div className="grid gap-5 md:grid-cols-2">
                         <Field>
-                          <Label htmlFor="serviceType">Service type</Label>
+                          <Label htmlFor="serviceType">{t("Service type")}</Label>
                           <Select
                             id="serviceType"
                             value={form.serviceType}
@@ -1744,15 +1761,15 @@ export default function Home() {
                               )
                             }
                           >
-                            <option>Regular Home Cleaning</option>
-                            <option>Deep Cleaning</option>
-                            <option>Airbnb Turnover Cleaning</option>
-                            <option>Move In / Move Out Cleaning</option>
-                            <option>After-party Cleanup</option>
+                            <option value="Regular Home Cleaning">{t("Regular Home Cleaning")}</option>
+                            <option value="Deep Cleaning">{t("Deep Cleaning")}</option>
+                            <option value="Airbnb Turnover Cleaning">{t("Airbnb Turnover Cleaning")}</option>
+                            <option value="Move In / Move Out Cleaning">{t("Move In / Move Out Cleaning")}</option>
+                            <option value="After-party Cleanup">{t("After-party Cleanup")}</option>
                           </Select>
                         </Field>
                         <Field>
-                          <Label htmlFor="propertyType">Property type</Label>
+                          <Label htmlFor="propertyType">{t("Property type")}</Label>
                           <Select
                             id="propertyType"
                             value={form.propertyType}
@@ -1763,34 +1780,31 @@ export default function Home() {
                               )
                             }
                           >
-                            <option>Studio</option>
-                            <option>1 Bedroom Apartment</option>
-                            <option>2 Bedroom Apartment</option>
-                            <option>3 Bedroom Apartment</option>
-                            <option>Villa / Large Home</option>
-                            <option>Holiday Home</option>
+                            <option value="Studio">{t("Studio")}</option>
+                            <option value="1 Bedroom Apartment">{t("1 Bedroom Apartment")}</option>
+                            <option value="2 Bedroom Apartment">{t("2 Bedroom Apartment")}</option>
+                            <option value="3 Bedroom Apartment">{t("3 Bedroom Apartment")}</option>
+                            <option value="Villa / Large Home">{t("Villa / Large Home")}</option>
+                            <option value="Holiday Home">{t("Holiday Home")}</option>
                           </Select>
                         </Field>
                         <Field className="md:col-span-2">
-                          <Label htmlFor="location">Area in Antalya</Label>
+                          <Label htmlFor="location">{t("Area in Antalya")}</Label>
                           <Input
                             id="location"
                             value={form.location}
                             onChange={(e) =>
                               updateField("location", e.target.value)
                             }
-                            placeholder="e.g. Muratpaşa, Lara or Konyaaltı"
+                            placeholder={t("e.g. Muratpaşa, Lara or Konyaaltı")}
                             autoComplete="address-level2"
                           />
                         </Field>
                         <details className="md:col-span-2 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 dark:border-white/10 dark:bg-white/[0.025]">
-                          <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">
-                            Add optional property details for a more accurate
-                            estimate
-                          </summary>
+                          <summary className="cursor-pointer text-sm font-semibold text-slate-700 dark:text-slate-200">{t("Add optional property details for a more accurate estimate")}</summary>
                           <div className="mt-5 grid gap-5 md:grid-cols-2">
                             <Field>
-                              <Label htmlFor="bathrooms">Bathrooms</Label>
+                              <Label htmlFor="bathrooms">{t("Bathrooms")}</Label>
                               <Select
                                 id="bathrooms"
                                 value={form.bathrooms}
@@ -1805,20 +1819,18 @@ export default function Home() {
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="propertySize">
-                                Approximate size
-                              </Label>
+                              <Label htmlFor="propertySize">{t("Approximate size")}</Label>
                               <Input
                                 id="propertySize"
                                 value={form.propertySize}
                                 onChange={(e) =>
                                   updateField("propertySize", e.target.value)
                                 }
-                                placeholder="e.g. 100 m²"
+                                placeholder={t("e.g. 100 m²")}
                               />
                             </Field>
                             <Field>
-                              <Label htmlFor="furnished">Furnished?</Label>
+                              <Label htmlFor="furnished">{t("Furnished?")}</Label>
                               <Select
                                 id="furnished"
                                 value={form.furnished}
@@ -1826,15 +1838,13 @@ export default function Home() {
                                   updateField("furnished", e.target.value)
                                 }
                               >
-                                <option>Yes</option>
-                                <option>No</option>
-                                <option>Partly</option>
+                                <option value="Yes">{t("Yes")}</option>
+                                <option value="No">{t("No")}</option>
+                                <option value="Partly">{t("Partly")}</option>
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="propertyCondition">
-                                Current condition
-                              </Label>
+                              <Label htmlFor="propertyCondition">{t("Current condition")}</Label>
                               <Select
                                 id="propertyCondition"
                                 value={form.propertyCondition}
@@ -1845,28 +1855,26 @@ export default function Home() {
                                   )
                                 }
                               >
-                                <option>Normally maintained</option>
-                                <option>Needs extra attention</option>
-                                <option>Heavily soiled</option>
-                                <option>Empty / recently renovated</option>
-                                <option>Not sure</option>
+                                <option value="Normally maintained">{t("Normally maintained")}</option>
+                                <option value="Needs extra attention">{t("Needs extra attention")}</option>
+                                <option value="Heavily soiled">{t("Heavily soiled")}</option>
+                                <option value="Empty / recently renovated">{t("Empty / recently renovated")}</option>
+                                <option value="Not sure">{t("Not sure")}</option>
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="floorNumber">Floor</Label>
+                              <Label htmlFor="floorNumber">{t("Floor")}</Label>
                               <Input
                                 id="floorNumber"
                                 value={form.floorNumber}
                                 onChange={(e) =>
                                   updateField("floorNumber", e.target.value)
                                 }
-                                placeholder="e.g. 7th floor"
+                                placeholder={t("e.g. 7th floor")}
                               />
                             </Field>
                             <Field>
-                              <Label htmlFor="elevator">
-                                Elevator available?
-                              </Label>
+                              <Label htmlFor="elevator">{t("Elevator available?")}</Label>
                               <Select
                                 id="elevator"
                                 value={form.elevator}
@@ -1874,22 +1882,20 @@ export default function Home() {
                                   updateField("elevator", e.target.value)
                                 }
                               >
-                                <option>Yes</option>
-                                <option>No</option>
-                                <option>Not applicable</option>
+                                <option value="Yes">{t("Yes")}</option>
+                                <option value="No">{t("No")}</option>
+                                <option value="Not applicable">{t("Not applicable")}</option>
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="fullAddress">
-                                Address or nearby landmark (optional)
-                              </Label>
+                              <Label htmlFor="fullAddress">{t("Address or nearby landmark (optional)")}</Label>
                               <Input
                                 id="fullAddress"
                                 value={form.fullAddress}
                                 onChange={(e) =>
                                   updateField("fullAddress", e.target.value)
                                 }
-                                placeholder="Street, building or a nearby landmark"
+                                placeholder={t("Street, building or a nearby landmark")}
                                 autoComplete="street-address"
                               />
                             </Field>
@@ -1902,28 +1908,18 @@ export default function Home() {
                   {formStep === 1 ? (
                     <div className="space-y-7">
                       <StepIntro
-                        eyebrow="Build the scope"
-                        title="Choose everything you need"
-                        text="Select as much as you like. Specialist details only appear when relevant."
+                        eyebrow={t("Build the scope")}
+                        title={t("Choose everything you need")}
+                        text={t("Select as much as you like. Specialist details only appear when relevant.")}
                       />
                       {form.serviceType === "Deep Cleaning" ? (
                         <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
-                          <p className="font-semibold">
-                            Included in Deep Cleaning
-                          </p>
-                          <p className="mt-1">
-                            Detailed room cleaning, normal surface cleaning of
-                            sofas and armchairs, plus curtain removal, washing
-                            and rehanging are included. Machine washing of sofa
-                            fabric, armchairs or mattresses is a separate
-                            specialist service only when you select it below.
-                          </p>
+                          <p className="font-semibold">{t("Included in Deep Cleaning")}</p>
+                          <p className="mt-1">{t("Detailed room cleaning, normal surface cleaning of sofas and armchairs, plus curtain removal, washing and rehanging are included. Machine washing of sofa fabric, armchairs or mattresses is a separate specialist service only when you select it below.")}</p>
                         </div>
                       ) : null}
                       <Field>
-                        <Label htmlFor="suppliesNeeded">
-                          Should the team bring all supplies and equipment?
-                        </Label>
+                        <Label htmlFor="suppliesNeeded">{t("Should the team bring all supplies and equipment?")}</Label>
                         <Select
                           id="suppliesNeeded"
                           value={form.suppliesNeeded}
@@ -1931,14 +1927,12 @@ export default function Home() {
                             updateField("suppliesNeeded", e.target.value)
                           }
                         >
-                          <option>No</option>
-                          <option>Yes</option>
+                          <option value="No">{t("No")}</option>
+                          <option value="Yes">{t("Yes")}</option>
                         </Select>
                       </Field>
                       <fieldset>
-                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">
-                          Additional services
-                        </legend>
+                        <legend className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-200">{t("Additional services")}</legend>
                         <div className="grid gap-3 sm:grid-cols-2">
                           {extraTaskOptions.map((task) => {
                             const active = form.extraTasks.includes(task);
@@ -1951,7 +1945,7 @@ export default function Home() {
                                 className={`flex min-h-14 items-center justify-between rounded-2xl border px-4 py-3 text-left text-sm font-medium transition ${active ? "border-slate-950 bg-slate-950 text-white shadow-sm dark:border-white dark:bg-white dark:text-slate-950" : "border-slate-200 bg-slate-50/70 text-slate-700 hover:border-slate-400 hover:bg-white dark:border-white/10 dark:bg-white/[0.035] dark:text-slate-200 dark:hover:bg-white/[0.07]"}`}
                               >
                                 <span>
-                                  {extraTaskLabel(task, form.serviceType)}
+                                  {t(extraTaskLabel(task, form.serviceType))}
                                 </span>
                                 <span
                                   className={`ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs ${active ? "border-white/30 bg-white/15 dark:border-slate-900/20 dark:bg-slate-900/10" : "border-slate-300 dark:border-white/15"}`}
@@ -1966,10 +1960,10 @@ export default function Home() {
                       {form.extraTasks.includes(
                         "Sofa & armchair deep cleaning",
                       ) ? (
-                        <DetailPanel title="Optional machine sofa & armchair washing">
+                        <DetailPanel title={t("Optional machine sofa & armchair washing")}>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <Field>
-                              <Label htmlFor="sofaType">Main sofa type</Label>
+                              <Label htmlFor="sofaType">{t("Main sofa type")}</Label>
                               <Select
                                 id="sofaType"
                                 value={form.sofaType}
@@ -1977,14 +1971,14 @@ export default function Home() {
                                   updateField("sofaType", e.target.value)
                                 }
                               >
-                                <option>Standard sofa</option>
-                                <option>L-shaped / corner sofa</option>
-                                <option>Sofa bed</option>
-                                <option>Large modular / sectional</option>
+                                <option value="Standard sofa">{t("Standard sofa")}</option>
+                                <option value="L-shaped / corner sofa">{t("L-shaped / corner sofa")}</option>
+                                <option value="Sofa bed">{t("Sofa bed")}</option>
+                                <option value="Large modular / sectional">{t("Large modular / sectional")}</option>
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="sofaSeats">Approx. seats</Label>
+                              <Label htmlFor="sofaSeats">{t("Approx. seats")}</Label>
                               <Select
                                 id="sofaSeats"
                                 value={form.sofaSeats}
@@ -1998,7 +1992,7 @@ export default function Home() {
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="armchairCount">Armchairs</Label>
+                              <Label htmlFor="armchairCount">{t("Armchairs")}</Label>
                               <Select
                                 id="armchairCount"
                                 value={form.armchairCount}
@@ -2015,32 +2009,30 @@ export default function Home() {
                         </DetailPanel>
                       ) : null}
                       {form.extraTasks.includes("Curtain cleaning") ? (
-                        <DetailPanel title="Curtain details">
+                        <DetailPanel title={t("Curtain details")}>
                           <div className="grid gap-4 sm:grid-cols-2">
                             <Input
                               value={form.curtainCount}
                               onChange={(e) =>
                                 updateField("curtainCount", e.target.value)
                               }
-                              placeholder="Number of curtains / rooms"
+                              placeholder={t("Number of curtains / rooms")}
                             />
                             <Input
                               value={form.curtainType}
                               onChange={(e) =>
                                 updateField("curtainType", e.target.value)
                               }
-                              placeholder="Sheer, blackout, roller, unknown…"
+                              placeholder={t("Sheer, blackout, roller, unknown…")}
                             />
                           </div>
                         </DetailPanel>
                       ) : null}
                       {form.extraTasks.includes("Mattress deep cleaning") ? (
-                        <DetailPanel title="Optional machine mattress washing">
+                        <DetailPanel title={t("Optional machine mattress washing")}>
                           <div className="grid gap-4 sm:grid-cols-3">
                             <Field>
-                              <Label htmlFor="singleMattressCount">
-                                Single
-                              </Label>
+                              <Label htmlFor="singleMattressCount">{t("Single")}</Label>
                               <Select
                                 id="singleMattressCount"
                                 value={form.singleMattressCount}
@@ -2057,9 +2049,7 @@ export default function Home() {
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="doubleMattressCount">
-                                Double
-                              </Label>
+                              <Label htmlFor="doubleMattressCount">{t("Double")}</Label>
                               <Select
                                 id="doubleMattressCount"
                                 value={form.doubleMattressCount}
@@ -2076,9 +2066,7 @@ export default function Home() {
                               </Select>
                             </Field>
                             <Field>
-                              <Label htmlFor="kingMattressCount">
-                                King / queen
-                              </Label>
+                              <Label htmlFor="kingMattressCount">{t("King / queen")}</Label>
                               <Select
                                 id="kingMattressCount"
                                 value={form.kingMattressCount}
@@ -2099,7 +2087,7 @@ export default function Home() {
                       ) : null}
                       <div className="grid gap-5 md:grid-cols-2">
                         <Field>
-                          <Label htmlFor="pets">Any pets?</Label>
+                          <Label htmlFor="pets">{t("Any pets?")}</Label>
                           <Select
                             id="pets"
                             value={form.pets}
@@ -2107,21 +2095,19 @@ export default function Home() {
                               updateField("pets", e.target.value)
                             }
                           >
-                            <option>No</option>
-                            <option>Yes</option>
+                            <option value="No">{t("No")}</option>
+                            <option value="Yes">{t("Yes")}</option>
                           </Select>
                         </Field>
                         <Field>
-                          <Label htmlFor="allergies">
-                            Allergies or product restrictions
-                          </Label>
+                          <Label htmlFor="allergies">{t("Allergies or product restrictions")}</Label>
                           <Input
                             id="allergies"
                             value={form.allergies}
                             onChange={(e) =>
                               updateField("allergies", e.target.value)
                             }
-                            placeholder="None, fragrance-free products…"
+                            placeholder={t("None, fragrance-free products…")}
                           />
                         </Field>
                       </div>
@@ -2131,20 +2117,14 @@ export default function Home() {
                   {formStep === 2 ? (
                     <div className="space-y-7">
                       <StepIntro
-                        eyebrow="Timing & access"
-                        title="What timing would work for you?"
-                        text="Choose your first preference and tell us how flexible you are. We will make reasonable efforts to check suitable local availability before offering any booking option."
+                        eyebrow={t("Timing & access")}
+                        title={t("What timing would work for you?")}
+                        text={t("Choose your first preference and tell us how flexible you are. We will make reasonable efforts to check suitable local availability before offering any booking option.")}
                       />
-                      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
-                        Your preferred date is not yet a confirmed appointment.
-                        If it is unavailable, we may email suitable alternatives
-                        for you to accept or decline.
-                      </div>
+                      <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">{t("Your preferred date is not yet a confirmed appointment. If it is unavailable, we may email suitable alternatives for you to accept or decline.")}</div>
                       <div className="grid gap-5 md:grid-cols-2">
                         <Field>
-                          <Label htmlFor="preferredDate">
-                            First-choice date (optional)
-                          </Label>
+                          <Label htmlFor="preferredDate">{t("First-choice date (optional)")}</Label>
                           <Input
                             id="preferredDate"
                             type="date"
@@ -2155,9 +2135,7 @@ export default function Home() {
                           />
                         </Field>
                         <Field>
-                          <Label htmlFor="preferredTime">
-                            Preferred arrival time
-                          </Label>
+                          <Label htmlFor="preferredTime">{t("Preferred arrival time")}</Label>
                           <Input
                             id="preferredTime"
                             type="time"
@@ -2168,9 +2146,7 @@ export default function Home() {
                           />
                         </Field>
                         <Field>
-                          <Label htmlFor="dateFlexibility">
-                            How flexible are your dates?
-                          </Label>
+                          <Label htmlFor="dateFlexibility">{t("How flexible are your dates?")}</Label>
                           <Select
                             id="dateFlexibility"
                             value={form.dateFlexibility}
@@ -2178,18 +2154,16 @@ export default function Home() {
                               updateField("dateFlexibility", e.target.value)
                             }
                           >
-                            <option>This date only</option>
-                            <option>Flexible by 1 day</option>
-                            <option>Flexible by 3 days</option>
-                            <option>Flexible within the same week</option>
-                            <option>
-                              Please suggest the earliest available option
-                            </option>
-                            <option>I’m fully flexible</option>
+                            <option value="This date only">{t("This date only")}</option>
+                            <option value="Flexible by 1 day">{t("Flexible by 1 day")}</option>
+                            <option value="Flexible by 3 days">{t("Flexible by 3 days")}</option>
+                            <option value="Flexible within the same week">{t("Flexible within the same week")}</option>
+                            <option value="Please suggest the earliest available option">{t("Please suggest the earliest available option")}</option>
+                            <option value="I’m fully flexible">{t("I’m fully flexible")}</option>
                           </Select>
                         </Field>
                         <Field>
-                          <Label htmlFor="frequency">Cleaning frequency</Label>
+                          <Label htmlFor="frequency">{t("Cleaning frequency")}</Label>
                           <Select
                             id="frequency"
                             value={form.frequency}
@@ -2200,17 +2174,15 @@ export default function Home() {
                               )
                             }
                           >
-                            <option>One-time</option>
-                            <option>Weekly</option>
-                            <option>Bi-weekly</option>
-                            <option>Monthly</option>
-                            <option>Not sure yet</option>
+                            <option value="One-time">{t("One-time")}</option>
+                            <option value="Weekly">{t("Weekly")}</option>
+                            <option value="Bi-weekly">{t("Bi-weekly")}</option>
+                            <option value="Monthly">{t("Monthly")}</option>
+                            <option value="Not sure yet">{t("Not sure yet")}</option>
                           </Select>
                         </Field>
                         <Field>
-                          <Label htmlFor="parkingAvailable">
-                            Parking nearby?
-                          </Label>
+                          <Label htmlFor="parkingAvailable">{t("Parking nearby?")}</Label>
                           <Select
                             id="parkingAvailable"
                             value={form.parkingAvailable}
@@ -2218,23 +2190,21 @@ export default function Home() {
                               updateField("parkingAvailable", e.target.value)
                             }
                           >
-                            <option>Not sure</option>
-                            <option>Yes</option>
-                            <option>No</option>
-                            <option>Paid parking only</option>
+                            <option value="Not sure">{t("Not sure")}</option>
+                            <option value="Yes">{t("Yes")}</option>
+                            <option value="No">{t("No")}</option>
+                            <option value="Paid parking only">{t("Paid parking only")}</option>
                           </Select>
                         </Field>
                         <Field>
-                          <Label htmlFor="accessDetails">
-                            Access arrangement
-                          </Label>
+                          <Label htmlFor="accessDetails">{t("Access arrangement")}</Label>
                           <Input
                             id="accessDetails"
                             value={form.accessDetails}
                             onChange={(e) =>
                               updateField("accessDetails", e.target.value)
                             }
-                            placeholder="I will be home, key handover, reception…"
+                            placeholder={t("I will be home, key handover, reception…")}
                           />
                         </Field>
                       </div>
@@ -2244,26 +2214,26 @@ export default function Home() {
                   {formStep === 3 ? (
                     <div className="space-y-7">
                       <StepIntro
-                        eyebrow="Almost done"
-                        title="Where should we send the available options?"
-                        text="We manually review your request, make reasonable efforts to check suitable local provider availability, and email you before any booking or payment."
+                        eyebrow={t("Almost done")}
+                        title={t("Where should we send the available options?")}
+                        text={t("We manually review your request, make reasonable efforts to check suitable local provider availability, and email you before any booking or payment.")}
                       />
                       <div className="grid gap-5 md:grid-cols-2">
                         <Field>
-                          <Label htmlFor="fullName">Full name</Label>
+                          <Label htmlFor="fullName">{t("Full name")}</Label>
                           <Input
                             id="fullName"
                             value={form.fullName}
                             onChange={(e) =>
                               updateField("fullName", e.target.value)
                             }
-                            placeholder="Your full name"
+                            placeholder={t("Your full name")}
                             required
                             autoComplete="name"
                           />
                         </Field>
                         <Field>
-                          <Label htmlFor="email">Email</Label>
+                          <Label htmlFor="email">{t("Email")}</Label>
                           <Input
                             id="email"
                             type="email"
@@ -2277,9 +2247,7 @@ export default function Home() {
                           />
                         </Field>
                         <Field>
-                          <Label htmlFor="whatsapp">
-                            WhatsApp number (optional)
-                          </Label>
+                          <Label htmlFor="whatsapp">{t("WhatsApp number (optional)")}</Label>
                           <Input
                             id="whatsapp"
                             type="tel"
@@ -2287,14 +2255,12 @@ export default function Home() {
                             onChange={(e) =>
                               updateField("whatsapp", e.target.value)
                             }
-                            placeholder="Include country code"
+                            placeholder={t("Include country code")}
                             autoComplete="tel"
                           />
                         </Field>
                         <Field>
-                          <Label htmlFor="preferredLanguage">
-                            Preferred language
-                          </Label>
+                          <Label htmlFor="preferredLanguage">{t("Preferred language")}</Label>
                           <Select
                             id="preferredLanguage"
                             value={form.preferredLanguage}
@@ -2305,30 +2271,25 @@ export default function Home() {
                               )
                             }
                           >
-                            <option>English</option>
-                            <option>Russian</option>
-                            <option>Turkish</option>
+                            <option value="English">{t("English")}</option>
+                            <option value="Russian">{t("Russian")}</option>
+                            <option value="Turkish">{t("Turkish")}</option>
                           </Select>
                         </Field>
                         <Field className="md:col-span-2">
-                          <Label htmlFor="specialNotes">
-                            Anything else we should know?
-                          </Label>
+                          <Label htmlFor="specialNotes">{t("Anything else we should know?")}</Label>
                           <Textarea
                             id="specialNotes"
                             value={form.specialNotes}
                             onChange={(e) =>
                               updateField("specialNotes", e.target.value)
                             }
-                            placeholder="Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately."
+                            placeholder={t("Stains, priority areas, guest timings, fragile surfaces or anything else that will help us quote accurately.")}
                           />
                         </Field>
                       </div>
-                      <DetailPanel title="Property photos (optional)">
-                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                          Photos improve quote accuracy. Please exclude people,
-                          documents, screens and family photographs.
-                        </p>
+                      <DetailPanel title={t("Property photos (optional)")}>
+                        <p className="mb-3 text-sm leading-6 text-slate-500 dark:text-slate-400">{t("Photos improve quote accuracy. Please exclude people, documents, screens and family photographs.")}</p>
                         <input
                           ref={photoInputRef}
                           id="propertyPhotos"
@@ -2353,7 +2314,7 @@ export default function Home() {
                               >
                                 <Image
                                   src={preview.url}
-                                  alt={`Selected property photo ${index + 1}`}
+                                  alt={`${t("Property photos (optional)")} ${index + 1}`}
                                   width={320}
                                   height={224}
                                   unoptimized
@@ -2363,9 +2324,7 @@ export default function Home() {
                                   type="button"
                                   onClick={() => removePropertyPhoto(index)}
                                   className="absolute right-2 top-2 rounded-full bg-black/70 px-2.5 py-1 text-xs text-white"
-                                >
-                                  Remove
-                                </button>
+                                >{t("Remove")}</button>
                               </div>
                             ))}
                           </div>
@@ -2373,26 +2332,14 @@ export default function Home() {
                       </DetailPanel>
                       <div className="grid gap-4 rounded-[28px] border border-slate-200 bg-[#f7f5f0] p-5 dark:border-white/10 dark:bg-white/[0.035] sm:grid-cols-[1fr_auto] sm:items-center">
                         <div>
-                          <p className="text-sm font-semibold">
-                            Indicative all-in range
-                          </p>
-                          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                            Final timing and price follow a manual scope and
-                            local availability review. This is the total
-                            customer price; CleanNestPro adds no VAT at
-                            checkout.
-                          </p>
+                          <p className="text-sm font-semibold">{t("Indicative all-in range")}</p>
+                          <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">{t("Final timing and price follow a manual scope and local availability review. This is the total customer price; CleanNestPro adds no VAT at checkout.")}</p>
                         </div>
                         <div className="text-3xl font-semibold tracking-tight">
                           {estimate}
                         </div>
                       </div>
-                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">
-                        🔒 No payment is requested now. We first check local
-                        availability. If you choose an available date and accept
-                        the final quote, we send a secure Stripe payment link
-                        and confirm the booking in writing.
-                      </div>
+                      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200">{t("🔒 No payment is requested now. We first check local availability. If you choose an available date and accept the final quote, we send a secure Stripe payment link and confirm the booking in writing.")}</div>
                       <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/[0.035]">
                         <label
                           htmlFor="termsAccepted"
@@ -2410,26 +2357,19 @@ export default function Home() {
                             className="mt-1 h-4 w-4 shrink-0 rounded border-slate-300 accent-slate-950"
                           />
                           <span className="text-sm leading-6 text-slate-600 dark:text-slate-300">
-                            I understand that this is an availability and quote
-                            request, not a confirmed booking. I agree to the{" "}
-                            <Link
-                              href="/terms"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
-                            >
-                              Terms of Service
-                            </Link>{" "}
-                            and acknowledge the{" "}
-                            <Link
-                              href="/privacy-policy"
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="font-medium text-slate-900 underline underline-offset-2 dark:text-white"
-                            >
-                              Privacy Policy
+                            {quoteLocale === "tr"
+                              ? "Bu talebin kesin rezervasyon olmadığını anlıyorum. "
+                              : quoteLocale === "ru"
+                                ? "Я понимаю, что это запрос, а не подтверждённое бронирование. "
+                                : "I understand that this is an availability and quote request, not a confirmed booking. I agree to the "}
+                            <Link href="/terms" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-900 underline underline-offset-2 dark:text-white">
+                              {t("Terms of Service")}
                             </Link>
-                            .
+                            {quoteLocale === "tr" ? " kabul ediyorum ve " : quoteLocale === "ru" ? " принимаю и подтверждаю ознакомление с " : " and acknowledge the "}
+                            <Link href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="font-medium text-slate-900 underline underline-offset-2 dark:text-white">
+                              {t("Privacy Policy")}
+                            </Link>
+                            {quoteLocale === "tr" ? " metnini okuduğumu onaylıyorum." : quoteLocale === "ru" ? "." : "."}
                           </span>
                         </label>
                       </div>
@@ -2444,16 +2384,13 @@ export default function Home() {
                       onClick={goToPreviousStep}
                       disabled={formStep === 0}
                       className="rounded-2xl border border-slate-300 px-5 py-3 text-sm font-medium transition hover:bg-white disabled:invisible dark:border-white/15 dark:hover:bg-white/5"
-                    >
-                      Back
-                    </button>
+                    >{t("Back")}</button>
                     {formStep < quoteSteps.length - 1 ? (
                       <button
                         type="button"
                         onClick={goToNextStep}
                         className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 dark:bg-white dark:text-slate-950"
-                      >
-                        Continue <span aria-hidden="true">→</span>
+                      >{t("Continue")}<span aria-hidden="true">→</span>
                       </button>
                     ) : (
                       <button
@@ -2462,10 +2399,10 @@ export default function Home() {
                         className="rounded-2xl bg-slate-950 px-6 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-50 dark:bg-white dark:text-slate-950"
                       >
                         {processingPhotos
-                          ? "Preparing photos…"
+                          ? t("Preparing photos…")
                           : sending
-                            ? "Sending…"
-                            : "Check local availability"}
+                            ? t("Sending…")
+                            : t("Check local availability")}
                       </button>
                     )}
                   </div>
@@ -2473,26 +2410,17 @@ export default function Home() {
 
                 {submitted ? (
                   <div className="m-6 rounded-[24px] border border-emerald-200 bg-emerald-50 p-5 dark:border-emerald-500/20 dark:bg-emerald-500/10">
-                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
-                      Your availability and quote request has been sent.
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">
-                      Thank you. We’ll review the scope, check suitable local
-                      provider availability, and email you with any suitable
-                      option or alternatives we are able to source. Nothing is
-                      booked and no payment is due yet.
-                    </p>
+                    <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">{t("Your availability and quote request has been sent.")}</p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-700/90 dark:text-emerald-200/90">{t("Thank you. We’ll review the scope, check suitable local provider availability, and email you with any suitable option or alternatives we are able to source. Nothing is booked and no payment is due yet.")}</p>
                   </div>
                 ) : null}
 
                 <p className="mx-6 mb-6 mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                  Are you a cleaner in Antalya?{" "}
+                  {t("Are you a cleaner in Antalya?")}{" "}
                   <Link
                     href="/apply"
                     className="underline hover:text-black dark:hover:text-white"
-                  >
-                    Apply to work with us
-                  </Link>
+                  >{t("Apply to work with us")}</Link>
                 </p>
               </motion.form>
             </div>
