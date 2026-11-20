@@ -1071,6 +1071,72 @@ export default function Home() {
       />
 
       <main className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-slate-900 dark:bg-[#0b1020] dark:text-slate-100">
+        {quoteLocale !== "en" ? (
+          <section lang={quoteLocale} className="relative overflow-hidden bg-[#122522] text-white">
+            <div className="absolute inset-0 opacity-20">
+              <Image src="/premium-villa-cleaning-service-antalya-turkey.avif" alt="" fill sizes="100vw" className="object-cover" aria-hidden="true" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#122522] via-[#122522]/95 to-[#122522]/70" />
+            <div className="relative mx-auto max-w-6xl px-6 py-14 md:py-20">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <Link href={quoteLocale === "tr" ? "/tr/luks-villa-temizligi-antalya" : "/ru"} className="inline-flex items-center gap-3 text-lg font-semibold">
+                  <Image src="/logo.png" alt="" width={36} height={36} className="h-9 w-9 object-contain" /> CleanNestPro
+                </Link>
+                <div className="flex flex-wrap gap-3 text-sm text-white/85">
+                  <Link href={quoteLocale === "tr" ? "/tr/luks-villa-temizligi-antalya" : "/ru"} className="hover:text-white">
+                    {quoteLocale === "tr" ? "Hizmetler" : "Услуги"}
+                  </Link>
+                  <a href="#quote-form" className="rounded-full border border-white/40 px-4 py-2 hover:bg-white/10">
+                    {quoteLocale === "tr" ? "Teklif al" : "Получить расчёт"}
+                  </a>
+                </div>
+              </div>
+              <div className="mt-14 grid items-center gap-10 md:grid-cols-[1fr_0.85fr] md:gap-14">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
+                    {quoteLocale === "tr" ? "Antalya • Profesyonel temizlik" : "Анталья • Профессиональная уборка"}
+                  </p>
+                  <h1 className="mt-5 text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
+                    {quoteLocale === "tr" ? "Eviniz için teklif alın. Gerisini biz koordine edelim." : "Получите расчёт уборки. Мы позаботимся об организации."}
+                  </h1>
+                  <p className="mt-6 text-lg leading-8 text-slate-200">
+                    {quoteLocale === "tr"
+                      ? "Villa, rezidans, yazlık ve daire temizliği için ihtiyaçlarınızı paylaşın. Uygun bağımsız yerel hizmet ekiplerini araştırır, kapsamı ve fiyatı yazılı olarak netleştiririz."
+                      : "Расскажите о вашей квартире, вилле или доме для отдыха. Мы уточним условия, проверим доступность независимых местных исполнителей и согласуем предложение письменно."}
+                  </p>
+                  <a href="#quote-form" className="mt-8 inline-flex rounded-full bg-white px-7 py-3.5 font-semibold text-[#122522] hover:bg-emerald-50">
+                    {quoteLocale === "tr" ? "Ücretsiz teklif iste" : "Запросить бесплатный расчёт"}
+                  </a>
+                  <p className="mt-3 text-sm text-white/75">
+                    {quoteLocale === "tr" ? "Şimdi ödeme yok • Kesin rezervasyon değil" : "Оплата сейчас не требуется • Это не бронирование"}
+                  </p>
+                </div>
+                <div className="relative aspect-[5/4] overflow-hidden rounded-[2rem] border border-white/15 shadow-2xl">
+                  <Image
+                    src="/premium-villa-cleaning-service-antalya-turkey.avif"
+                    alt={quoteLocale === "tr" ? "Antalya'da profesyonel villa ve ev temizliği" : "Профессиональная уборка дома и виллы в Анталье"}
+                    fill
+                    sizes="(max-width: 767px) 100vw, 44vw"
+                    className="object-cover"
+                  />
+                </div>
+              </div>
+              <div className="mt-12 grid gap-3 sm:grid-cols-3">
+                {(quoteLocale === "tr"
+                  ? ["Türkçe iletişim ve yazılı teklif", "Yerel ekip uygunluk kontrolü", "Güvenli ödeme, şeffaf koordinasyon"]
+                  : ["Общение на русском и письменный расчёт", "Проверка доступности местных команд", "Безопасная оплата и прозрачная координация"]
+                ).map((benefit) => (
+                  <div key={benefit} className="rounded-2xl border border-white/20 bg-white/10 p-4 text-sm font-medium text-white/90 backdrop-blur-sm">
+                    <span className="mr-2 text-emerald-200">✓</span>{benefit}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ) : null}
+
+        {quoteLocale === "en" ? (
+          <>
         <section
           ref={heroRef}
           className="relative min-h-[100svh] w-full overflow-hidden text-white md:h-screen"
@@ -1616,6 +1682,9 @@ export default function Home() {
             ))}
           </div>
         </motion.section>
+
+          </>
+        ) : null}
 
         <motion.section
           ref={quoteSectionRef}
@@ -2427,6 +2496,44 @@ export default function Home() {
           </div>
         </motion.section>
 
+        {quoteLocale !== "en" ? (
+          <section lang={quoteLocale} className="bg-[#f4f6f2] px-6 py-16 dark:bg-[#13201e]">
+            <div className="mx-auto max-w-6xl">
+              <h2 className="text-3xl font-semibold text-slate-900 dark:text-white">
+                {quoteLocale === "tr" ? "Teklif süreci nasıl işler?" : "Как работает запрос?"}
+              </h2>
+              <div className="mt-8 grid gap-5 md:grid-cols-3">
+                {(quoteLocale === "tr"
+                  ? [
+                      ["1. Bilgileri paylaşın", "Mülkünüzü, hizmet türünü ve uygun tarihleri belirtin. Fotoğraf eklemek isteğe bağlıdır."],
+                      ["2. Uygunluğu kontrol edelim", "Bağımsız yerel hizmet sağlayıcılarından uygunluk ve kapsam bilgisi alalım."],
+                      ["3. Teklifi onaylayın", "Kesin ücret ve tarih yazılı olarak iletilir. Kabul ederseniz güvenli ödeme bağlantısı gönderilir."],
+                    ]
+                  : [
+                      ["1. Опишите объект", "Укажите тип уборки, параметры жилья и предпочтительные даты. Фото необязательны."],
+                      ["2. Мы проверим доступность", "Уточним объём работ и варианты у независимых местных исполнителей."],
+                      ["3. Подтвердите предложение", "Получите финальную стоимость и дату письменно. Оплата — только после вашего согласия."],
+                    ]
+                ).map(([title, desc]) => (
+                  <article key={title} className="rounded-3xl bg-white p-7 shadow-sm dark:bg-white/5">
+                    <h3 className="font-semibold text-slate-900 dark:text-white">{title}</h3>
+                    <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">{desc}</p>
+                  </article>
+                ))}
+              </div>
+              <p className="mt-10 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                {quoteLocale === "tr"
+                  ? "Not: Temizlik hizmeti bağımsız yerel ekipler tarafından sağlanır. CleanNestPro iletişim, teklif, ödeme ve müşteri desteğini koordine eder. Tahmini fiyat nihai teklif değildir."
+                  : "Примечание: уборку выполняют независимые местные исполнители. CleanNestPro координирует коммуникацию, предложения, оплату и поддержку. Предварительная оценка не является окончательной ценой."}
+              </p>
+              <a href="#quote-form" className="mt-6 inline-block rounded-full bg-[#122522] px-6 py-3 font-semibold text-white">
+                {quoteLocale === "tr" ? "Forma dön" : "Вернуться к форме"}
+              </a>
+            </div>
+          </section>
+        ) : null}
+        {quoteLocale === "en" ? (
+          <>
         <motion.section
           id="faq"
           initial="hidden"
@@ -2497,8 +2604,52 @@ export default function Home() {
           </div>
         </motion.section>
 
-        <ChatAssistant />
-        <Footer />
+          </>
+        ) : null}
+
+        {quoteLocale === "en" ? (
+          <>
+            <ChatAssistant />
+            <Footer />
+          </>
+        ) : (
+          <footer lang={quoteLocale} className="border-t border-slate-200 bg-white py-14 text-slate-700 dark:border-white/10 dark:bg-[#0f172a] dark:text-slate-200">
+            <div className="mx-auto max-w-6xl px-6">
+              <div className="grid gap-8 md:grid-cols-2">
+                <div>
+                  <h2 className="text-xl font-semibold">CleanNestPro</h2>
+                  <p className="mt-4 max-w-lg text-sm leading-7">
+                    {quoteLocale === "tr"
+                      ? "Antalya'da bağımsız yerel temizlik ekipleriyle profesyonel temizlik koordinasyonu. İhtiyaçlarınızı ve tarih tercihlerinizi yazılı olarak değerlendiriyoruz."
+                      : "Профессиональная координация уборки в Анталье с независимыми местными исполнителями. Условия и доступность подтверждаются письменно."}
+                  </p>
+                  <p className="mt-3 text-sm">support@cleannestpro.com</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold">{quoteLocale === "tr" ? "İlgili sayfalar" : "Полезные страницы"}</h3>
+                  <div className="mt-4 flex flex-col items-start gap-3 text-sm">
+                    {quoteLocale === "tr" ? (
+                      <>
+                        <Link className="hover:underline" href="/tr/luks-villa-temizligi-antalya">Lüks villa temizliği</Link>
+                        <Link className="hover:underline" href="/tr/profesyonel-ev-temizligi-antalya">Profesyonel ev temizliği</Link>
+                        <Link className="hover:underline" href="/tr/detayli-temizlik-antalya">Detaylı temizlik</Link>
+                      </>
+                    ) : (
+                      <>
+                        <Link className="hover:underline" href="/ru">Уборка в Анталье</Link>
+                        <Link className="hover:underline" href="/ru/uborka-kvartir-antaliya">Уборка квартир</Link>
+                        <Link className="hover:underline" href="/ru/generalnaya-uborka-antaliya">Генеральная уборка</Link>
+                      </>
+                    )}
+                    <Link className="hover:underline" href="/terms">{quoteLocale === "tr" ? "Hizmet şartları (İngilizce)" : "Условия обслуживания (англ.)"}</Link>
+                    <Link className="hover:underline" href="/privacy-policy">{quoteLocale === "tr" ? "Gizlilik politikası (İngilizce)" : "Политика конфиденциальности (англ.)"}</Link>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-10 border-t border-slate-200 pt-5 text-xs text-slate-500 dark:border-white/10 dark:text-slate-400">© {new Date().getFullYear()} CleanNestPro · BetaOffice Ltd</p>
+            </div>
+          </footer>
+        )}
       </main>
     </>
   );
