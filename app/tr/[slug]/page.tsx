@@ -83,7 +83,7 @@ export default async function TurkishServicePage({ params }: { params: Promise<{
             <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Antalya • Profesyonel temizlik koordinasyonu</p>
             <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">{p.heading}</h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-200">{p.intro}</p>
-            <Link href="/#quote-form" className="mt-8 inline-flex rounded-full bg-white px-7 py-4 font-semibold text-[#122522] transition hover:bg-emerald-50">Ücretsiz teklif talep et</Link>
+            <Link href={`/?lang=tr&service=${encodeURIComponent(slug === "detayli-temizlik-antalya" ? "Deep Cleaning" : "Regular Home Cleaning")}${slug === "luks-villa-temizligi-antalya" ? "&property=Villa%20%2F%20Large%20Home" : ""}#quote-form`} className="mt-8 inline-flex rounded-full bg-white px-7 py-4 font-semibold text-[#122522] transition hover:bg-emerald-50">Ücretsiz teklif talep et</Link>
             <p className="mt-4 text-sm text-slate-300">Talep oluşturmak ücretsizdir. Randevu ve nihai fiyat yazılı onaydan sonra kesinleşir.</p>
           </div>
           <figure className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#1c3530] shadow-2xl shadow-black/20 md:aspect-[4/5] lg:aspect-[5/4]">
