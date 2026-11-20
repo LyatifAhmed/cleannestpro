@@ -1629,63 +1629,28 @@ export default function Home() {
                 variants={fadeUp}
                 className="max-w-2xl lg:sticky lg:top-8"
               >
-                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">
-                  One managed experience
-                </div>
+                <div className="mb-4 text-sm font-medium uppercase tracking-[0.22em] text-slate-400">{quoteLocale === "tr" ? "Tek merkezden yönetilen hizmet" : quoteLocale === "ru" ? "Единая координация" : "One managed experience"}</div>
 
-                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
-                  Tell us what matters.
-                  <br />
-                  We manage the experience.
-                </h2>
+                <h2 className="text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">{quoteLocale === "tr" ? "Önceliklerinizi anlatın." : quoteLocale === "ru" ? "Расскажите, что важно." : "Tell us what matters."}<br />{quoteLocale === "tr" ? "Gerisini biz koordine edelim." : quoteLocale === "ru" ? "Мы всё организуем." : "We manage the experience."}</h2>
 
-                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">
-                  Share your priorities, timing and property details once. We
-                  coordinate suitable independent local providers, put the
-                  proposed scope in writing and remain available if anything
-                  needs clarification before, during or after the service.
-                </p>
+                <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-300 md:text-xl">{quoteLocale === "tr" ? "Önceliklerinizi, tarih ve mülk bilgilerinizi paylaşın. Uygun yerel ekipleri araştırır, iş kapsamını yazılı olarak netleştirir ve süreç boyunca iletişimi koordine ederiz." : quoteLocale === "ru" ? "Расскажите о недвижимости, сроках и пожеланиях. Мы подберём местных исполнителей, согласуем объём работ письменно и будем на связи." : "Share your priorities, timing and property details once. We coordinate suitable independent local providers, put the proposed scope in writing and remain available if anything needs clarification before, during or after the service."}</p>
 
-                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">
-                  Your selected date is a preference, not a confirmed
-                  appointment. If it is unavailable, we may suggest suitable
-                  alternatives. You are free to accept or decline any option.
-                </div>
+                <div className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-900 dark:border-sky-500/20 dark:bg-sky-500/10 dark:text-sky-100">{quoteLocale === "tr" ? "Seçtiğiniz tarih henüz kesin rezervasyon değildir. Uygun değilse alternatifleri sunarız; kabul etmek zorunda değilsiniz." : quoteLocale === "ru" ? "Выбранная дата пока не подтверждена. Если она недоступна, предложим альтернативы без обязательств." : "Your selected date is a preference, not a confirmed appointment. If it is unavailable, we may suggest suitable alternatives. You are free to accept or decline any option."}</div>
 
                 <div className="mt-10 rounded-[32px] border border-slate-200 bg-[#f6f3ee] p-8 dark:border-white/10 dark:bg-white/5">
-                  <h3 className="text-lg font-semibold">
-                    The experience CleanNestPro manages
-                  </h3>
+                  <h3 className="text-lg font-semibold">{quoteLocale === "tr" ? "CleanNestPro neleri koordine eder?" : quoteLocale === "ru" ? "Что организует CleanNestPro" : "The experience CleanNestPro manages"}</h3>
                   <ul className="mt-5 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
-                    <li>
-                      • Understanding your priorities and setting expectations
-                    </li>
-                    <li>
-                      • Finding suitable local providers and coordinating the
-                      scope
-                    </li>
+                    <li>{quoteLocale === "tr" ? "• İhtiyaçların belirlenmesi ve beklentilerin netleştirilmesi" : quoteLocale === "ru" ? "• Изучение пожеланий и ожиданий" : "• Understanding your priorities and setting expectations"}</li>
+                    <li>{quoteLocale === "tr" ? "• Uygun yerel ekiplerin bulunması ve iş kapsamının belirlenmesi" : quoteLocale === "ru" ? "• Подбор местных исполнителей и согласование работ" : "• Finding suitable local providers and coordinating the scope"}</li>
                     <li>
                       • Confirming timing, access details and requested extras
                       in writing
                     </li>
-                    <li>
-                      • Keeping pricing, timing and responsibilities clear
-                    </li>
-                    <li>
-                      • Multilingual communication and secure Stripe payment
-                    </li>
-                    <li>
-                      • Service follow-up and constructive issue coordination
-                    </li>
+                    <li>{quoteLocale === "tr" ? "• Fiyat, tarih ve sorumlulukların açıklanması" : quoteLocale === "ru" ? "• Прозрачные цены, сроки и обязанности" : "• Keeping pricing, timing and responsibilities clear"}</li>
+                    <li>{quoteLocale === "tr" ? "• Çok dilli iletişim ve güvenli Stripe ödemesi" : quoteLocale === "ru" ? "• Поддержка на разных языках и безопасная оплата Stripe" : "• Multilingual communication and secure Stripe payment"}</li>
+                    <li>{quoteLocale === "tr" ? "• Hizmet sonrası takip ve sorunların çözüm koordinasyonu" : quoteLocale === "ru" ? "• Контроль после уборки и решение вопросов" : "• Service follow-up and constructive issue coordination"}</li>
                   </ul>
-                  <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">
-                    On-site cleaning is performed by an independent local
-                    service partner. CleanNestPro’s European-standard promise
-                    relates to communication, coordination, transparency and
-                    customer care. Cleaning outcomes can vary with property
-                    condition, access, time and the limits of stain or material
-                    treatment.
-                  </p>
+                  <p className="mt-5 border-t border-slate-200 pt-5 text-sm leading-6 text-slate-500 dark:border-white/10 dark:text-slate-400">{quoteLocale === "tr" ? "Temizlik yerinde bağımsız yerel hizmet sağlayıcıları tarafından yapılır. CleanNestPro iletişim, koordinasyon, şeffaflık ve müşteri desteğinden sorumludur. Sonuçlar mülkün durumuna ve işin koşullarına göre değişebilir." : quoteLocale === "ru" ? "Уборку выполняют независимые местные партнёры. CleanNestPro отвечает за коммуникацию, координацию и поддержку. Результат зависит от состояния объекта и условий работы." : "On-site cleaning is performed by an independent local service partner. CleanNestPro’s European-standard promise relates to communication, coordination, transparency and customer care. Cleaning outcomes can vary with property condition, access, time and the limits of stain or material treatment."}</p>
                 </div>
               </motion.div>
 
@@ -1696,6 +1661,32 @@ export default function Home() {
                 className="overflow-hidden rounded-[36px] border border-slate-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.08)] dark:border-white/10 dark:bg-[#11182a] dark:shadow-none"
               >
                 <div className="border-b border-slate-200 bg-[#f7f5f0] px-6 py-6 dark:border-white/10 dark:bg-white/[0.035] md:px-9">
+                  <div className="mb-4 flex items-center justify-end gap-2">
+                    <label htmlFor="quote-form-language" className="text-xs font-medium text-slate-500 dark:text-slate-300">
+                      {quoteLocale === "tr" ? "Form dili" : quoteLocale === "ru" ? "Язык формы" : "Form language"}
+                    </label>
+                    <select
+                      id="quote-form-language"
+                      value={quoteLocale}
+                      onChange={(event) => {
+                        const next = event.target.value as QuoteLocale;
+                        setQuoteLocale(next);
+                        setForm((previous) => ({
+                          ...previous,
+                          preferredLanguage: next === "tr" ? "Turkish" : next === "ru" ? "Russian" : "English",
+                        }));
+                        const currentUrl = new URL(window.location.href);
+                        if (next === "en") currentUrl.searchParams.delete("lang");
+                        else currentUrl.searchParams.set("lang", next);
+                        window.history.replaceState(null, "", currentUrl.pathname + currentUrl.search + currentUrl.hash);
+                      }}
+                      className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 dark:border-white/15 dark:bg-slate-900 dark:text-white"
+                    >
+                      <option value="en">English</option>
+                      <option value="tr">Türkçe</option>
+                      <option value="ru">Русский</option>
+                    </select>
+                  </div>
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
