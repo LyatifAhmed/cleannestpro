@@ -30,11 +30,11 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold">1. Who we are</h2>
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
-                  CleanNestPro operates under <strong>Generation Beta Digital Ltd</strong>,
+                  CleanNestPro operates under <strong>BetaOffice Ltd</strong>,
                   a company registered in the United Kingdom.
                 </p>
                 <p>
-                  Registered office: 3rd Floor, 86–90 Paul Street, London EC2A
+                  Registered office: 66 Paul Street, London EC2A
                   4NE, United Kingdom
                 </p>
                 <p>Company Number: 16274319</p>
