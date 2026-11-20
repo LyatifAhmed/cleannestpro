@@ -1151,7 +1151,9 @@ export default function Home() {
               sizes="100vw"
               className="object-cover scale-[1.02]"
             />
-            <div className="absolute inset-0 bg-black/12" />
+            <div className="absolute inset-0 bg-[#071b20]/35" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#081b20]/40 via-[#081b20]/25 to-[#081b20]/60" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#051d22]/35 via-transparent to-[#051d22]/20" />
           </motion.div>
 
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-black/10 to-transparent" />
@@ -1222,7 +1224,7 @@ export default function Home() {
               >
                 <motion.div
                   variants={fadeUp}
-                  className="mx-auto inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm text-white/85 shadow-sm backdrop-blur"
+                  className="mx-auto inline-flex rounded-full border border-white/30 bg-[#0c2428]/50 px-4 py-1.5 text-sm text-white shadow-sm backdrop-blur-md"
                 >
                   <span className="sm:hidden">
                     European-standard coordination in Antalya
@@ -1235,7 +1237,7 @@ export default function Home() {
 
                 <motion.h1
                   variants={fadeUp}
-                  className="mx-auto mt-5 max-w-5xl text-[clamp(2.55rem,5.2vw,5.25rem)] font-light leading-[1.06] tracking-[-0.035em] text-white sm:mt-6"
+                  className="mx-auto mt-5 max-w-6xl text-[clamp(2.7rem,5.8vw,6.15rem)] font-light leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_3px_22px_rgba(0,0,0,0.4)] sm:mt-6"
                 >
                   Home Cleaning in Antalya.
                   <br />A better-managed experience.
@@ -1243,7 +1245,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/90 sm:mt-5 sm:text-base sm:leading-7 lg:text-lg lg:leading-8"
+                  className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-lg sm:leading-8 lg:text-xl lg:leading-8"
                 >
                   <span className="sm:hidden">
                     Local professionals deliver the cleaning. We deliver the
@@ -1264,7 +1266,7 @@ export default function Home() {
                   {trustBadges.map((badge) => (
                     <span
                       key={badge}
-                      className="rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur"
+                      className="rounded-full border border-white/25 bg-[#0a1c22]/50 px-4 py-2 text-sm font-medium text-white backdrop-blur-md"
                     >
                       {badge}
                     </span>
@@ -1277,7 +1279,7 @@ export default function Home() {
                 >
                   <a
                     href="#quote-form"
-                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-white/90 sm:w-auto sm:min-w-[220px]"
+                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-2xl bg-white px-7 py-4 text-base font-semibold text-[#122522] shadow-[0_12px_30px_rgba(0,0,0,0.25)] transition hover:bg-emerald-50 sm:w-auto sm:min-w-[235px]"
                   >
                     Check local availability
                   </a>
@@ -1286,7 +1288,7 @@ export default function Home() {
                     onClick={() =>
                       window.dispatchEvent(new CustomEvent("open-clean-chat"))
                     }
-                    className="hidden min-w-[200px] items-center justify-center rounded-2xl border border-white/20 bg-black/25 px-5 py-3.5 text-sm font-medium text-white transition hover:bg-black/35 sm:inline-flex"
+                    className="hidden min-w-[210px] items-center justify-center rounded-2xl border border-white/50 bg-[#0d2024]/65 px-6 py-4 text-base font-medium text-white shadow-[0_12px_30px_rgba(0,0,0,0.2)] backdrop-blur-md transition hover:bg-[#0d2024]/85 sm:inline-flex"
                   >
                     Ask the assistant
                   </button>
@@ -1294,7 +1296,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-3 max-w-xl rounded-2xl border border-white/15 bg-black/20 px-4 py-2 text-xs leading-5 text-white/80 backdrop-blur-sm sm:mt-4 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-xs sm:leading-5 sm:text-white/75"
+                  className="mx-auto mt-4 max-w-xl rounded-2xl border border-white/15 bg-[#0b2025]/50 px-4 py-2 text-xs leading-5 text-white/90 backdrop-blur-md sm:mt-5 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:leading-6 sm:text-white/90"
                 >
                   We do not promise human work will be flawless. We promise
                   clear expectations, responsive support and professional
