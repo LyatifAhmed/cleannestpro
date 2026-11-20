@@ -1137,7 +1137,7 @@ export default function Home() {
           <>
         <section
           ref={heroRef}
-          className="relative min-h-[100svh] w-full overflow-hidden text-white md:h-screen"
+          className="relative min-h-[100svh] w-full overflow-hidden text-white"
         >
           <motion.div
             style={{ y: heroY, opacity: heroOpacity }}
@@ -1160,7 +1160,7 @@ export default function Home() {
             <HeroLens containerRef={heroRef} />
           </div>
 
-          <div className="relative z-30 flex min-h-[100svh] w-full flex-col px-4 pb-7 pt-4 sm:px-6 md:h-full md:min-h-0 md:px-0 md:pb-0 md:pt-8">
+          <div className="relative z-30 flex min-h-[100svh] w-full flex-col px-4 pb-8 pt-4 sm:px-6 md:px-8 md:pb-10 md:pt-6">
             <header
               className={`mx-auto flex w-full max-w-6xl items-center justify-between rounded-full border border-white/15 bg-black/22 px-3 py-2.5 shadow-sm backdrop-blur-md transition-all duration-300 sm:px-4 md:px-6 md:py-3 ${
                 showFloatingQuote
@@ -1213,12 +1213,12 @@ export default function Home() {
               </button>
             </header>
 
-            <div className="flex w-full flex-1 items-center justify-center px-1 sm:px-6">
+            <div className="flex w-full flex-1 items-center justify-center px-1 py-6 sm:px-6 md:py-8">
               <motion.div
                 initial="hidden"
                 animate="show"
                 variants={staggerWrap}
-                className="w-full py-6 text-center sm:py-8 md:pt-8"
+                className="w-full max-w-6xl py-3 text-center sm:py-5"
               >
                 <motion.div
                   variants={fadeUp}
@@ -1235,7 +1235,7 @@ export default function Home() {
 
                 <motion.h1
                   variants={fadeUp}
-                  className="mx-auto mt-6 max-w-7xl text-[44px] font-light leading-[0.96] tracking-[-0.04em] text-white sm:mt-8 sm:text-[72px] md:text-[96px] lg:text-[128px]"
+                  className="mx-auto mt-5 max-w-5xl text-[clamp(2.55rem,5.2vw,5.25rem)] font-light leading-[1.06] tracking-[-0.035em] text-white sm:mt-6"
                 >
                   Home Cleaning in Antalya.
                   <br />A better-managed experience.
@@ -1243,7 +1243,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/85 sm:mt-8 sm:text-lg sm:leading-8 md:text-2xl md:leading-10"
+                  className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-white/90 sm:mt-5 sm:text-base sm:leading-7 lg:text-lg lg:leading-8"
                 >
                   <span className="sm:hidden">
                     Local professionals deliver the cleaning. We deliver the
@@ -1259,7 +1259,7 @@ export default function Home() {
 
                 <motion.div
                   variants={fadeUp}
-                  className="mx-auto mt-7 hidden max-w-5xl flex-wrap items-center justify-center gap-3 sm:flex"
+                  className="mx-auto mt-5 hidden max-w-5xl flex-wrap items-center justify-center gap-2 lg:flex"
                 >
                   {trustBadges.map((badge) => (
                     <span
@@ -1273,11 +1273,11 @@ export default function Home() {
 
                 <motion.div
                   variants={fadeUp}
-                  className="mt-8 flex items-center justify-center gap-3 sm:mt-10"
+                  className="mt-6 flex flex-col items-center justify-center gap-3 sm:mt-7 sm:flex-row"
                 >
                   <a
                     href="#quote-form"
-                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-2xl bg-white px-6 py-4 text-base font-medium text-slate-900 transition hover:bg-white/90 sm:w-auto sm:min-w-[220px]"
+                    className="inline-flex w-full max-w-[320px] items-center justify-center rounded-2xl bg-white px-6 py-3.5 text-sm font-semibold text-slate-900 transition hover:bg-white/90 sm:w-auto sm:min-w-[220px]"
                   >
                     Check local availability
                   </a>
@@ -1286,7 +1286,7 @@ export default function Home() {
                     onClick={() =>
                       window.dispatchEvent(new CustomEvent("open-clean-chat"))
                     }
-                    className="hidden min-w-[220px] items-center justify-center rounded-2xl border border-white/20 bg-black/16 px-6 py-4 text-base font-medium text-white transition hover:bg-black/24 sm:inline-flex"
+                    className="hidden min-w-[200px] items-center justify-center rounded-2xl border border-white/20 bg-black/25 px-5 py-3.5 text-sm font-medium text-white transition hover:bg-black/35 sm:inline-flex"
                   >
                     Ask the assistant
                   </button>
@@ -1294,7 +1294,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-4 max-w-xl rounded-2xl border border-white/15 bg-black/20 px-4 py-3 text-xs leading-5 text-white/80 backdrop-blur-sm sm:mt-5 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:leading-6 sm:text-white/70"
+                  className="mx-auto mt-3 max-w-xl rounded-2xl border border-white/15 bg-black/20 px-4 py-2 text-xs leading-5 text-white/80 backdrop-blur-sm sm:mt-4 sm:max-w-3xl sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:text-xs sm:leading-5 sm:text-white/75"
                 >
                   We do not promise human work will be flawless. We promise
                   clear expectations, responsive support and professional
