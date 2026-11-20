@@ -117,7 +117,7 @@ export default async function TurkishServicePage({ params }: { params: Promise<{
         <div className="mx-auto max-w-5xl">
           <h2 className="text-3xl font-semibold">Sık sorulan sorular</h2>
           <div className="mt-8 grid gap-5 md:grid-cols-2">{p.faq.map(([q,a]) => <div key={q} className="rounded-2xl border border-slate-200 p-6"><h3 className="font-semibold">{q}</h3><p className="mt-3 text-sm leading-7 text-slate-600">{a}</p></div>)}</div>
-          <div className="mt-12 rounded-3xl bg-[#f1f6f2] p-8"><h2 className="text-2xl font-semibold">Eviniz için doğru ekibi bulalım</h2><p className="mt-3 text-slate-600">Mülkünüzü ve ihtiyaçlarınızı paylaşın; uygunluk ve teklif sürecini sizin için koordine edelim.</p><Link href="/#quote-form" className="mt-6 inline-block rounded-full bg-[#122522] px-6 py-3 font-semibold text-white">Teklif iste</Link></div>
+          <div className="mt-12 rounded-3xl bg-[#f1f6f2] p-8"><h2 className="text-2xl font-semibold">Eviniz için doğru ekibi bulalım</h2><p className="mt-3 text-slate-600">Mülkünüzü ve ihtiyaçlarınızı paylaşın; uygunluk ve teklif sürecini sizin için koordine edelim.</p><Link href={`/?lang=tr&service=${encodeURIComponent(slug === "detayli-temizlik-antalya" ? "Deep Cleaning" : "Regular Home Cleaning")}${slug === "luks-villa-temizligi-antalya" ? "&property=Villa%20%2F%20Large%20Home" : ""}#quote-form`} className="mt-6 inline-block rounded-full bg-[#122522] px-6 py-3 font-semibold text-white">Teklif iste</Link></div>
           <nav className="mt-12 flex flex-wrap gap-4 text-sm">{Object.entries(pages).filter(([key])=>key!==slug).map(([key,val])=><Link className="text-emerald-800 underline" key={key} href={`/tr/${key}`}>{val.heading}</Link>)}</nav>
         </div>
       </section>
