@@ -1151,9 +1151,9 @@ export default function Home() {
               sizes="100vw"
               className="object-cover scale-[1.02]"
             />
-            <div className="absolute inset-0 bg-[#071b20]/35" />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#081b20]/40 via-[#081b20]/25 to-[#081b20]/60" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#051d22]/35 via-transparent to-[#051d22]/20" />
+            <div className="absolute inset-0 bg-[#071b20]/20" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#081b20]/22 via-[#081b20]/10 to-[#081b20]/34" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#051d22]/18 via-transparent to-[#051d22]/10" />
           </motion.div>
 
           <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-24 bg-gradient-to-b from-black/10 to-transparent" />
@@ -1237,7 +1237,7 @@ export default function Home() {
 
                 <motion.h1
                   variants={fadeUp}
-                  className="mx-auto mt-5 max-w-6xl text-[clamp(2.7rem,5.8vw,6.15rem)] font-light leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_3px_22px_rgba(0,0,0,0.4)] sm:mt-6"
+                  className="mx-auto mt-5 max-w-6xl text-[clamp(2.7rem,5.8vw,6.15rem)] font-light leading-[1.04] tracking-[-0.04em] text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.28)] sm:mt-6"
                 >
                   Home Cleaning in Antalya.
                   <br />A better-managed experience.
@@ -1245,7 +1245,7 @@ export default function Home() {
 
                 <motion.p
                   variants={fadeUp}
-                  className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/95 drop-shadow-[0_2px_12px_rgba(0,0,0,0.65)] sm:text-lg sm:leading-8 lg:text-xl lg:leading-8"
+                  className="mx-auto mt-5 max-w-3xl text-base leading-7 text-white/92 drop-shadow-[0_2px_10px_rgba(0,0,0,0.35)] sm:text-lg sm:leading-8 lg:text-xl lg:leading-8"
                 >
                   <span className="sm:hidden">
                     Local professionals deliver the cleaning. We deliver the
