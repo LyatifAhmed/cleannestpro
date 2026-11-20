@@ -852,22 +852,23 @@ export default function Home() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("https://api.frankfurter.app/latest?from=EUR&to=TRY", {
+    fetch("/api/fx-rate", {
       signal: controller.signal,
     })
       .then((response) => {
         if (!response.ok) throw new Error("FX rate unavailable");
         return response.json();
       })
-      .then((data: { rates?: { TRY?: number } }) => {
-        const liveRate = data.rates?.TRY;
-        if (!liveRate || !Number.isFinite(liveRate)) return;
-        // A 2.5% buffer protects the quote from card/FX movement. Round to 0.5.
+      .then((data: { rate?: number }) => {
+        const liveRate = data.rate;
+        if (typeof liveRate !== "number" || !Number.isFinite(liveRate) || liveRate <= 0) return;
+        // Preserve the existing 2.5% FX buffer and 0.5 TRY rounding.
         const protectedRate = Math.floor(liveRate * 0.975 * 2) / 2;
-        setEurTryRate(protectedRate);
+        if (protectedRate > 0) setEurTryRate(protectedRate);
       })
       .catch(() => {
-        // Keep the conservative fallback so the form remains usable offline.
+        // Keep the existing reference fallback if the provider is unavailable.
+        // This estimate is not a confirmed quote and is reviewed manually.
       });
     return () => controller.abort();
   }, []);
