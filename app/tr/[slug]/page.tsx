@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Script from "next/script";
 import Footer from "@/components/Footer";
 
 const pages = {
   "luks-villa-temizligi-antalya": {
+    heroImage: "/antalya-luks-villa-temizligi.webp",
+    heroAlt: "Antalya lüks villasında profesyonel temizlik ve özenli yaşam alanı hazırlığı",
     title: "Antalya Lüks Villa Temizliği | CleanNestPro",
     description: "Antalya'da lüks villa ve müstakil evler için profesyonel temizlik koordinasyonu. Konyaaltı, Lara ve çevresinde seçilmiş yerel ekipler, yazılı teklif ve takip.",
     heading: "Antalya'da lüks villa temizliği",
@@ -14,6 +17,8 @@ const pages = {
     faq: [["Villa temizliği fiyatı ne kadar?", "Fiyat metrekare, oda ve banyo sayısı, mülkün durumu, tercih edilen tarih ve ek işlere göre değişir. Formu doldurduğunuzda tahmini aralık görebilir, nihai yazılı teklif isteyebilirsiniz."],["Villada olmam şart mı?", "Hayır. Anahtar teslimi ve erişim detayları önceden yazılı olarak kararlaştırılabiliyorsa uzaktan koordinasyon talep edebilirsiniz."]],
   },
   "profesyonel-ev-temizligi-antalya": {
+    heroImage: "/antalya-profesyonel-ev-temizligi.webp",
+    heroAlt: "Antalya modern rezidansında profesyonel ev temizliği yapılan aydınlık yaşam alanı",
     title: "Antalya Profesyonel Ev Temizliği | CleanNestPro",
     description: "Antalya Konyaaltı, Lara ve Muratpaşa için profesyonel ev temizliği teklifleri. Türkçe iletişim, bağımsız yerel partnerler ve şeffaf hizmet koordinasyonu.",
     heading: "Antalya'da profesyonel ev temizliği",
@@ -23,6 +28,8 @@ const pages = {
     faq: [["Ücret nasıl hesaplanıyor?", "Oda, banyo, metrekare, temizlik tipi ve seçilen ek hizmetlere göre tahmini fiyat aralığı hesaplanır. Nihai teklif uygun yerel sağlayıcıyla teyit edilir."],["Temizlik malzemesi getirilir mi?", "İhtiyaç formunda malzeme talebinizi belirtebilirsiniz; kapsam ve olası ek ücret teklif öncesinde açıklanır."]],
   },
   "detayli-temizlik-antalya": {
+    heroImage: "/antalya-detayli-temizlik.webp",
+    heroAlt: "Antalya konutunda banyo mermer yüzeylerinde detaylı ve özenli temizlik",
     title: "Antalya Detaylı Ev Temizliği | CleanNestPro",
     description: "Antalya detaylı ev temizliği ve derinlemesine temizlik hizmeti. Daire, rezidans ve villalar için yazılı kapsam, yerel ekip koordinasyonu ve teklif.",
     heading: "Antalya'da detaylı ev temizliği",
@@ -47,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: p.title, description: p.description,
     alternates: { canonical: url },
-    openGraph: { title: p.title, description: p.description, url, locale: "tr_TR", siteName: "CleanNestPro", type: "website" },
+    openGraph: { title: p.title, description: p.description, url, locale: "tr_TR", siteName: "CleanNestPro", type: "website", images: [{ url: p.heroImage, alt: p.heroAlt, width: 1200, height: 900 }] },
   };
 }
 
@@ -69,14 +76,28 @@ export default async function TurkishServicePage({ params }: { params: Promise<{
   return (
     <main lang="tr" className="min-h-screen bg-[#fcfbf8] text-slate-900">
       <Script id={`tr-service-${slug}`} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <section className="bg-[#122522] px-6 py-20 text-white md:py-28">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/" className="text-sm font-semibold tracking-wide text-emerald-100">CleanNestPro</Link>
-          <p className="mt-12 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Antalya • Profesyonel temizlik koordinasyonu</p>
-          <h1 className="mt-5 max-w-4xl text-4xl font-semibold leading-tight md:text-6xl">{p.heading}</h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">{p.intro}</p>
-          <Link href="/#quote-form" className="mt-9 inline-flex rounded-full bg-white px-7 py-4 font-semibold text-[#122522] hover:bg-emerald-50">Ücretsiz teklif talep et</Link>
-          <p className="mt-4 text-sm text-slate-300">Talep oluşturmak ücretsizdir. Randevu ve nihai fiyat yazılı onaydan sonra kesinleşir.</p>
+      <section className="overflow-hidden bg-[#122522] text-white">
+        <div className="mx-auto grid max-w-7xl items-center gap-10 px-6 py-14 md:grid-cols-[1fr_1.05fr] md:gap-12 md:px-8 md:py-20">
+          <div>
+            <Link href="/" className="text-sm font-semibold tracking-wide text-emerald-100">CleanNestPro</Link>
+            <p className="mt-10 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">Antalya • Profesyonel temizlik koordinasyonu</p>
+            <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight md:text-5xl lg:text-6xl">{p.heading}</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-200">{p.intro}</p>
+            <Link href="/#quote-form" className="mt-8 inline-flex rounded-full bg-white px-7 py-4 font-semibold text-[#122522] transition hover:bg-emerald-50">Ücretsiz teklif talep et</Link>
+            <p className="mt-4 text-sm text-slate-300">Talep oluşturmak ücretsizdir. Randevu ve nihai fiyat yazılı onaydan sonra kesinleşir.</p>
+          </div>
+          <figure className="relative aspect-[4/3] overflow-hidden rounded-[2rem] bg-[#1c3530] shadow-2xl shadow-black/20 md:aspect-[4/5] lg:aspect-[5/4]">
+            <Image
+              src={p.heroImage}
+              alt={p.heroAlt}
+              fill
+              priority
+              quality={78}
+              sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 600px"
+              className="object-cover"
+            />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#10231f]/30 via-transparent to-transparent" />
+          </figure>
         </div>
       </section>
       <section className="mx-auto grid max-w-5xl gap-12 px-6 py-16 md:grid-cols-[1fr_0.8fr] md:py-24">
