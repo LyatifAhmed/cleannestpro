@@ -35,13 +35,13 @@ export default function PrivacyPolicyPage() {
                 </p>
                 <p>
                   Registered office: 66 Paul Street, London EC2A
-                  4NE, United Kingdom
+                  4NA, United Kingdom
                 </p>
                 <p>Company Number: 16274319</p>
                 <p>ICO Registration Number: ZB883806</p>
                 <p>
-                  For the purposes of applicable data protection law, Generation
-                  Beta Digital Ltd is the data controller for personal data
+                  For the purposes of applicable data protection law, BetaOffice Ltd
+                  is the data controller for personal data
                   collected through this website, unless stated otherwise.
                 </p>
               </div>
@@ -155,6 +155,32 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
+            <section>
+              <h2 className="text-2xl font-semibold">Optional analytics and cookie choices</h2>
+              <div className="mt-4 space-y-4 leading-8 text-slate-600">
+                <p>
+                  With your consent, CleanNestPro uses Google Analytics 4 to measure
+                  page visits and quote-form engagement, and Microsoft Clarity to
+                  understand how visitors interact with our website. We do not
+                  intentionally send form names, emails, phone numbers, property
+                  addresses or free-text enquiry details as analytics event parameters.
+                </p>
+                <p>
+                  These optional analytics tools do not load until you choose
+                  &quot;Accept analytics&quot; in our cookie notice. Choosing
+                  &quot;Reject optional analytics&quot; does not prevent you from
+                  requesting a quote. You can change your choice using the cookie
+                  settings control at the bottom of the site.
+                </p>
+                <p>
+                  Essential site functions, including the draft of your quote
+                  form stored in your browser, are separate from optional
+                  analytics. Google and Microsoft may process analytics data
+                  under their respective privacy notices.
+                </p>
+              </div>
+            </section>
+
               <h2 className="text-2xl font-semibold">
                 6. Third-party tools and processors
               </h2>
