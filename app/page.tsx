@@ -908,10 +908,14 @@ export default function Home() {
       return;
     }
 
-    setFormStep((current) => Math.min(current + 1, quoteSteps.length - 1));
+    const nextStep = Math.min(formStep + 1, quoteSteps.length - 1);
+    trackQuoteEvent(`quote_step_${nextStep + 1}_viewed`);
+    if (formStep === 0) trackQuoteEvent("quote_estimate_seen");
+    setFormStep(nextStep);
   }
 
   function goToPreviousStep() {
+    trackQuoteEvent(`quote_step_${Math.max(formStep, 1)}_back`);
     setFormStep((current) => Math.max(current - 1, 0));
   }
 
@@ -965,6 +969,7 @@ export default function Home() {
       return;
     }
 
+    trackQuoteEvent("quote_submission_attempted");
     setSending(true);
     setSubmitted(false);
 
@@ -1017,6 +1022,7 @@ export default function Home() {
       setPropertyPhotos([]);
       if (photoInputRef.current) photoInputRef.current.value = "";
     } catch (error) {
+      trackQuoteEvent("quote_submission_failed");
       console.error(error);
       alert("Something went wrong while sending your quote request.");
     } finally {
