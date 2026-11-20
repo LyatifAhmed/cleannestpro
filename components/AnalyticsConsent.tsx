@@ -9,7 +9,7 @@ const STORAGE_KEY = "cleannestpro-analytics-consent-v1";
 
 type ConsentChoice = "accepted" | "rejected";
 type AnalyticsWindow = Window & {
-  dataLayer?: unknown[][];
+  dataLayer?: Array<IArguments | unknown[]>;
   gtag?: (...args: unknown[]) => void;
   clarity?: (...args: unknown[]) => void;
   __cleanNestTrackingLoaded?: boolean;
@@ -59,7 +59,11 @@ export default function AnalyticsConsent() {
     if (!browser.__cleanNestTrackingLoaded) {
       browser.__cleanNestTrackingLoaded = true;
       browser.dataLayer = browser.dataLayer || [];
-      browser.gtag = (...args: unknown[]) => { browser.dataLayer?.push(args); };
+      // Google's gtag.js consumes array-like Arguments objects from dataLayer.
+      // A rest-parameter array is not the canonical Google tag queue format.
+      browser.gtag = function gtag(..._args: unknown[]) {
+        browser.dataLayer?.push(arguments);
+      };
       browser.gtag("js", new Date());
       browser.gtag("config", GA4_MEASUREMENT_ID, {
         send_page_view: false,
