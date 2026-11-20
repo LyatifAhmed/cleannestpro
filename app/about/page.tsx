@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata = {
   title: "About CleanNestPro | International Standards, Local Trust in Antalya",
   description:
-    "Learn more about CleanNestPro, a UK-based and Antalya-connected home cleaning brand operated by Generation Beta Digital Ltd for international clients, expats, holiday homeowners, and Airbnb hosts.",
+    "Learn more about CleanNestPro, a UK-based and Antalya-connected home cleaning brand operated by BetaOffice Ltd for international clients, expats, holiday homeowners, and Airbnb hosts.",
 };
 
 const values = [
@@ -28,7 +28,7 @@ const values = [
 
 const trustPoints = [
   "UK-based business structure with Antalya-connected delivery",
-  "Operated by Generation Beta Digital Ltd",
+  "Operated by BetaOffice Ltd",
   "Headquartered in London, United Kingdom",
   "English, Turkish, and Russian support",
   "Only selected local service partners",
@@ -84,7 +84,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                CleanNestPro operates under <strong>Generation Beta Digital Ltd</strong>,
+                CleanNestPro operates under <strong>BetaOffice Ltd</strong>,
                 a UK company headquartered in London. That gives the brand a more
                 international structure and a more accountable foundation, while
                 remaining closely connected to the local reality of service in
@@ -97,11 +97,11 @@ export default function AboutPage() {
 
               <div className="mt-4 space-y-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
                 <p>
-                  <strong>Legal entity:</strong> Generation Beta Digital Ltd
+                  <strong>Legal entity:</strong> BetaOffice Ltd
                 </p>
                 <p>
-                  <strong>Headquarters:</strong> 3rd Floor, 86–90 Paul Street,
-                  London EC2A 4NE, UK
+                  <strong>Headquarters:</strong> 66 Paul Street,
+                  London EC2A 4NA, UK
                 </p>
                 <p>
                   <strong>Company No:</strong> 16274319

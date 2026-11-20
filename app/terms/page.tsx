@@ -54,7 +54,7 @@ export default function TermsPage() {
 
                 <p>
                   Your accepted quote, confirmed booking, and payment are with
-                  CleanNestPro, operated by Generation Beta Digital Ltd. Unless
+                  CleanNestPro, operated by BetaOffice Ltd. Unless
                   we explicitly state otherwise before you accept a quote,
                   CleanNestPro is your contracting service provider and remains
                   your customer-service contact throughout a confirmed booking.
@@ -768,12 +768,12 @@ export default function TermsPage() {
 
               <div className="mt-4 space-y-3 leading-8 text-slate-600">
                 <p>
-                  CleanNestPro operates under Generation Beta Digital Ltd, a
+                  CleanNestPro operates under BetaOffice Ltd, a
                   company registered in the United Kingdom.
                 </p>
 
                 <p>
-                  Registered office: 3rd Floor, 86–90 Paul Street, London EC2A
+                  Registered office: 66 Paul Street, London EC2A
                   4NE, United Kingdom
                 </p>
 

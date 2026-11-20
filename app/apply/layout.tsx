@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "Work With CleanNestPro | Join Our Trusted Cleaning Network in Antalya",
+    "Antalya Temizlik İş Ortaklığı Başvurusu | CleanNestPro",
   description:
-    "Apply to work with CleanNestPro — a UK-based and Antalya-connected cleaning service for international clients. We collaborate with selected cleaners and local companies for premium homes, holiday properties, and Airbnb hosts.",
+    "Antalya'da temizlik şirketi, ekip veya bireysel hizmet sağlayıcısı olarak CleanNestPro iş ortaklığına başvurun. Villa, yazlık ve profesyonel ev temizliği iş fırsatları.",
   keywords: [
-    "cleaning jobs Antalya",
-    "Antalya cleaning company jobs",
-    "cleaner application Antalya",
-    "Airbnb cleaning jobs Turkey",
-    "cleaning partner network Antalya",
-    "house cleaning work Antalya",
+    "Antalya temizlik işi",
+    "Antalya temizlik şirketi iş ortaklığı",
+    "Antalya temizlikçi başvurusu",
+    "Antalya Airbnb temizlik işleri",
+    "Antalya temizlik iş ortaklığı",
+    "Antalya ev temizliği iş ilanları",
   ],
   alternates: {
     canonical: "https://www.cleannestpro.com/apply",
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: "Work With CleanNestPro | Join Our Trusted Cleaning Network",
+    title: "Antalya Temizlik İş Ortaklığı | CleanNestPro",
     description:
-      "Apply as an individual cleaner or cleaning company. Work with international clients and premium properties in Antalya.",
+      "Antalya'da temizlik şirketi veya bireysel temizlik görevlisi olarak başvurun. Seçkin konutlar, villalar ve yazlıklar için hizmet ağı.",
     url: "https://www.cleannestpro.com/apply",
     siteName: "CleanNestPro",
     type: "website",
@@ -38,9 +38,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Work With CleanNestPro | Join Our Trusted Cleaning Network",
+    title: "Antalya Temizlik İş Ortaklığı | CleanNestPro",
     description:
-      "Apply as an individual cleaner or cleaning company. Work with international clients and premium properties in Antalya.",
+      "Antalya'da temizlik şirketi veya bireysel temizlik görevlisi olarak başvurun. Seçkin konutlar, villalar ve yazlıklar için hizmet ağı.",
     images: ["https://www.cleannestpro.com/og-image.jpg"],
   },
 };

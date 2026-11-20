@@ -67,7 +67,7 @@ export default function Footer({ locale = "en" }: { locale?: "en" | "ru" }) {
 
               <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
                 <p>
-                  <strong>Generation Beta Digital Ltd</strong>
+                  <strong>BetaOffice Ltd</strong>
                 </p>
 
                 <p>Company No: 16274319</p>
@@ -247,6 +247,21 @@ export default function Footer({ locale = "en" }: { locale?: "en" | "ru" }) {
                 </Link>
               </li>
               <li>
+                <Link href="/tr/luks-villa-temizligi-antalya" lang="tr" className="transition hover:text-black dark:hover:text-white">
+                  Türkçe: Lüks villa temizliği
+                </Link>
+              </li>
+              <li>
+                <Link href="/tr/profesyonel-ev-temizligi-antalya" lang="tr" className="transition hover:text-black dark:hover:text-white">
+                  Türkçe: Ev temizliği
+                </Link>
+              </li>
+              <li>
+                <Link href="/tr/detayli-temizlik-antalya" lang="tr" className="transition hover:text-black dark:hover:text-white">
+                  Türkçe: Detaylı temizlik
+                </Link>
+              </li>
+              <li>
                 <Link
                   href="/ru"
                   lang="ru"
@@ -265,13 +280,13 @@ export default function Footer({ locale = "en" }: { locale?: "en" | "ru" }) {
 
             <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
               <p>
-                <strong>Generation Beta Digital Ltd</strong>
+                <strong>BetaOffice Ltd</strong>
               </p>
 
               <p>
-                3rd Floor, 86–90 Paul Street
+                66 Paul Street
                 <br />
-                London EC2A 4NE, UK
+                London EC2A 4NA, UK
               </p>
 
               <p>Company No: 16274319</p>
