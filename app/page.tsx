@@ -755,15 +755,13 @@ function getCoordinationServiceJsonLd() {
 
 function trackQuoteEvent(eventName: string) {
   if (typeof window === "undefined") return;
-  const clarity = (
-    window as Window & {
-      clarity?: (...args: string[]) => void;
-    }
-  ).clarity;
-
-  if (typeof clarity === "function") {
-    clarity("event", eventName);
-  }
+  const browser = window as Window & {
+    clarity?: (...args: unknown[]) => void;
+    gtag?: (...args: unknown[]) => void;
+  };
+  // Both vendors are activated only after explicit analytics consent.
+  browser.clarity?.("event", eventName);
+  browser.gtag?.("event", eventName);
 }
 
 export default function Home() {
