@@ -1039,14 +1039,17 @@ export default function Home() {
       trackQuoteEvent("quote_form_submitted");
       setSubmitted(true);
       window.localStorage.removeItem("cleannestpro-quote-draft");
-      setForm(createInitialState());
+      setForm({
+        ...createInitialState(),
+        preferredLanguage: quoteLocale === "tr" ? "Turkish" : quoteLocale === "ru" ? "Russian" : "English",
+      });
       setFormStep(0);
       setPropertyPhotos([]);
       if (photoInputRef.current) photoInputRef.current.value = "";
     } catch (error) {
       trackQuoteEvent("quote_submission_failed");
       console.error(error);
-      alert("Something went wrong while sending your quote request.");
+      alert(quoteLocale === "tr" ? "Teklif talebi gönderilemedi. Lütfen tekrar deneyin." : quoteLocale === "ru" ? "Не удалось отправить запрос. Попробуйте ещё раз." : "Something went wrong while sending your quote request.");
     } finally {
       setSending(false);
     }
