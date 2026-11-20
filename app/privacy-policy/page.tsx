@@ -155,7 +155,6 @@ export default function PrivacyPolicyPage() {
             </section>
 
             <section>
-            <section>
               <h2 className="text-2xl font-semibold">Optional analytics and cookie choices</h2>
               <div className="mt-4 space-y-4 leading-8 text-slate-600">
                 <p>
@@ -181,6 +180,7 @@ export default function PrivacyPolicyPage() {
               </div>
             </section>
 
+            <section>
               <h2 className="text-2xl font-semibold">
                 6. Third-party tools and processors
               </h2>
