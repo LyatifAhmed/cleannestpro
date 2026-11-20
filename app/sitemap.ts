@@ -4,6 +4,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.cleannestpro.com";
 
   return [
+    ...["luks-villa-temizligi-antalya", "profesyonel-ev-temizligi-antalya", "detayli-temizlik-antalya"].map((slug) => ({
+      url: `${baseUrl}/tr/${slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    })),
     {
       url: `${baseUrl}/`,
       changeFrequency: "weekly",
